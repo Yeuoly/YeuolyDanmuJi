@@ -1,7 +1,15 @@
 import api from '../settings/api';
 import axios from 'axios';
 import Warning from './Warning';
-import Info from './Info';
+import INFO from './Info';
+import MessageHandler from './MessageHandler';
+
+import { BiliDataEncoder, BiliDataCoder, BiliDataDecoder } from './DataCoder';
+
+import Utils from './Utils';
+
+const platform = 'h5';
+const heart_beat_time = 30000;
 
 //定义弹幕加载类
 export default class DanmuLoader{
@@ -10,14 +18,6 @@ export default class DanmuLoader{
         this.init_base_pramas();
         this.init_base_instance();
     }
-
-    //头部偏移、长度
-    raw_header_len = 16;
-    packet_offset = 0;
-    header_offset = 4;
-    ver_offset = 6;
-    op_offset = 8;
-    seq_offset = 12;
 
     //初始化基础参数
     init_base_pramas(){
@@ -30,7 +30,6 @@ export default class DanmuLoader{
     init_base_instance(){
         this.socket = null;
         this.heart_beat_interval = null;
-        this.info_instance = new Info();
     }
 
     //加载入口
@@ -60,7 +59,7 @@ export default class DanmuLoader{
     getConf(successHook){
         axios.get(api.bili_get_room_conf,{
             room_id : this.room_id,
-            platform : 'h5'
+            platform : platform
         }).then( response => {
             const data = response.data;
             if(data['code'] === 0){
@@ -77,103 +76,74 @@ export default class DanmuLoader{
 
     //处理消息
     onMessage(e){
+        INFO.log('RevMsg','获取到新数据');
         const data = e.data;
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(data);
-        const vm = this;
-        //读取Blob为ArrayBuffer
-        reader.onload = function(){
-            var dataView = new DataView(this.result, 0);
-            var packetLen = dataView.getUint32(vm.packet_offset);
-            if (dataView.byteLength >= packetLen) {
-                var headerLen = dataView.getInt16(vm.header_offset);
-                var ver = dataView.getInt16(vm.ver_offset);
-                var op = dataView.getUint32(vm.op_offset);
-                var seq = dataView.getUint32(vm.seq_offset);
-                switch (op) {
-                case 8:
-                    vm.info_instance.log('SuccessShaking','握手成功，正在加载心跳');
-                    //开始心跳循环
-                    vm.heartBeat(vm);
-                    vm.heart_beat_interval = setInterval(() => {
-                        vm.heartBeat(vm);
-                    }, 30000);
-                    break;
-                case 3:
-                    //获取人气值
-                    const renqi = dataView.getInt32(16);
-                    break;
-                case 5:
-                    //处理数据主体
-                    var packetView = dataView;
-                    var msg = this.result;
-                    var msg_body;
-                    for (var offset = 0; offset < msg.byteLength; offset += packetLen) {
-                        packetLen = packetView.getUint32(offset);
-                        headerLen = packetView.getInt16(offset + vm.header_offset);
-                        //获取数据主体
-                        msg_body = msg.slice(offset + headerLen , offset + packetLen);
-                        //解码，至今没成功
-                        let str = new TextDecoder('utf-8').decode(msg_body);
-                        vm.info_instance.log('HandleRevData',str);
-                    }
-                    break;
+        const bili_decoder = new BiliDataDecoder(data, self => {
+            //睿站这里有个很蛋疼的地方，一次传输的消息可能有好几个封装，需要在这里分离开，你说你老老实实用JSON它不香吗
+            let extrme_len = 1;
+            while(extrme_len > 0){
+                switch(self.getOp()){
+                    case 8:
+                        INFO.log('SuccessHandShaking','握手成功，正在加载心跳……');
+                        //开始心跳循环
+                        this.heartBeat();
+                        this.heart_beat_interval = setInterval(() => { this.heartBeat() }, heart_beat_time);
+                        break;
+                    case 3:
+                        //心跳成功
+                        this.heart_beat_times++;
+                        INFO.log('HeartBeat',`心跳成功！心跳-总次数:${this.heart_beat_times}`);
+                        break;
+                    case 5:
+                        //处理数据主体
+                        INFO.log('RevMsg','接受到主流消息');
+                        const data_buf = self.getBodyBuffer();
+                        const message_handler = new MessageHandler();
+                        const data_json = Utils.transFormatFromBufferToJson(data_buf);
+                        message_handler.handleMessage(data_json);
+                        break;
+                }
+                extrme_len = bili_decoder.getLastLen();
+                if(extrme_len){
+                    bili_decoder.replaceCurrent();
                 }
             }
-        }
+        });
     }
 
     //心跳
-    heartBeat(vm){
-        this.info_instance.log('HeartBeat',`心跳-总次数:${this.heart_beat_times}`);
-        const header_buf = new ArrayBuffer(vm.raw_header_len);
-        const header_view = new DataView(header_buf, 0);
-        header_view.setInt32(vm.packet_offset, vm.raw_header_len);
-        header_view.setInt16(vm.header_offset, vm.raw_header_len);
-        header_view.setInt16(vm.ver_offset, 1);
-        header_view.setInt32(vm.op_offset, 2);
-        header_view.setInt32(vm.seq_offset, 1);
-        vm.socket.send(header_buf);
-        this.heart_beat_times++;
+    heartBeat(){
+        INFO.log('HeartBeat','发送心跳中……');
+        const bili_coder = new BiliDataCoder();
+        bili_coder.setHeaderDetail(2,1,1);
+        this.socket.send(bili_coder.getHeaderBuffer());
     }
 
     //第一次连接发送身份验证
     onOpen(e){
-        this.info_instance.log('WSConnection','连接成功，正在进行握手……');
+        INFO.log('WSConnection','连接成功，正在进行握手……');
         const auth_info =JSON.stringify({
             'uid':       0,
             'roomid':    this.room_id,
-            'protover':  2,
+            'protover':  1,
             'platform':  'web',
             'clientver': '1.8.2',
             'type':      2,
             'key':       this.token
         });
-        const header_buf = new ArrayBuffer(this.raw_header_len);
-        const header_view = new DataView(header_buf,0);
+
         const body_buf = new TextEncoder().encode(auth_info);
-        header_view.setInt32(this.packet_offset, this.raw_header_len + body_buf.byteLength);
-        header_view.setInt16(this.header_offset,this.raw_header_len);
-        header_view.setInt16(this.ver_offset,1);
-        header_view.setInt32(this.seq_offset,1);
-        header_view.setInt32(this.op_offset,7)
-        this.socket.send(this.mergeArrayBuffer(header_buf,body_buf));
+        const bili_coder = new BiliDataCoder();
+        bili_coder.setHeaderDetail(7,1,1);
+        bili_coder.setBody(new DataView(new Uint8Array(body_buf).buffer));
+        this.socket.send(bili_coder.getAllBuffer());
     }
 
     onClose(e){
-        this.info_instance.log('WSConnection','连接断开:'+e.reason);
+        INFO.log('WSConnection','连接断开:'+e.reason);
     }
 
     onError(e){
 
-    }
-
-    mergeArrayBuffer(ab1, ab2) {
-        var u81 = new Uint8Array(ab1),
-        u82 = new Uint8Array(ab2),
-        res = new Uint8Array(ab1.byteLength + ab2.byteLength);
-        res.set(u81, 0);
-        res.set(u82, ab1.byteLength);
-        return res.buffer;
     }
 }

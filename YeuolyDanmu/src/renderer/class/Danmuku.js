@@ -1,10 +1,10 @@
-import Warning from './Warning';
+import INFO from './Info';
 
-export class Danmuku{
+export default class Danmuku{
     constructor(){
         this.max_length = 1000000;
-        this.current_pos = 0;
-        this.danmus = new Array(this.max_length);
+        this.current_pos = -1;
+        this.danmus = [];
     }
 
     isNearFull(offset,send_report){
@@ -12,15 +12,22 @@ export class Danmuku{
         offset = offset || 1000
         if(this.danmus[this.max_length - offset - 1]){
             if(send_report){
-                new Warning('Danmuku','弹幕库就要炸了，系统将会在爆炸之前清理弹幕库存，并保存到弹幕文件夹中。').emit();
+                INFO.log('Danmuku','弹幕库就要炸了，系统将会在爆炸之前清理弹幕库存，并保存到弹幕文件夹中。');
             }
-            return false
+            return true;
         }
         return false;
     }
 
+    i = 0;
+
     add(newDanmu){
+        if(!newDanmu.isDanmu){
+            INFO.error('Danmuku','弹幕入库：不符合规则的对象类型。');
+            return;
+        }
         this.danmus.push(newDanmu);
+        this.current_pos++;
     }
 
     addGroup(group){

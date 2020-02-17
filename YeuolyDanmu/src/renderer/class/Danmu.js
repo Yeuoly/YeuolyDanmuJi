@@ -1,29 +1,18 @@
 export default class Danmu{
-    constructor(message,user_id,user_uid,time,extrme){
-        this.message = message;
-        this.user_id = user_id;
-        this.user_uid = user_uid;
-        this.extrme = extrme;
-        this.time = time;
-    }
-
-    get(){
-        return this;
-    }
-
-    setMessage(message){
+    constructor(
+        user_id,user_uid,message,
+        medal_level,medal_nickname,medal_up,
+        live_ul,live_ul_rank
+    ){
+        this.user = { uid : user_uid, id : user_id };
+        this.medal = { lv : medal_level, name : medal_nickname, up : medal_up };
+        this.live_ul = { lv : live_ul , rank : live_ul_rank };
         this.message = message;
     }
 
-    setUid(uid){
-        this.user_uid = uid;
-    }
+    isDanmu = true;
 
-    setUserID(user_id){
-        this.user_id = user_id;
-    }
-
-    isOutdated(current_time,last_time){
-        return current_time > last_time + this.time;
-    }
+    getUserInfo(){ return this.user; }
+    getDanmuMsg(){ return this.message; }
+    getLv(){ return this.live_ul; }
 }

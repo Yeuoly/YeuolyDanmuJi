@@ -1,8 +1,10 @@
-export default class Info{
+class Info{
     log(block,message){
-        console.log(`[${block}]:${message}`);
+        console.log(`[${new Date().format('yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`);
     }
     error(block,message){
-        console.error(`[${block}]:${message}`);
+        console.error(`[${new Date().format('yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`);
     }
 }
+
+export default new Info();
