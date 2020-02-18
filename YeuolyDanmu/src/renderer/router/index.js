@@ -14,11 +14,27 @@ export default new Router({
       },
       children : [
         {
-          name : 'logo',
-          path : '/index/logo',
+          name : 'log',
+          path : '/index/log',
           component: require('@/components/items/Logger.vue').default,
           meta : {
             title : '日志'
+          }
+        },
+        {
+          name : 'task',
+          path : '/index/task',
+          component: require('@/views/Task.vue').default,
+          meta : {
+            title : '任务'
+          }
+        },
+        {
+          name : 'room-settings',
+          path : '/index/room-settings',
+          component: require('@/views/RoomSettings.vue').default,
+          meta : {
+            title : '房间设置'
           }
         }
       ]

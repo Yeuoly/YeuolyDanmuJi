@@ -5,35 +5,49 @@
                 <el-menu
                     class="el-menu-vertical-demo"
                     style="height:100%"
-                    background-color="#545c64"
+                    background-color="#252526"
+                    active-background-color="#2A2D2E"
                     text-color="#fff"
-                    active-text-color="#ffd04b"
+                    active-text-color="rgb(226,192,141)"
                 >
-                    <el-menu-item index="1" @click="$router.push('index/logo')">
+                    <el-menu-item index="1" @click="$router.push('/index/log')">
                         <template slot=title>
                             <i class="el-icon-location"></i>
                             <span>日志</span>
                         </template>
                     </el-menu-item>
-                    <el-submenu index="2">
+                    <el-menu-item index="2" @click="$router.push('/index/task')">
+                        <template slot=title>
+                            <i class="el-icon-document"></i>
+                            <span>任务</span>
+                        </template>
+                    </el-menu-item>
+                    <el-submenu index="3">
                         <template slot="title">
                             <i class="el-icon-setting"></i>
                             <span>设置</span>
                         </template>
                         <el-menu-item-group>
                             <template slot="title">基础设置</template>
-                            <el-menu-item index="2-1">房间信息</el-menu-item>
+                            <el-menu-item index="2-1" @click="$router.push('/index/room-settings')">
+                                房间信息
+                            </el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
                 </el-menu>
             </el-aside>
         </el-container>
         <el-container>
-            <el-header>
+            <el-header id="header">
                 <h1 class="title">{{ $route.meta.title }}</h1>
+                <div id="drag_area"></div>
+                <i id="close" class="controller el-icon-close" @click="closeProgress"></i>
+                <i id="minimize" class="controller el-icon-minus" @click="minimizeProgress"></i>
             </el-header>
             <el-main>
-                <router-view></router-view>
+                <keep-alive>
+                    <router-view></router-view>
+                </keep-alive>
             </el-main>
         </el-container>
     </div>
@@ -41,19 +55,77 @@
 
 <script>
 import Logger from '../components/items/Logger.vue';
+const drag = require('electron-drag');
+const { ipcRenderer : ipc } = require('electron');
 
 export default {
     name : 'Index',
-    components : { Logger }
+    components : { Logger },
+    methods: {
+        closeProgress(){
+            console.log('asd');
+            ipc.send('window-close');
+        },
+        minimizeProgress(){
+            ipc.send('window-min');
+        }
+    },
+    mounted() {
+        //linux等平台的窗口拖动
+        const clear = drag('#drag_area');
+        //windows和mac的窗口拖动
+        if(!drag.supported){
+            document.querySelector('#drag_area').style['-webkit-app-region'] = 'drag';
+        }
+    },
 }
 </script>
 
 <style scoped>
+    .el-main > * {
+        background-color: transparent;
+    }
+    #drag_area{
+        position: absolute;
+        color: transparent;
+        height: 70px;
+        right: 80px;
+        left: 0;
+        top: 0;
+        bottom: 70px;
+    }
+    .controller{
+        background-color: transparent;
+        font-size: 20px;
+        color: gray;
+        width: 20px;
+        height: 20px;
+        transition: all .1s;
+    }
+    #close:hover{
+        color: red;
+    }
+    #minimize:hover{
+        color: white;
+    }
+    #close{
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    #minimize{
+        position: absolute;
+        top: 10px;
+        right: 40px;
+    }
     .title{
         color: rgb(208,208,208);
     }
     .el-menu{
         overflow: hidden;
+    }
+    .el-menu-item .is-active:hover{
+        background-color: red !important;
     }
     .el-aside {
         display: block;
@@ -62,24 +134,25 @@ export default {
         top: 0;
         bottom: 0;
         overflow-y: none;
+        background-color: rgb(37,37,38);
     }
     .el-header{
-        height: 80px !important;
+        height: 70px !important;
         display: block;
         position: absolute;
         left: 199px;
         top: 0;
         right: 0;
-        background-color: #545464; 
+        background-color: rgb(50,50,51); 
     }
     .el-main{
         display: block;
         position: absolute;
-        top: 80px;
+        top: 70px;
         bottom: 0px;
         left: 199px;
         right: 0;
         padding: 5px;
-        background-color: rgb(94,92,105); 
+        background-color: rgb(30,30,30); 
     }
 </style>

@@ -33,8 +33,12 @@ export default class DanmuLoader{
         this.heart_beat_interval = null;
     }
 
-    //加载入口
-    startLoader(){
+    setRoomID(room_id){
+        this.room_id = room_id;
+    }
+
+    //加载入口，提供两个钩子，一个成功调用，一个用于修改连接状态为关闭
+    startLoader(fn_suc,fn_fai){
         //获取服务器信息与token
         this.getConf(() => {
             let host_index = 0;
@@ -45,15 +49,28 @@ export default class DanmuLoader{
                 this.onMessage(e);
             };
             this.socket.onopen = e => {
+                setTimeout(fn_suc,0);
                 this.onOpen(e);
             };
             this.socket.onerror = e => {
+                setTimeout(fn_fai,0);
                 this.onError(e);
             };
             this.socket.onclose = e =>{
+                setTimeout(fn_fai,0);
                 this.onClose(e);
             }
+            this.socket.on
         });
+    }
+
+    //关闭，成功后调用这个钩子
+    closeLoader(fn){
+        this.socket.close(0);
+        delete this.socket;
+        clearInterval(this.heart_beat_interval);
+
+        INFO.log('WSConnection','连接已断开','green');
     }
 
     //获取服务器信息与token

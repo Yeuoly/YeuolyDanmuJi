@@ -8,18 +8,24 @@
                 :id="'log-' + i.line_id"
             >{{ i.log }}</p>
         </div>
-        <div class="info">logs:{{lines}} errors:{{errors.length}} warnings:{{warnings.length}}</div>
+        <div class="info">logs:{{lines}} errors:{{errors.length}} warnings:{{warnings.length}} </div>
     </div>
 </template>
 
 <script>
 import { InfoEventBus } from '../../events/evnetBus';
+import INFO from '../../class/Info';
 
 export default {
     name : 'Logger',
     data : () => ({
-        lines : 0,
-        logs : [],
+        lines : 1,
+        logs : [{
+            class_name : 'grey',
+            log : `[LogConsole]:日志模块已启动`,
+            type : 'info',
+            line_id : 0
+        }],
         errors : [],
         warnings : [],
     }),
@@ -40,6 +46,31 @@ export default {
 </script>
 
 <style scoped>
+
+    /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+    ::-webkit-scrollbar
+    {
+        width: 8px;
+        height: 8px;
+        background-color: rgb(60,60,60);
+    }
+ 
+    /*定义滚动条轨道 内阴影+圆角*/
+    ::-webkit-scrollbar-track
+    {
+        /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
+        /*border-radius: 10px;*/
+        background-color: rgb(30,30,30);
+    }
+ 
+    /*定义滑块 内阴影+圆角*/
+    ::-webkit-scrollbar-thumb
+    {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+        background-color: #555;
+    }
+
     .green{
         color: green;
     }
@@ -53,7 +84,7 @@ export default {
         color: orange;
     }
     .log{
-        height: 15px;
+        min-height: 15px;
         font-size: 14px;
         padding: 0;
         margin-top: 0;
@@ -64,15 +95,17 @@ export default {
         margin: 0;
         border: 0;
         height: 100%;
+        background-color: rgb(30,30,30);
     }
     .logger{
         height: calc(100% - 15px);
         width: 100%;
-        background-color: white;
+        background-color:transparent;
         position: relative;
-        overflow: scroll;
+        overflow-y: scroll;
     }
     .info{
+        padding-right: 5px;
         color: grey;
         text-align: right; 
         font-size: 13px;
@@ -80,6 +113,6 @@ export default {
         height: 15px;
         position: absolute;
         bottom: 5px;
-        background-color: #dcdcdc;
+        background-color: rgb(60,60,60);
     }
 </style>

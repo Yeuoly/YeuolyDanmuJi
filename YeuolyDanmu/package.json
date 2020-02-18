@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "electron-drag": "^1.2.2",
     "element-ui": "^2.13.0",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
