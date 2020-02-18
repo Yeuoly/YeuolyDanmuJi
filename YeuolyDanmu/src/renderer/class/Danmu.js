@@ -1,12 +1,13 @@
+import { User , Medal , Guard } from './User'
+
 export default class Danmu{
     constructor(
         user_id,user_uid,message,
         medal_level,medal_nickname,medal_up,
         live_ul,live_ul_rank
     ){
-        this.user = { uid : user_uid, id : user_id };
-        this.medal = { lv : medal_level, name : medal_nickname, up : medal_up };
-        this.live_ul = { lv : live_ul , rank : live_ul_rank };
+        this.user = new User(user_id,user_uid,null,0,live_ul,live_ul_rank);
+        this.medal = new Medal(medal_level,medal_nickname,medal_up);
         this.message = message;
     }
 

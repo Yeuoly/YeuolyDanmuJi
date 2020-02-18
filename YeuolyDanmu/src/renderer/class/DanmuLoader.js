@@ -8,8 +8,9 @@ import { BiliDataEncoder, BiliDataCoder, BiliDataDecoder } from './DataCoder';
 
 import Utils from './Utils';
 
-const platform = 'h5';
+const platform = 'web';
 const heart_beat_time = 30000;
+const reconnect_time = 5000;
 
 //定义弹幕加载类
 export default class DanmuLoader{
@@ -84,7 +85,7 @@ export default class DanmuLoader{
             while(extrme_len > 0){
                 switch(self.getOp()){
                     case 8:
-                        INFO.log('SuccessHandShaking','握手成功，正在加载心跳……');
+                        INFO.log('SuccessHandShaking','握手成功，正在加载心跳……','green');
                         //开始心跳循环
                         this.heartBeat();
                         this.heart_beat_interval = setInterval(() => { this.heartBeat() }, heart_beat_time);
@@ -121,12 +122,12 @@ export default class DanmuLoader{
 
     //第一次连接发送身份验证
     onOpen(e){
-        INFO.log('WSConnection','连接成功，正在进行握手……');
+        INFO.log('WSConnection','连接成功，正在进行握手……','green');
         const auth_info =JSON.stringify({
             'uid':       0,
             'roomid':    this.room_id,
             'protover':  1,
-            'platform':  'web',
+            'platform':  platform,
             'clientver': '1.8.2',
             'type':      2,
             'key':       this.token
@@ -144,6 +145,10 @@ export default class DanmuLoader{
     }
 
     onError(e){
-
+        INFO.error('ERROR','与服务器连接出错，将在五秒内尝试重连');
+        setTimeout(() => {
+            this.socket.close(0);
+            this.startLoader();
+        },reconnect_time);
     }
 }

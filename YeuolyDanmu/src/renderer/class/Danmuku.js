@@ -12,7 +12,7 @@ export default class Danmuku{
         offset = offset || 1000
         if(this.danmus[this.max_length - offset - 1]){
             if(send_report){
-                INFO.log('Danmuku','弹幕库就要炸了，系统将会在爆炸之前清理弹幕库存，并保存到弹幕文件夹中。');
+                INFO.warning('Danmuku','弹幕库就要炸了，系统将会在爆炸之前清理弹幕库存，并保存到弹幕文件夹中。');
             }
             return true;
         }

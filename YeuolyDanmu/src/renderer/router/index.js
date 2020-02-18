@@ -7,12 +7,25 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'landing-page',
-      component: require('@/components/TestPage.vue').default
+      name: 'index',
+      component: require('@/views/Index.vue').default,
+      meta : {
+        title : '默认目录'
+      },
+      children : [
+        {
+          name : 'logo',
+          path : '/index/logo',
+          component: require('@/components/items/Logger.vue').default,
+          meta : {
+            title : '日志'
+          }
+        }
+      ]
     },
     {
       path: '*',
-      redirect: '/'
+      redirect: '/index/log'
     }
   ]
 })
