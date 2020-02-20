@@ -31,7 +31,7 @@ export default class Danmuku{
     }
 
     addGroup(group){
-        group.array.forEach(element => {
+        group.forEach(element => {
             this.add(element);
         });
     }

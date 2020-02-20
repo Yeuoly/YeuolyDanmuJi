@@ -6,15 +6,15 @@ const state = {
 }
 
 const mutations = {
-    addNewDanmuToDanmuku(_state,newDanmu){
-        DanmukuEventBus.$emit('on-add',newDanmu);
-        state.danmus.add(newDanmu);
+    addNewDanmusToDanmuku(_state,newDanmus){
+        DanmukuEventBus.$emit('on-add-group',newDanmus);
+        state.danmus.addGroup(newDanmus);
     }
 }
 
 const actions = {
-    ADD_DANMU({ commit },danmu){
-        commit('addNewDanmuToDanmuku',danmu);
+    ADD_DANMUS({ commit },danmus){
+        commit('addNewDanmusToDanmuku',danmus);
     }
 }
 

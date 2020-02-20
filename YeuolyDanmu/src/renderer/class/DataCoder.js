@@ -60,10 +60,14 @@ export class BiliDataCoder{
 
     //初始化
     init(buf){
-        //信息的真实长度：一条信息中可能有很多条弹幕，每条弹幕都是完全分开的，这里需要截开不同的弹幕
+        /**信息的真实长度：一条信息中可能有很多条弹幕，每条弹幕都是完全分开的，这里需要截开不同的弹幕
+         * 将buf中弹幕的第一部分作为主体分割出来，并获取其header内的信息，剩余分布保存
+         */
         const real_len = buf.byteLength;
+        //头部信息
         const header_buf = buf.slice(0,raw_header_len);
         const header_view = new DataView(header_buf);
+        //第一分部的实际长度
         const current_packet_len = header_view.getUint32(packet_offset);
         const body_buf = buf.slice(raw_header_len,current_packet_len);
         const data_buf = buf.slice(0,current_packet_len);

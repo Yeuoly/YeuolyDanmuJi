@@ -40,6 +40,11 @@ export default new Router({
       ]
     },
     {
+      path : '/danmu',
+      name : 'danmu',
+      component: () => import('@/views/DanmuDialog.vue')
+    },
+    {
       path: '*',
       redirect: '/index/log'
     }

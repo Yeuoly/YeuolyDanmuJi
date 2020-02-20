@@ -6,6 +6,7 @@ export class User{
         this.lv = lv;
         this.live_lv = live_lv;
         this.live_rank = live_rank;
+        //获取头像，异步获取头像链接
     }
     getID(){ return this.id; }
     getUid(){ return this.uid; }
@@ -32,7 +33,7 @@ export class Guard{
     getUid(){ return this.up_uid; }  
 }
 
-class Medal{
+export class Medal{
     constructor(lv,up_name,up_uid){
         this.lv = lv || 0; // 0无 1舰长 2提督 3总督 
         this.up_name = up_name || '';

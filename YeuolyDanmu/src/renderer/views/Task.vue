@@ -23,12 +23,24 @@
                     关闭弹幕姬
                 </el-button>
             </el-col>
+            <el-col :span="4">
+                <el-button 
+                    type="info" 
+                    plain   
+                    @click="clearDanmu" 
+                >
+                    清空弹幕姬
+                </el-button>
+            </el-col>
         </el-row>
     </div>
 </template>
 
 <script>
 import Loader from '../class/DanmuLoader';
+import { DanmuTransBus } from '../events/evnetBus';
+
+const ipc = require('electron').ipcRenderer;
 
 export default {
     name : 'Task',
@@ -36,26 +48,68 @@ export default {
         DanmuLoader : new Loader(1534600),
         started : false,
         starting : false,
-        closing :false
+        closing :false,
+        danmu_dialog_id : 1,
+        socket_sender : null
     }),
     methods: {
+        transDanmus(danmus){
+            //向弹幕窗口发送新弹幕
+            ipc.send('to-danmu','trans-danmu',danmus);
+        },
+        //启动弹幕加载
         startDanmuLoader(){
+            //首先打开弹幕窗口，初始化窗口信息
+            this.openDanmuDialog();
+            //禁止再次启动
             this.starting = true;
             const room_id = this.$store.getters.getRoomID;
+            //把弹幕传输钩子挂到Loader上
+            this.DanmuLoader.onadd = danmus => {
+                this.transDanmus(danmus);
+            }
             this.DanmuLoader.setRoomID(room_id);
             this.DanmuLoader.startLoader(() => {
+                //成功后的回调
                 this.starting = false;
                 this.started = true;
             });
         },
         closeDanmuLoader(){
             this.closing = true;
-            this.DanmuLoader.closeDanmuLoader(() => {
+            this.DanmuLoader.closeLoader(() => {
                 this.closing = false;
                 this.started = false;
                 this.starting = false;
             });
+        },
+        clearDanmu(){
+            ipc.send('to-danmu','clear');
+        },
+        openDanmuDialog(){
+            const win = this.$Win.openWin({
+                width: 300,
+                height: 700,
+                useContentSize: true,
+                webPreferences : {
+                    webSecurity : false
+                },
+                resizable: true,
+                frame: false,
+                titleBarStyle: false,
+
+                windowConfig : {
+                    router : '/danmu',
+                    name : '弹幕窗口',
+                }
+            });
         }
+    },
+    mounted() {
+        
+    },
+    beforeDestroy() {
+        this.$Win.closeWin();
     },
 }
 </script>

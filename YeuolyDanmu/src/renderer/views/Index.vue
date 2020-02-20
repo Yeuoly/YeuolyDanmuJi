@@ -55,6 +55,8 @@
 
 <script>
 import Logger from '../components/items/Logger.vue';
+import { DanmuTransBus } from '../events/evnetBus';
+import INFO from '../class/Info';
 const drag = require('electron-drag');
 const { ipcRenderer : ipc } = require('electron');
 
@@ -63,11 +65,22 @@ export default {
     components : { Logger },
     methods: {
         closeProgress(){
-            console.log('asd');
             ipc.send('window-close');
         },
         minimizeProgress(){
             ipc.send('window-min');
+        },
+        mountChannel(){
+            ipc.on('to-main', ( _sender, channel, info ) => {
+                switch(channel){
+                    case 'trans-info':
+                        this.transInfo(info.block,info.info,info.color);
+                        break;
+                }
+            });
+        },
+        transInfo(block,info,color){
+            INFO.log(block,info,color);
         }
     },
     mounted() {

@@ -1,16 +1,22 @@
+//初始化设置
+const Store = require('electron-store');
+const store = new Store();
+const settings = store.get('settings') || { room_id : 1534600 };
+
 const state = {
-    room_id : 1534600
+    room_id : settings['room_id']
 }
 
 const mutations = {
     setRoomID(_state,room_id){
         _state.room_id = room_id;
+        store.set('settings.room_id',room_id);
     }
 }
 
 const getters = {
     getRoomID(_state){
-        return state.room_id;
+        return _state.room_id;
     }
 }
 

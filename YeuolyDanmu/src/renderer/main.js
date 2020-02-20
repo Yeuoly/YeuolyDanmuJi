@@ -1,9 +1,19 @@
 import Vue from 'vue'
 import axios from 'axios'
 
+axios.defaults.withCredentials = true;
+
 import App from './App'
 import router from './router'
 import store from './store'
+
+//多窗口初始化
+import Win from 'electron-vue-windows';
+Win.init(router,{
+  freeWindowNum: 2,
+  port : 9080
+});
+Vue.prototype.$Win = Win;
 
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';

@@ -31,6 +31,13 @@ export default class DanmuLoader{
     init_base_instance(){
         this.socket = null;
         this.heart_beat_interval = null;
+        this.message_handler = new MessageHandler();
+        //挂载新增弹幕钩子，当有新弹幕传输的时候会调用onAdd
+        this.message_handler.onAdd = danmu => {
+            if(typeof this.onadd === 'function'){
+                this.onadd(danmu);
+            }
+        }
     }
 
     setRoomID(room_id){
@@ -39,6 +46,7 @@ export default class DanmuLoader{
 
     //加载入口，提供两个钩子，一个成功调用，一个用于修改连接状态为关闭
     startLoader(fn_suc,fn_fai){
+        INFO.log('WSConnection',`开始连接至直播间，当前房间号：${this.room_id}`);
         //获取服务器信息与token
         this.getConf(() => {
             let host_index = 0;
@@ -60,16 +68,16 @@ export default class DanmuLoader{
                 setTimeout(fn_fai,0);
                 this.onClose(e);
             }
-            this.socket.on
         });
     }
 
     //关闭，成功后调用这个钩子
     closeLoader(fn){
-        this.socket.close(0);
+        this.socket.close(3001);
         delete this.socket;
+        this.heart_beat_times = 0;
         clearInterval(this.heart_beat_interval);
-
+        setTimeout(fn, 0);
         INFO.log('WSConnection','连接已断开','green');
     }
 
@@ -85,10 +93,10 @@ export default class DanmuLoader{
                 this.token = data['data']['token'];
                 setTimeout(successHook,0);
             }else{
-                new Warning('DanmuLoader','获取房间信息失败');
+                INFO.error('DanmuLoader','获取房间信息失败');
             }
         }).catch(() => {
-            new Warning('DanmuLoader','获取房间信息失败');
+            INFO.error('DanmuLoader','获取房间信息失败');
         });
     }
 
@@ -116,13 +124,22 @@ export default class DanmuLoader{
                         //处理数据主体
                         INFO.log('RevMsg','接受到主流消息');
                         const data_buf = self.getBodyBuffer();
-                        const message_handler = new MessageHandler();
                         const data_json = Utils.transFormatFromBufferToJson(data_buf);
-                        message_handler.handleMessage(data_json);
+                        this.message_handler.handleMessage(data_json);
                         break;
                 }
                 extrme_len = bili_decoder.getLastLen();
                 if(extrme_len){
+                    //当有剩余弹幕时替换当前信息为分割出来的后一部分信息
+                    /**
+                     * 可能有一堆人不明白这玩意的作用
+                     * 
+                     * 原本的弹幕信息是 { 1.header => [opt] | 1.main => [json] } | { 2.header => [opt] | 2.main....
+                     * 这样的形式，biliCoder通过1.header内的opt信息分割出第一分部作为主体部分，后面 2 3 4 5 6全部作为剩余部分保存起来
+                     * 当剩余部分的长度>0时说明有剩余，调用replaceCurrent()将主体部分替换为2,后面 3 4 5 6再作为剩余部分
+                     * 一直这样循环直到剩余部分长度为0
+                     * 详细请看DataCoder.js内BiliDataCoder的实现
+                     */
                     bili_decoder.replaceCurrent();
                 }
             }
@@ -164,7 +181,7 @@ export default class DanmuLoader{
     onError(e){
         INFO.error('ERROR','与服务器连接出错，将在五秒内尝试重连');
         setTimeout(() => {
-            this.socket.close(0);
+            this.socket.close(3001);
             this.startLoader();
         },reconnect_time);
     }

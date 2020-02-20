@@ -19,12 +19,18 @@ import INFO from '../../class/Info';
 export default {
     name : 'Logger',
     data : () => ({
-        lines : 1,
+        lines : 2,
         logs : [{
             class_name : 'grey',
-            log : `[LogConsole]:日志模块已启动`,
+            log : '[LogConsole]:日志模块已启动',
             type : 'info',
             line_id : 0
+        },{
+            class_name : 'grey',
+            log : '大佬好.jpg，我是这个弹幕姬的作者Yeuoly，这个破弹幕姬基于Electron+Vue+ElementUI开发，' +
+                '希望您能用着舒服。如果大佬们想参加发开的话我留个链接放这里orz https://github.com/Yeuoly/YeuolyDanmuJI',
+            type : 'info',
+            line_id : 1
         }],
         errors : [],
         warnings : [],
