@@ -60,6 +60,7 @@
     "electron-vue-windows": "^1.0.41",
     "element-ui": "^2.13.0",
     "md5": "^2.2.1",
+    "vcolorpicker": "^0.1.8",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",

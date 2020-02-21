@@ -36,6 +36,13 @@ export default new Router({
           meta : {
             title : '房间设置'
           }
+        },{
+          name : 'color-settings',
+          path : '/index/color-settings',
+          component: require('@/views/ColorSettings.vue').default,
+          meta : {
+            title : '选择弹幕颜色'
+          }
         }
       ]
     },

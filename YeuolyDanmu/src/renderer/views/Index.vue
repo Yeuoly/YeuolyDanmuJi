@@ -32,6 +32,9 @@
                             <el-menu-item index="2-1" @click="$router.push('/index/room-settings')">
                                 房间信息
                             </el-menu-item>
+                            <el-menu-item index="2-2" @click="$router.push('/index/color-settings')">
+                                颜色设置
+                            </el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
                 </el-menu>

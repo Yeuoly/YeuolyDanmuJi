@@ -7,6 +7,10 @@ import App from './App'
 import router from './router'
 import store from './store'
 
+//安装颜色选择器
+import vcolorpicker from 'vcolorpicker';
+Vue.use(vcolorpicker);
+
 //多窗口初始化
 import Win from 'electron-vue-windows';
 Win.init(router,{

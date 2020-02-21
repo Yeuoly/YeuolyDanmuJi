@@ -1,7 +1,10 @@
 <template>
-    <div :class="{ hidden : hidden }">
-        <img class="avatar" :src="Danmu.user.face" />
-        <span class="danmu-text">{{Danmu.user.id}}:{{Danmu.message}}</span>
+    <div ref="holder" class="danmu-holder">
+        <img class="avatar" :src="Danmu.user.face" @load="move" />
+        <div ref="text" class="danmu-text"> 
+            <span>{{Danmu.user.id}}:</span> 
+            <span :style="{ color : textColor }">{{Danmu.message}}</span> 
+        </div>
     </div>
 </template>
 
@@ -11,7 +14,7 @@ import { getAvatar } from '../../class/Avatar';
 
 export default {
     name : 'Danmu',
-    props : ['Danmu','parent'],
+    props : ['Danmu','parent','text-color'],
     data : () => ({
         hidden : true
     }),
@@ -26,17 +29,24 @@ export default {
             }
         });
     },
-    watch : {
-        hidden(v){
-            if(!v){
-                this.parent.scrollTop = this.parent.scrollHeight;
-            }
-        }
-    }
+    methods: {
+        move(){
+            //新增弹幕的动画处理
+            const height = window.getComputedStyle(this.$refs.text)['height'];
+            this.$refs.holder.style.height = Number(height.substr(0,height.length - 2)) + 6 + 'px';
+        },
+    },
 }
 </script>
 
 <style>
+
+.danmu-holder{
+    display: block;
+    height: 0;
+    transition: all .2s;
+    overflow: hidden;
+}
 
 .danmu-text{
     font-size: 22px;
@@ -59,7 +69,4 @@ export default {
     float: left;
 }
 
-.hidden{
-    display: none;
-}
 </style>
