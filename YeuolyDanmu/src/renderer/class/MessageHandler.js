@@ -1,10 +1,10 @@
 import Danmu from './Danmu';
-import SuperChat from './Danmu';
+import { SuperChat } from './Danmu';
 import store from '../store';
 
 const waiting_time = 1000;
 const temp_max_count = 5;
-const store_temp_max_count = 200;
+const store_temp_max_count = 2000;
 
 /**
  * 这里说一下，不论是SuperChat还是礼物信息我这里都定义为弹幕
@@ -137,6 +137,15 @@ export default class MessageHandler{
                  *  user_level => 直播用户等级
                  * }
                  */
+                const data = msg['data'];
+                danmu = new SuperChat(
+                    data['user_info']['uname'],data['uid'],data['message'],
+                    data['medal_info']['medal_level'],data['medal_info']['medal_name'],data['medal_info']['anchor_uname'],
+                    data['user_info']['user_level'],data['price'],data['start_time'],data['end_time'],
+                    data['background_color'],data['background_bottom_color'],data['background_price_color'],
+                    data['background_image'],data['user_info']['face']
+                );
+                console.log(danmu);
                 break;
             case 'SUPER_CHAT_MESSAGE_JPN':
                 //说出来你们可能不信，sc还有专门的日文包的，参数和上面基本一致 $data
@@ -144,8 +153,6 @@ export default class MessageHandler{
                  * 多了一个 message_jpn => 日文翻译草，我寻思这要是其他语种的v多了你要怎么整
                  */
                 break;
-            default:
-                console.log(msg);
         }
         //弹幕入库
         /**
@@ -164,7 +171,7 @@ export default class MessageHandler{
         }
         //当弹幕储量达到max_count的时候将弹幕入库
         if(this.temp_store.length === store_temp_max_count){
-            this.dispatchDanmu();
+            //this.dispatchDanmu();
         }
     }
 
@@ -176,6 +183,8 @@ export default class MessageHandler{
             if(typeof this.onAdd === 'function'){
                 this.onAdd(this.temp_danmus);
             }
+            //清理缓存，不清要死人了，内存暴增太可怕了草
+            delete this.temp_danmus;
             this.temp_danmus = [];
         }
     }
@@ -184,6 +193,7 @@ export default class MessageHandler{
     dispatchDanmu(){
         if(this.temp_store.length > 0){
             store.dispatch('ADD_DANMUS',this.temp_store);
+            delete this.temp_store;
             this.temp_store = [];
         }
     }

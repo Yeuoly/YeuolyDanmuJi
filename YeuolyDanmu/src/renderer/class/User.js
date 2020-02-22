@@ -34,13 +34,15 @@ export class Guard{
 }
 
 export class Medal{
-    constructor(lv,up_name,up_uid){
-        this.lv = lv || 0; // 0无 1舰长 2提督 3总督 
+    constructor(lv,medal_name,up_name,up_uid){
+        this.lv = lv || 0; 
+        this.medal_name = medal_name || '';
         this.up_name = up_name || '';
         this.up_uid = up_uid || '';
     }
 
     getLv(){ return this.lv; }
-    getName(){ return this.up_name; }
+    getName(){ return this.medal_name; }
+    getUname(){ return this.up_name; }
     getUid(){ return this.up_uid; }
 }

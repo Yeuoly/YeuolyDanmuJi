@@ -34,6 +34,13 @@ ipc.on('window-max', function () {
     mainWindow.maximize();
   }
 });
+//关闭弹幕窗口
+ipc.on('window-close-danmu',function () {
+  if(danmu_win_id){
+    BrowserWindow.fromId(danmu_win_id).close();
+    danmu_win_id = 0;
+  }
+});
 //关闭窗口
 ipc.on('window-close', function () {
   mainWindow.close();

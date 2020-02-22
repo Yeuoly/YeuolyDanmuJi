@@ -49,8 +49,8 @@ export default {
         started : false,
         starting : false,
         closing :false,
-        danmu_dialog_id : 1,
-        socket_sender : null
+        socket_sender : null,
+        danmu_dialog_flag : false
     }),
     methods: {
         transDanmus(danmus){
@@ -60,7 +60,9 @@ export default {
         //启动弹幕加载
         startDanmuLoader(){
             //首先打开弹幕窗口，初始化窗口信息
-            this.openDanmuDialog();
+            if(!this.danmu_dialog_flag){
+                this.openDanmuDialog();
+            }
             //禁止再次启动
             this.starting = true;
             const room_id = this.$store.getters.getRoomID;
@@ -71,6 +73,7 @@ export default {
             this.DanmuLoader.setRoomID(room_id);
             this.DanmuLoader.startLoader(() => {
                 //成功后的回调
+                this.danmu_dialog_flag = true;
                 this.starting = false;
                 this.started = true;
             });
@@ -109,7 +112,8 @@ export default {
         
     },
     beforeDestroy() {
-        this.$Win.closeWin();
+        ipc.send('window-close-danmu');
+        this.danmu_dialog_flag = false;
     },
 }
 </script>
