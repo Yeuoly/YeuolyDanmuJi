@@ -2,8 +2,7 @@ import Danmu from './Danmu';
 import { SuperChat } from './Danmu';
 import store from '../store';
 
-const waiting_time = 1000;
-const temp_max_count = 5;
+const temp_max_count = 50;
 const store_temp_max_count = 2000;
 
 /**
@@ -11,19 +10,72 @@ const store_temp_max_count = 2000;
  * 只是给了弹幕多种类型，一种是normal普通类型，一种是superchat，一种是gift
  */
 
+/**
+ * 这里再说一下，经过弹幕爆破测试，非常有必要根据弹幕速度设置缓存量
+ * 
+ */
+
+const speed_list_time = {
+    FAST : { SPEED : 8 , INTERVAL : 2000 },
+    NORMAL : { SPEED : 5 , INTERVAL : 1000 },
+    SLOW : { SPEED : 2 , INTERVAL : 500 },
+    QUIET : { SPEED : 1 , INTERVAL : 200 }
+}
+
 export default class MessageHandler{
     constructor(){
-        //启动传输器
-        const handler = setInterval(() => {
-            this.transDanmu();
-        },waiting_time);
+        //启动循环
+        this.setupLoop();
     }
 
     //传输缓存
     temp_danmus = [];
     //入库缓存
     temp_store = [];
+    //延迟时间
+    waiting_time = 1000;
 
+    //速度计算参数
+    danmu_count = {
+        last : 0,
+        now : 0,
+    }
+    //计算速度
+    speedCalc(){
+        const dif = this.danmu_count.now - this.danmu_count.last;
+        const speed = dif / this.waiting_time;
+        switch(dif){
+            case speed >= speed_list_time.FAST.SPEED:
+                this.waiting_time = speed_list_time.FAST.INTERVAL;
+                break;
+            case speed >= speed_list_time.NORMAL.SPEED && speed < speed_list_time.FAST.SPEED:
+                this.waiting_time = speed_list_time.NORMAL.INTERVAL;
+                break;
+            case speed >= speed_list_time.SLOW.SPEED && speed < speed_list_time.NORMAL.SPEED:
+                this.waiting_time = speed_list_time.SLOW.INTERVAL;
+                break;
+            case speed < speed_list_time.SLOW.SPEED:
+                this.waiting_time = speed_list_time.QUIET.INTERVAL;
+                break;
+        }
+    }
+
+    setupLoop(){
+        //消息循环
+        const looper = () => {
+            //用于计算速度
+            this.danmu_count.last = this.danmu_count.now;
+            //传输弹幕出去
+            this.transDanmu();
+            setTimeout(() => {
+                looper();
+                this.speedCalc();
+            },this.waiting_time);
+        }
+        looper();
+    }
+
+    //装载弹幕进入类内
     handleMessage(msg){
         let danmu;
         switch(msg['cmd']){
@@ -145,7 +197,6 @@ export default class MessageHandler{
                     data['background_color'],data['background_bottom_color'],data['background_price_color'],
                     data['background_image'],data['user_info']['face']
                 );
-                console.log(danmu);
                 break;
             case 'SUPER_CHAT_MESSAGE_JPN':
                 //说出来你们可能不信，sc还有专门的日文包的，参数和上面基本一致 $data
@@ -164,6 +215,10 @@ export default class MessageHandler{
         //可能存在还没有登记过的消息类型
         if(!danmu)return;
 
+        //增加弹幕数量
+        this.danmu_count.now++;
+
+        //加入临时缓存
         this.temp_danmus.push(danmu);
         //当弹幕储量达到max_count时传输弹幕
         if(this.temp_danmus.length === temp_max_count){

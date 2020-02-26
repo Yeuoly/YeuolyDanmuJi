@@ -53,9 +53,32 @@ export default {
         danmu_dialog_flag : false
     }),
     methods: {
+        //传输普通弹幕
         transDanmus(danmus){
             //向弹幕窗口发送新弹幕
             ipc.send('to-danmu','trans-danmu',danmus);
+        },
+        //传输sc
+        transSuperChat(scs){
+            ipc.send('to-danmu','trans-sc',scs);
+        },
+        //将原始弹幕分类，原始弹幕分为sc和普通弹幕
+        classifyDanmus(source){
+            let sc = [];
+            let nr = [];
+            source.forEach(e => {
+                if(e.type === 'normal'){
+                    nr.push(e);
+                }else if(e.type === 'super_chat'){
+                    sc.push(e);
+                }
+            });
+            sc.length > 0 ? this.transSuperChat(sc) : null;
+            nr.length > 0 ? this.transDanmus(this.danmusFilter(nr)) : null;
+        },
+        //过滤弹幕
+        danmusFilter(danmus){
+            return danmus;
         },
         //启动弹幕加载
         startDanmuLoader(){
@@ -66,9 +89,9 @@ export default {
             //禁止再次启动
             this.starting = true;
             const room_id = this.$store.getters.getRoomID;
-            //把弹幕传输钩子挂到Loader上
+            //把弹幕分裂钩子挂到Loader上
             this.DanmuLoader.onadd = danmus => {
-                this.transDanmus(danmus);
+                this.classifyDanmus(danmus);
             }
             this.DanmuLoader.setRoomID(room_id);
             this.DanmuLoader.startLoader(() => {

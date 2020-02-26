@@ -2,18 +2,18 @@
     <div id="handle" class="danmu-dialog">
         <div id="cover" ref="cover">
             <SuperChat v-if="current_super_chat > -1" :Danmu="super_chats[current_super_chat]" class="superchats"></SuperChat>
-            <Danmu  v-for="(i, key) in danmus" 
-                    :text-color="text_color(key)" 
-                    :key="key" 
-                    :Danmu="i" 
-                    :parent="$refs.cover"
-            ></Danmu>
+            <DanmuGroup v-for="(i, key) in danmu_groups"
+                        :text-color="text_color(key)"
+                        :key="i.id"
+                        :index="current_danmu_count + key"
+                        :Danmus="i.value"
+            ></DanmuGroup>
         </div>
     </div>
 </template>
 
 <script>
-import Danmu from '../components/items/Danmu';
+import DanmuGroup from '../components/items/DanmuGroup';
 import SuperChat from '../components/items/SuperChat';
 
 const drag = require('electron-drag');
@@ -23,7 +23,7 @@ require('electron').remote.getCurrentWindow().setAlwaysOnTop(true);
 
 //十万的时候清理一下，100000个在沙月的直播间大概要5 * 1000分钟，完全够了
 //就算弹幕速度快5倍也能用1000分钟，一天就24 * 60分钟
-const danmu_max_len = 1000;
+const danmu_max_len = 50;
 const delete_time = 5;
 
 //初始化颜色信息
@@ -35,12 +35,11 @@ const filter = store.get('settings-filter',{ lv : 0 , message : []});
 
 export default {
     name : 'DanmuDialog',
-    components : { Danmu , SuperChat },
+    components : { DanmuGroup , SuperChat },
     data: () => ({
-        danmus : [],
-        move_interval : null,
+        danmu_groups : [],
         color_group : color_group,
-        fast_flag : false,
+        current_danmu_count : 0,
         super_chats : [],
         current_super_chat : -1
     }),
@@ -63,6 +62,10 @@ export default {
                     case 'trans-danmu':
                         this.loadDanmu(msg);
                         break;
+                    case 'trans-sc':
+                        this.loadSuperChat(msg);
+                        this.current_super_chat++;
+                        break;
                     case 'clear':
                         this.clear();
                         break;
@@ -75,43 +78,42 @@ export default {
             ipc.send('to-main','trans-info',
                 { block : '[DanmuDialog]', info : '弹幕窗口连接成功', color : 'green'} );
         },
+        loadSuperChat(scs){
+            this.super_chats = [...this.super_chats,...scs];  
+        },
         loadDanmu(danmus){
-            this.onFast(danmus.length > 1);
-            danmus.forEach( e => { 
-                if(e.type === 'normal')
-                    this.danmus.push(e);
-                else if(e.type === 'super_chat'){
-                    this.super_chats.push(e);
-                    this.current_super_chat++;
-                }
+            this.current_danmu_count++;
+            this.danmu_groups.push({
+                value : danmus,
+                id : Number(Math.random().toString().substr(3, 3) + Date.now()).toString(36)
             });
-            if(this.danmus.length > danmu_max_len){
+            if(this.danmu_groups.length > danmu_max_len){
                 this.clear(20);
             }
         },
         //当弹幕太多了的时候清除顶部的几个
         clear(end){
             if(end){
-                this.danmus.splice(0,this.danmus.length - end); 
+                this.danmu_groups.splice(0,this.danmu_groups.length - end);
             }else{
-                this.danmus = [];
+                this.danmu_groups = [];
             }
         },
-        onFast(flag){
-            if(this.fast_flag !== flag){
-                this.fast_flag = flag;
-                this.$refs.cover.style['scroll-behavior'] =  flag ? 'initial' : 'smooth';
-            }
-        },
-        moveScroll(){
-            //如果弹幕太多了就动快点，弹幕少就慢慢动，救命啊这里卡爆了
-            if(this.$refs.cover.scrollTop + 100 < this.$refs.cover.scrollHeight){
-                this.$refs.cover.scrollTop = this.$refs.cover.scrollHeight;
-            }
-            else{
-                this.$refs.cover.scrollTop += 30;
-            }
-        }
+        // onFast(flag){
+        //     if(this.fast_flag !== flag){
+        //         this.fast_flag = flag;
+        //         this.$refs.cover.style['scroll-behavior'] =  flag ? 'initial' : 'smooth';
+        //     }
+        // },
+        // moveScroll(){
+        //     //如果弹幕太多了就动快点，弹幕少就慢慢动，救命啊这里卡爆了
+        //     if(this.$refs.cover.scrollTop + 100 < this.$refs.cover.scrollHeight){
+        //         this.$refs.cover.scrollTop = this.$refs.cover.scrollHeight;
+        //     }
+        //     else{
+        //         this.$refs.cover.scrollTop += 30;
+        //     }
+        // }
     },
     mounted() {
         //linux等平台的窗口拖动
@@ -122,9 +124,9 @@ export default {
         }
         this.setupRevMsg();
         //将滑条固定在最底部
-        this.move_interval = setInterval(() => {
-            this.moveScroll();
-        },100);        
+        // this.move_interval = setInterval(() => {
+        //     this.moveScroll();
+        // },100);        
     },
 }
 </script>
@@ -138,6 +140,7 @@ export default {
     .superchats{
         position: absolute;
         width: 100%;
+        z-index: 100;
     }
 
     @font-face {

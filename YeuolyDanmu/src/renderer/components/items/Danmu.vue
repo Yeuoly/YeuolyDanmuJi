@@ -1,6 +1,6 @@
 <template>
     <div ref="holder" class="danmu-holder">
-        <img class="avatar" :src="Danmu.user.face" @load="move" />
+        <img class="avatar" :src="Danmu.user.face"/>
         <div ref="text" class="danmu-text"> 
             <span>{{Danmu.user.id}}:</span> 
             <span :style="{ color : textColor }">{{Danmu.message}}</span> 
@@ -14,10 +14,7 @@ import { getAvatar } from '../../class/Avatar';
 
 export default {
     name : 'Danmu',
-    props : ['Danmu','parent','text-color'],
-    data : () => ({
-        hidden : true
-    }),
+    props : ['Danmu','text-color'],
     beforeMount() {
         //图片链接加载与图片预加载
         getAvatar(this.Danmu.user.uid, url => {
@@ -25,15 +22,16 @@ export default {
             const image = new Image();
             image.src = url;
             image.onload = () => {
-                this.hidden = false;
+                this.$emit('finishedLoadingAvatar');
             }
         });
     },
     methods: {
         move(){
+            //老版处理，太卡了，改用群体transform
             //新增弹幕的动画处理
-            const height = window.getComputedStyle(this.$refs.text)['height'];
-            this.$refs.holder.style.height = Number(height.substr(0,height.length - 2)) + 6 + 'px';
+            // const height = window.getComputedStyle(this.$refs.text)['height'];
+            // this.$refs.holder.style.height = Number(height.substr(0,height.length - 2)) + 6 + 'px';
         },
     },
 }
@@ -43,7 +41,7 @@ export default {
 
 .danmu-holder{
     display: block;
-    height: 0;
+    /* height: 0; 老版处理 */
     transition: all .2s;
     overflow: hidden;
 }
