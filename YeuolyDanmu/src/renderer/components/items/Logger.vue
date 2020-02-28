@@ -16,6 +16,8 @@
 import { InfoEventBus } from '../../events/evnetBus';
 import INFO from '../../class/Info';
 
+const max_line = 2000;
+
 export default {
     name : 'Logger',
     data : () => ({
@@ -43,6 +45,12 @@ export default {
                 case 'warning': this.warnings.push(this.lines); break;
             }
             this.lines++;
+            if(this.lines > max_line){
+                setTimeout(() => {
+                    this.logs = [];
+                    this.lines = 0;
+                },500);
+            }
         }
     },
     mounted() {
@@ -58,7 +66,7 @@ export default {
     {
         width: 8px;
         height: 8px;
-        background-color: rgb(60,60,60);
+        /* background-color: rgb(240,240,240); */
     }
  
     /*定义滚动条轨道 内阴影+圆角*/
@@ -66,7 +74,7 @@ export default {
     {
         /*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);*/
         /*border-radius: 10px;*/
-        background-color: rgb(30,30,30);
+        /* background-color: rgb(30,30,30); */
     }
  
     /*定义滑块 内阴影+圆角*/

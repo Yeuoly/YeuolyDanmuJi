@@ -8,7 +8,6 @@
                     background-color="#252526"
                     active-background-color="#2A2D2E"
                     text-color="#fff"
-                    active-text-color="rgb(226,192,141)"
                 >
                     <el-menu-item index="1" @click="$router.push('/index/log')">
                         <template slot=title>
@@ -150,7 +149,7 @@ export default {
         top: 0;
         bottom: 0;
         overflow-y: none;
-        background-color: rgb(37,37,38);
+        /* background-color: rgb(37,37,38); */
     }
     .el-header{
         height: 70px !important;
@@ -159,7 +158,7 @@ export default {
         left: 199px;
         top: 0;
         right: 0;
-        background-color: rgb(50,50,51); 
+        background-color: rgb(50,50,51);
     }
     .el-main{
         display: block;
@@ -169,6 +168,6 @@ export default {
         left: 199px;
         right: 0;
         padding: 5px;
-        background-color: rgb(30,30,30); 
+        /* background-color: rgb(30,30,30);  */
     }
 </style>

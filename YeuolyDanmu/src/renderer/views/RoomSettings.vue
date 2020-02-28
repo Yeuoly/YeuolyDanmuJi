@@ -19,7 +19,7 @@
             <el-table-column label="上次标题" prop="title"></el-table-column>
             <el-table-column label="直播状态">
                 <template slot-scope="scope">
-                    <span :style="{ color : scope.row.live_status === 1 ? 'green' : 'grey' }"
+                    <span :style="{ color : scope.row.live_status === 1 ? '#54a954' : 'grey' }"
                     >{{ scope.row.live_status === 1 ? '直播中' : '未开播' }}</span>
                 </template>
             </el-table-column>
@@ -97,11 +97,5 @@ export default {
 </script>
 
 <style>
-    .el-input-group__append{
-        background-color: transparent !important;
-    }
 
-    .el-input__inner{
-        background-color: transparent !important;
-    }
 </style>

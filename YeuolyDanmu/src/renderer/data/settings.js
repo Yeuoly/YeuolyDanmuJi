@@ -66,3 +66,13 @@ export let room_id_controller = {
         });
     }
 }
+
+export let filter_danmu_controller = {
+    black_list : [
+        '哔哩哔哩 (゜-゜)つロ 干杯~',
+        '来拥抱勇气和爱呀（*/ω＼*）',
+    ],
+    in(msg){
+        return this.black_list.includes(msg);
+    }
+}

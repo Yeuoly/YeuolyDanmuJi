@@ -111,8 +111,30 @@ export default {
             }
         },
         loadDanmu(danmus){
+            //要考虑处理一下重复弹幕，肝，它痛了起来
+            //开始处理叭
+            /**
+             * 写一下注释，对一个弹幕组的弹幕进行分析，把相同弹幕都抽出来放到同一个弹幕中
+             * 给这个弹幕添加属性：uids，表示发这个弹幕的所有用户
+             * 然后修改这个弹幕名称为[一般路过群众]
+             */
+            const msg = [];
+            const norepeat_danmus = [];
+            danmus.forEach( e => {
+                let index = msg.indexOf(e.message);
+                if(index !== -1){
+                    norepeat_danmus[index].users.uids.push(e.user.uid);
+                    norepeat_danmus[index].user.id = '一般路过群众';
+                }else{
+                    e.users = {
+                        uids : [ e.user.uid ]
+                    }
+                    norepeat_danmus.push(e);
+                    msg.push(e.message);
+                }
+            })
             this.danmu_groups.push({
-                value : danmus,
+                value : norepeat_danmus,
                 id : this.current_danmu_count++
             });
             if(this.danmu_groups.length > danmu_max_len){

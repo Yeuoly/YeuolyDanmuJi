@@ -50,12 +50,16 @@ export default {
     components : { ColorGroup },
     data : () => ({
         color_groups : saved_color_groups,
-        current_color : '#ffffff',
+        current_color : 'rgb(218,229,240)',
         current_color_group : color_group_using,
         default_color_groups : [
             [
                 'rgb(242,174,185)','rgb(245,198,162)','rgb(255,251,177)','rgb(130,194,71)','rgb(207,100,146)',
-                'rgb(233,120,132)','rgb(237,137,165)','rgb(183,221,201)','rgb(223,223,221)','rgb(255,255,255)'
+                'rgb(233,120,132)','rgb(237,137,165)','rgb(183,221,201)','rgb(255,255,255)','rgb(223,223,221)'
+            ],
+            [
+                'rgb(92 ,80 ,130)','rgb(132,135,166)','rgb(237,155,53 )','rgb(196,153,170)','rgb(112,69,140)',
+                'rgb(226,86 ,97 )','rgb(122,166,191)','rgb(132,135,166)','rgb(76,176,52)','rgb(92,80,130)'
             ]
         ],
         mine_color_groups : saved_color_groups

@@ -56,15 +56,7 @@ export const getAvatar = ( uid, fn ) => {
     if(url){
         fn(url);
     }else{
-        axios.post('http://' + api.self_proxy, qs.stringify({
-            proxy : JSON.stringify({
-                url : api.bili_get_space_info,
-                method : 'GET',
-                data : {
-                    mid : uid
-                }
-            })
-        })).then( e => {
+        axios.get(`${api.bili_get_space_info}?mid=${uid}`).then( e => {
             const data = e.data;
             if(data['code'] === 0){
                 _set(hash,data['data']['face']);

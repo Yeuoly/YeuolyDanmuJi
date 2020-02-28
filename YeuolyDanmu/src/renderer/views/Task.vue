@@ -41,6 +41,7 @@ import Loader from '../class/DanmuLoader';
 import { DanmuTransBus } from '../events/evnetBus';
 
 import { room_id_controller } from '../data/settings';
+import { filter_danmu_controller } from '../data/settings';
 
 const ipc = require('electron').ipcRenderer;
 
@@ -66,7 +67,10 @@ export default {
         },
         //过滤弹幕
         danmusFilter(danmus){
-            return danmus;
+            //这里会过滤掉常见的刷屏弹幕，比如噼哩噼哩干杯
+            return danmus.filter( e => {
+                return !filter_danmu_controller.in(e.message);
+            });
         },
         //启动弹幕加载
         startDanmuLoader(){
@@ -133,8 +137,5 @@ export default {
 </script>
 
 <style>
-    .el-button{
-        background-color: transparent !important;
-        border-color: white !important;
-    }
+
 </style>
