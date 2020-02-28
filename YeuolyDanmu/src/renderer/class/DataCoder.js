@@ -98,7 +98,7 @@ export class BiliDataDecoder extends BiliDataCoder{
         blob_reader.readAsArrayBuffer(blob);
         blob_reader.onload = function(){
             self.init(this.result);
-            typeof fn === 'function' ? fn(self) : null;
+            typeof fn === 'function' && fn(self);
         }
     }
 }

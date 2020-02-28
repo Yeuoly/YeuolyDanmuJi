@@ -43,28 +43,22 @@ export default class MessageHandler{
     //计算速度
     speedCalc(){
         const dif = this.danmu_count.now - this.danmu_count.last;
-        const speed = dif / this.waiting_time;
-        switch(dif){
-            case speed >= speed_list_time.FAST.SPEED:
-                this.waiting_time = speed_list_time.FAST.INTERVAL;
-                break;
-            case speed >= speed_list_time.NORMAL.SPEED && speed < speed_list_time.FAST.SPEED:
-                this.waiting_time = speed_list_time.NORMAL.INTERVAL;
-                break;
-            case speed >= speed_list_time.SLOW.SPEED && speed < speed_list_time.NORMAL.SPEED:
-                this.waiting_time = speed_list_time.SLOW.INTERVAL;
-                break;
-            case speed < speed_list_time.SLOW.SPEED:
-                this.waiting_time = speed_list_time.QUIET.INTERVAL;
-                break;
+        const speed = (dif / this.waiting_time) * 1000;
+        if( speed >= speed_list_time.FAST.SPEED ){
+            this.waiting_time = speed_list_time.FAST.INTERVAL;
+        }else if(speed >= speed_list_time.NORMAL.SPEED){
+            this.waiting_time = speed_list_time.NORMAL.INTERVAL;
+        }else if(speed >= speed_list_time.SLOW.SPEED){
+            this.waiting_time = speed_list_time.SLOW.INTERVAL;
+        }else{
+            this.waiting_time = speed_list_time.QUIET.INTERVAL;
         }
+        this.danmu_count.now = this.danmu_count.last;
     }
 
     setupLoop(){
         //消息循环
         const looper = () => {
-            //用于计算速度
-            this.danmu_count.last = this.danmu_count.now;
             //传输弹幕出去
             this.transDanmu();
             setTimeout(() => {
@@ -215,6 +209,12 @@ export default class MessageHandler{
         //可能存在还没有登记过的消息类型
         if(!danmu)return;
 
+        //如果是sc就直接传，不搞花里胡哨的东西了
+        if(danmu.type === 'super_chat'){
+            this.transSuperChat(danmu);
+            return;
+        }
+
         //增加弹幕数量
         this.danmu_count.now++;
 
@@ -235,12 +235,19 @@ export default class MessageHandler{
         if(this.temp_danmus.length > 0){
             //dispatch巨tm消耗性能，考虑满一定大的量再入库
             //store.dispatch('ADD_DANMUS',this.temp_danmus);
-            if(typeof this.onAdd === 'function'){
-                this.onAdd(this.temp_danmus);
+            if(typeof this.onDanmu === 'function'){
+                this.onDanmu(this.temp_danmus);
             }
             //清理缓存，不清要死人了，内存暴增太可怕了草
             delete this.temp_danmus;
             this.temp_danmus = [];
+        }
+    }
+
+    //传输sc
+    transSuperChat(scs){
+        if(typeof this.onSC === 'function'){
+            this.onSC(scs);
         }
     }
 

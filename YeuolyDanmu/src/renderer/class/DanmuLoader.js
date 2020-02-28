@@ -1,10 +1,9 @@
 import api from '../settings/api';
 import axios from 'axios';
-import Warning from './Warning';
 import INFO from './Info';
 import MessageHandler from './MessageHandler';
 
-import { BiliDataEncoder, BiliDataCoder, BiliDataDecoder } from './DataCoder';
+import { BiliDataCoder, BiliDataDecoder } from './DataCoder';
 
 import Utils from './Utils';
 
@@ -25,6 +24,7 @@ export default class DanmuLoader{
         this.server_list = [];
         this.token = '';
         this.heart_beat_times = 0;
+        this.host_index = 0;
     }
 
     //初始化实例
@@ -32,16 +32,31 @@ export default class DanmuLoader{
         this.socket = null;
         this.heart_beat_interval = null;
         this.message_handler = new MessageHandler();
-        //挂载新增弹幕钩子，当有新弹幕传输的时候会调用onAdd
-        this.message_handler.onAdd = danmu => {
-            if(typeof this.onadd === 'function'){
-                this.onadd(danmu);
+        //挂载新增弹幕钩子，当有新弹幕传输的时候会调用onDanmu
+        this.message_handler.onDanmu = danmu => {
+            if(typeof this.onDanmu === 'function'){
+                this.onDanmu(danmu);
+            }
+        }
+        this.message_handler.onSC = sc => {
+            if(typeof this.onSC === 'function'){
+                this.onSC(sc);
             }
         }
     }
 
+    onDanmu = null;
+
     setRoomID(room_id){
         this.room_id = room_id;
+    }
+
+    getRoutesCount(){
+        return this.server_list.length;
+    }
+
+    setRoute(index){
+        this.host_index = index;
     }
 
     //加载入口，提供两个钩子，一个成功调用，一个用于修改连接状态为关闭
@@ -49,7 +64,7 @@ export default class DanmuLoader{
         INFO.log('WSConnection',`开始连接至直播间，当前房间号：${this.room_id}`);
         //获取服务器信息与token
         this.getConf(() => {
-            let host_index = 0;
+            let host_index = this.host_index;
             this.socket = new WebSocket(
                 `wss://${this.server_list[host_index]['host']}:${this.server_list[host_index]['wss_port']}/sub`
             );

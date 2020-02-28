@@ -2,10 +2,10 @@
     <div id="handle" class="danmu-dialog">
         <div id="cover" ref="cover">
             <SuperChat v-if="current_super_chat > -1" :Danmu="super_chats[current_super_chat]" class="superchats"></SuperChat>
-            <DanmuGroup v-for="(i, key) in danmu_groups"
-                        :text-color="text_color(key)"
+            <DanmuGroup v-for="i in danmu_groups"
+                        :text-color="text_color(i.id)"
                         :key="i.id"
-                        :index="current_danmu_count + key"
+                        :index="i.id"
                         :Danmus="i.value"
             ></DanmuGroup>
         </div>
@@ -30,8 +30,9 @@ const delete_time = 5;
 import Store from 'electron-store';
 const store = new Store();
 const color_group = store.get('color-group-using',[]);
-//初始化过滤设置
-const filter = store.get('settings-filter',{ lv : 0 , message : []});
+
+//sc停留时间判定
+import SCTimer from '../settings/super_chat_staying_time';
 
 export default {
     name : 'DanmuDialog',
@@ -41,7 +42,8 @@ export default {
         color_group : color_group,
         current_danmu_count : 0,
         super_chats : [],
-        current_super_chat : -1
+        current_super_chat : -1,
+        sc_cycling : false
     }),
     computed : {
         text_color(index){
@@ -64,7 +66,6 @@ export default {
                         break;
                     case 'trans-sc':
                         this.loadSuperChat(msg);
-                        this.current_super_chat++;
                         break;
                     case 'clear':
                         this.clear();
@@ -78,14 +79,41 @@ export default {
             ipc.send('to-main','trans-info',
                 { block : '[DanmuDialog]', info : '弹幕窗口连接成功', color : 'green'} );
         },
-        loadSuperChat(scs){
-            this.super_chats = [...this.super_chats,...scs];  
+        replaceCurrentSuperChat(){
+            if(this.current_super_chat === this.super_chats.length - 1){
+                this.sc_cycling = false;
+                return;
+            }else{
+                this.sc_cycling = true;
+                this.current_super_chat++;
+                const interval = SCTimer.getEach() * 1000;
+                setTimeout(() => {
+                    const current = this.super_chats[this.current_super_chat];
+                    if(current.last_tims > 0){
+                        this.spendSC(current);
+                    }
+                    //下一次展示更换sc
+                    this.replaceCurrentSuperChat();
+                },interval);
+            }
+        },
+        //消费一次sc？感觉听着好奇怪x
+        spendSC(src){
+            src.last_tims--;
+            this.super_chats.push(src);
+        },
+        loadSuperChat(sc){
+            //获取sc轮询次数
+            sc.last_tims = SCTimer.getTimes(sc.price);
+            this.spendSC(sc);
+            if(!this.sc_cycling){
+                this.replaceCurrentSuperChat();
+            }
         },
         loadDanmu(danmus){
-            this.current_danmu_count++;
             this.danmu_groups.push({
                 value : danmus,
-                id : Number(Math.random().toString().substr(3, 3) + Date.now()).toString(36)
+                id : this.current_danmu_count++
             });
             if(this.danmu_groups.length > danmu_max_len){
                 this.clear(20);
@@ -103,7 +131,7 @@ export default {
         //     if(this.fast_flag !== flag){
         //         this.fast_flag = flag;
         //         this.$refs.cover.style['scroll-behavior'] =  flag ? 'initial' : 'smooth';
-        //     }
+        //     }s
         // },
         // moveScroll(){
         //     //如果弹幕太多了就动快点，弹幕少就慢慢动，救命啊这里卡爆了

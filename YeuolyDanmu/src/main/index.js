@@ -8,7 +8,7 @@ import { app, BrowserWindow, remote } from 'electron'
 import '../renderer/store';
 
 if (process.env.NODE_ENV !== 'development') {
-  global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+  global.__static = require('path').join(__dirnamse, '/static').replace(/\\/g, '\\\\')
 }
 
 let mainWindow;

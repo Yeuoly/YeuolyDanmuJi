@@ -40,6 +40,8 @@
 import Loader from '../class/DanmuLoader';
 import { DanmuTransBus } from '../events/evnetBus';
 
+import { room_id_controller } from '../data/settings';
+
 const ipc = require('electron').ipcRenderer;
 
 export default {
@@ -56,25 +58,11 @@ export default {
         //传输普通弹幕
         transDanmus(danmus){
             //向弹幕窗口发送新弹幕
-            ipc.send('to-danmu','trans-danmu',danmus);
+            ipc.send('to-danmu','trans-danmu',this.danmusFilter(danmus));
         },
         //传输sc
         transSuperChat(scs){
             ipc.send('to-danmu','trans-sc',scs);
-        },
-        //将原始弹幕分类，原始弹幕分为sc和普通弹幕
-        classifyDanmus(source){
-            let sc = [];
-            let nr = [];
-            source.forEach(e => {
-                if(e.type === 'normal'){
-                    nr.push(e);
-                }else if(e.type === 'super_chat'){
-                    sc.push(e);
-                }
-            });
-            sc.length > 0 ? this.transSuperChat(sc) : null;
-            nr.length > 0 ? this.transDanmus(this.danmusFilter(nr)) : null;
         },
         //过滤弹幕
         danmusFilter(danmus){
@@ -88,10 +76,13 @@ export default {
             }
             //禁止再次启动
             this.starting = true;
-            const room_id = this.$store.getters.getRoomID;
+            const room_id = room_id_controller.current;
             //把弹幕分裂钩子挂到Loader上
-            this.DanmuLoader.onadd = danmus => {
-                this.classifyDanmus(danmus);
+            this.DanmuLoader.onDanmu = danmus => {
+                this.transDanmus(danmus);
+            }
+            this.DanmuLoader.onSC = sc => {
+                this.transSuperChat(sc)
             }
             this.DanmuLoader.setRoomID(room_id);
             this.DanmuLoader.startLoader(() => {
