@@ -34,6 +34,9 @@ const color_group = store.get('color-group-using',[]);
 //sc停留时间判定
 import SCTimer from '../settings/super_chat_staying_time';
 
+//礼物欢迎语
+let gift_pre_saying = '赠送了';
+
 export default {
     name : 'DanmuDialog',
     components : { DanmuGroup , SuperChat },
@@ -66,6 +69,9 @@ export default {
                         break;
                     case 'trans-sc':
                         this.loadSuperChat(msg);
+                        break;
+                    case 'trans-gift':
+                        this.loadGift(msg);
                         break;
                     case 'clear':
                         this.clear();
@@ -101,6 +107,26 @@ export default {
         spendSC(src){
             src.last_tims--;
             this.super_chats.push(src);
+        },
+        loadGift(gift){
+            if(gift.is_super){
+
+            }else{
+                //伪造假弹幕、真礼物，普通礼物就划过去好了，super礼物在上面处理，会停留
+                const Danmu = {
+                    users : {
+                        uids : [ gift.user.uid ]
+                    },
+                    user : {
+                        id : gift.user.id
+                    },
+                    message : `${gift_pre_saying}${gift.gift_num}个<img class="small-gift" src="${gift.gift_image}" />${gift.gift_name}`
+                }
+                this.danmu_groups.push({
+                    value : [ Danmu ],
+                    id : this.current_danmu_count++
+                });
+            }
         },
         loadSuperChat(sc){
             //获取sc轮询次数

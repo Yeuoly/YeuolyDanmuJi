@@ -34,14 +34,13 @@ export default class DanmuLoader{
         this.message_handler = new MessageHandler();
         //挂载新增弹幕钩子，当有新弹幕传输的时候会调用onDanmu
         this.message_handler.onDanmu = danmu => {
-            if(typeof this.onDanmu === 'function'){
-                this.onDanmu(danmu);
-            }
+            typeof this.onDanmu === 'function' && this.onDanmu(danmu);
         }
         this.message_handler.onSC = sc => {
-            if(typeof this.onSC === 'function'){
-                this.onSC(sc);
-            }
+            typeof this.onSC === 'function' && this.onSC(sc);
+        }
+        this.message_handler.onGift = gift => {
+            typeof this.onGift === 'function' && this.onGift(gift);
         }
     }
 

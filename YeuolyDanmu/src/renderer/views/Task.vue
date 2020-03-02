@@ -38,7 +38,7 @@
 
 <script>
 import Loader from '../class/DanmuLoader';
-import { DanmuTransBus } from '../events/evnetBus';
+import { OrdinaryEventBus } from '../events/evnetBus';
 
 import { room_id_controller } from '../data/settings';
 import { filter_danmu_controller } from '../data/settings';
@@ -53,7 +53,9 @@ export default {
         starting : false,
         closing :false,
         socket_sender : null,
-        danmu_dialog_flag : false
+        danmu_dialog_flag : false,
+        danmu_dialog_id : 0,
+        gift_dialog_id : 0
     }),
     methods: {
         //传输普通弹幕
@@ -62,8 +64,12 @@ export default {
             ipc.send('to-danmu','trans-danmu',this.danmusFilter(danmus));
         },
         //传输sc
-        transSuperChat(scs){
-            ipc.send('to-danmu','trans-sc',scs);
+        transSuperChat(sc){
+            ipc.send('to-danmu','trans-sc',sc);
+        },
+        transGift(gift){
+            //这里最后需要做一点调整，把礼物全部传输到一个单独显示礼物的地方
+            ipc.send('to-danmu','trans-gift',gift);
         },
         //过滤弹幕
         danmusFilter(danmus){
@@ -86,11 +92,15 @@ export default {
                 this.transDanmus(danmus);
             }
             this.DanmuLoader.onSC = sc => {
-                this.transSuperChat(sc)
+                this.transSuperChat(sc);
             }
+            this.DanmuLoader.onGift = gift => {
+                this.transGift(gift);
+            },
             this.DanmuLoader.setRoomID(room_id);
             this.DanmuLoader.startLoader(() => {
                 //成功后的回调
+                OrdinaryEventBus.$emit('start-loader');
                 this.danmu_dialog_flag = true;
                 this.starting = false;
                 this.started = true;
@@ -107,8 +117,8 @@ export default {
         clearDanmu(){
             ipc.send('to-danmu','clear');
         },
-        openDanmuDialog(){
-            const win = this.$Win.openWin({
+        async openDanmuDialog(){
+            const win = await this.$Win.openWin({
                 width: 300,
                 height: 700,
                 useContentSize: true,
@@ -124,6 +134,11 @@ export default {
                     name : '弹幕窗口',
                 }
             });
+        },
+        async openGiftDialog(){
+            // const win = await this.$Win.openWin({
+            //     width: 
+            // })
         }
     },
     mounted() {

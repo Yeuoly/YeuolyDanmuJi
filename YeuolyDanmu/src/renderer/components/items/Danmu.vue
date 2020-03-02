@@ -7,7 +7,9 @@
         /> -->
         <div ref="text" class="danmu-text"> 
             <span>{{Danmu.user.id}}:</span> 
-            <span :style="{ color : textColor }">{{Danmu.message}}</span> 
+            <span :style="{ color : textColor }">
+                <span v-html="Danmu.message"></span>
+            </span> 
         </div>
     </div>
 </template>
@@ -80,4 +82,7 @@ export default {
     float: left;
 }
 
+.small-gift{
+    width: 30px;
+}
 </style>

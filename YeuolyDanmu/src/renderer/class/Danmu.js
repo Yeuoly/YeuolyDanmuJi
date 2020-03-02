@@ -1,5 +1,9 @@
 import { User , Medal , Guard } from './User'
 
+/**
+ * 所有弹幕、礼物、SC都广义定义为弹幕
+ */
+
 export default class Danmu{
     constructor(
         user_id,user_uid,message,
@@ -44,5 +48,22 @@ export class SuperChat extends SuperChatBase{
         this.message = message;
         this.user = new User(user_id,user_uid,face,0,live_ul,'none');
         this.medal = new Medal(medal_level,medal_nickname,medal_up,0);
+    }
+}
+
+export class Gift{
+    constructor(
+        user_id,user_uid,face,
+        gift_id,gift_name,gift_price,gift_num,gift_image,
+        is_super
+    ){
+        this.type = 'gift';
+        this.user = new User(user_id,user_uid,face,0,0,0);
+        this.gift_id = gift_id;
+        this.gift_name = gift_name;
+        this.gift_price = gift_price;
+        this.gift_num = gift_num;
+        this.gift_image = gift_image;
+        this.is_super = is_super;
     }
 }

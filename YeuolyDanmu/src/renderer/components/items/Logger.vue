@@ -21,7 +21,7 @@ const max_line = 2000;
 export default {
     name : 'Logger',
     data : () => ({
-        lines : 2,
+        lines : 3,
         logs : [{
             class_name : 'grey',
             log : '[LogConsole]:日志模块已启动',
@@ -33,6 +33,11 @@ export default {
                 '希望您能用着舒服。如果大佬们想参加发开的话我留个链接放这里orz https://github.com/Yeuoly/YeuolyDanmuJI',
             type : 'info',
             line_id : 1
+        },{
+            class_name : 'grey',
+            log : '顺便再放一个联系方式：QQ2035914926',
+            type : 'info',
+            line_id : 2
         }],
         errors : [],
         warnings : [],

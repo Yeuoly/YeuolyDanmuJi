@@ -1,9 +1,17 @@
 import Danmu from './Danmu';
-import { SuperChat } from './Danmu';
+import { SuperChat , Gift } from './Danmu';
 import store from '../store';
+
+//引入礼物处理
+import GiftStation from './Gift';
 
 const temp_max_count = 50;
 const store_temp_max_count = 2000;
+
+//礼物自动过滤开关
+let auto_filt_low_price = true;
+//最低的直接显示礼物价值，如果一个礼物的价值高于$direct_gift_trans_min_price，就可以直接显示，否则要丢到礼物处理站处理一下
+let direct_gift_trans_min_price = 9800;
 
 /**
  * 这里说一下，不论是SuperChat还是礼物信息我这里都定义为弹幕
@@ -15,15 +23,34 @@ const store_temp_max_count = 2000;
  * 
  */
 
-const speed_list_time = {
-    FAST : { SPEED : 8 , INTERVAL : 2000 },
-    NORMAL : { SPEED : 5 , INTERVAL : 1000 },
-    SLOW : { SPEED : 2 , INTERVAL : 500 },
-    QUIET : { SPEED : 1 , INTERVAL : 200 }
-}
+const speed_list_time = [
+    { SPEED : 8 , INTERVAL : 2000 , RPICE_MIN : 10000 , LATIAO_MIN : 100 },
+    { SPEED : 5 , INTERVAL : 1000 , PRICE_MIN : 5000 , LATIAO_MIN : 50 },
+    { SPEED : 2 , INTERVAL : 500 , PRICE_MIN : 1000 , LATIAO_MIN : 5 },
+    { SPEED : 0 , INTERVAL : 200 , PRICE_MIN : 100 , LATIAO_MIN : 1 }
+]
 
 export default class MessageHandler{
     constructor(){
+        //初始化礼物处理站
+        GiftStation.setSender( res => {
+            /**
+             * 根据速度判断是否打开礼物过滤
+             * 简称礼物自动过滤
+             * 大胆猜想，不过都不用猜了，基本可以认定  礼物速度正比于弹幕速度，
+             * 比如说，高速状态下 SPEED>=8 ，如果礼物是辣条，要送了100根以上的辣条才会显示，否则就过滤掉
+             * 如果礼物不是辣条，那就得总价值超过10000金瓜子才会显示，否则过滤掉
+             */
+            if(auto_filt_low_price){
+                if(res.gift_id === 1 && res.gift_num < this.speed_info.latiao_min){
+                    return;
+                }else if(res.gift_id !== 1 && res.gift_price < this.speed_info.price_min){
+                    return;
+                }
+            }
+
+            this.transGift(res);
+        })
         //启动循环
         this.setupLoop();
     }
@@ -32,8 +59,8 @@ export default class MessageHandler{
     temp_danmus = [];
     //入库缓存
     temp_store = [];
-    //延迟时间
-    waiting_time = 1000;
+    //速度相关
+    speed_info = { waiting_time : 1000 , latiao_min : 2 , price_min : 100 };
 
     //速度计算参数
     danmu_count = {
@@ -44,14 +71,15 @@ export default class MessageHandler{
     speedCalc(){
         const dif = this.danmu_count.now - this.danmu_count.last;
         const speed = (dif / this.waiting_time) * 1000;
-        if( speed >= speed_list_time.FAST.SPEED ){
-            this.waiting_time = speed_list_time.FAST.INTERVAL;
-        }else if(speed >= speed_list_time.NORMAL.SPEED){
-            this.waiting_time = speed_list_time.NORMAL.INTERVAL;
-        }else if(speed >= speed_list_time.SLOW.SPEED){
-            this.waiting_time = speed_list_time.SLOW.INTERVAL;
-        }else{
-            this.waiting_time = speed_list_time.QUIET.INTERVAL;
+        for(let i in speed_list_time){
+            if( speed >= speed_list_time[i].SPEED ){
+                this.speed_info = { 
+                    waiting_time : speed_list_time[i].INTERVAL,
+                    latiao_min : speed_list_time[i].LATIAO_MIN,
+                    price_min : speed_list_time[i].RPICE_MIN
+                };
+                break;
+            }
         }
         this.danmu_count.now = this.danmu_count.last;
     }
@@ -64,7 +92,7 @@ export default class MessageHandler{
             setTimeout(() => {
                 looper();
                 this.speedCalc();
-            },this.waiting_time);
+            },this.speed_info.waiting_time);
         }
         looper();
     }
@@ -105,6 +133,26 @@ export default class MessageHandler{
                  * is_first => 是不是今天第一次送礼物
                  * num => 礼物数量
                  */
+                const gf = msg['data'];
+                /** 
+                 * 这里有个很蛋疼的事情，有一堆用户都是一根辣条一根辣条地送，这样造成了严重的性能损耗
+                 * 但也不能无视人家送的礼物叭？？总还是要礼貌性地接收一下，总价值超过一定值之后再传入礼物列表
+                 * 这样可以有效地过滤掉
+                 * 为了解决这个玩意，我决定加一个低价值礼物缓存，只缓存辣条，缓存模式参照头像链接缓存，hash分表
+                 * */ 
+                //有一些价值为0的礼物，还没想好怎么处理，就先这里掐掉
+                if(gf['price'] === 0){
+                    return;
+                }
+                danmu = new Gift(
+                    gf['uname'],gf['uid'],gf['face'],gf['giftId'],gf['giftName'],
+                    gf['price'],gf['num'],GiftStation.getGiftImage(gf['giftId']),false
+                );
+                if(gf['giftId'] === 1 || gf['price'] < direct_gift_trans_min_price ){
+                    //如果是辣条或者价值低的话就丢到处理站里去，由处理站转交Task，如果不是就直接传给Task处理
+                    GiftStation.insertGift(gf['uid'],gf['num'],gf['giftId'],danmu);
+                    return;
+                }
                 break;
             case 'NOTICE_MSG':
                 //这个是全站抽奖广播 $data
@@ -213,6 +261,9 @@ export default class MessageHandler{
         if(danmu.type === 'super_chat'){
             this.transSuperChat(danmu);
             return;
+        }else if(danmu.type === 'gift'){
+            this.transGift(danmu);
+            return;
         }
 
         //增加弹幕数量
@@ -235,9 +286,7 @@ export default class MessageHandler{
         if(this.temp_danmus.length > 0){
             //dispatch巨tm消耗性能，考虑满一定大的量再入库
             //store.dispatch('ADD_DANMUS',this.temp_danmus);
-            if(typeof this.onDanmu === 'function'){
-                this.onDanmu(this.temp_danmus);
-            }
+            typeof this.onDanmu === 'function' && this.onDanmu(this.temp_danmus);
             //清理缓存，不清要死人了，内存暴增太可怕了草
             delete this.temp_danmus;
             this.temp_danmus = [];
@@ -246,9 +295,12 @@ export default class MessageHandler{
 
     //传输sc
     transSuperChat(scs){
-        if(typeof this.onSC === 'function'){
-            this.onSC(scs);
-        }
+        typeof this.onSC === 'function' && this.onSC(scs);
+    }
+
+    //传输礼物，辣条在检测完之后才会传输，普通礼物比较少，所以单个单个传
+    transGift(gift){
+        typeof this.onGift === 'function' && this.onGift(gift);
     }
 
     //弹幕入库

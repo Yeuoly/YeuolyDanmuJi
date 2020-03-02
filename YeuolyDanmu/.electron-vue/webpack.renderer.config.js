@@ -21,7 +21,7 @@ const { VueLoaderPlugin } = require('vue-loader')
  */
 
  //element-ui莫得白名单，导致了一些组件不能渲染草
-let whiteListedModules = ['vue','element-ui']
+let whiteListedModules = ['vue','element-ui','axios','vuex','vue-electron','vue-router']
 
 let rendererConfig = {
   devtool: '#cheap-module-eval-source-map',
