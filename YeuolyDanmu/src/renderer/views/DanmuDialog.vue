@@ -1,7 +1,14 @@
 <template>
     <div id="handle" class="danmu-dialog">
-        <div id="cover" ref="cover">
-            <SuperChat v-if="current_super_chat > -1" :Danmu="super_chats[current_super_chat]" class="superchats"></SuperChat>
+        <i class="el-icon-s-tools" 
+           id="setting" 
+           @click="handleSetting"
+        ></i>        
+        <div id="cover" ref="cover" :style="{ backgroundColor: backgroundColor }">
+            <SuperChat :Danmu="super_chats[current_super_chat]" 
+                       class="superchats"
+                       :style="{ transform : `translateY( -${ sc_replacing ? '160' : '0' }px )` }"
+            ></SuperChat>
             <DanmuGroup v-for="i in danmu_groups"
                         :text-color="text_color(i.id)"
                         :key="i.id"
@@ -9,12 +16,33 @@
                         :Danmus="i.value"
             ></DanmuGroup>
         </div>
+        <el-dialog width="95%" 
+                   title="设置" 
+                   :visible.sync="dialog_open"
+                   center
+                   id="setting-dig"
+        >
+            <div class="block">
+                <span class="demonstration">窗口透明度</span>
+                <el-slider v-model="opacity" :format-tooltip="calcOpacity"></el-slider>
+            </div>
+            <div class="block">
+                <span class="demonstration">底色：</span>
+                <el-radio-group v-model="backgound_color">
+                    <el-radio :label="0">白色</el-radio>
+                    <el-radio :label="1">黑色</el-radio>
+                </el-radio-group>
+            </div>
+            <span class="demonstration">
+                温馨提示：透明度请以关闭设置窗口后的为准
+            </span>
+        </el-dialog>
     </div>
 </template>
 
 <script>
 import DanmuGroup from '../components/items/DanmuGroup';
-import SuperChat from '../components/items/SuperChat';
+import SuperChatComponent from '../components/items/SuperChat';
 
 const drag = require('electron-drag');
 const ipc = require('electron').ipcRenderer;
@@ -31,22 +59,36 @@ import Store from 'electron-store';
 const store = new Store();
 const color_group = store.get('color-group-using',[]);
 
+//获取全局设置
+import { global_settings , refreshSettings } from '../settings/global_settings';
+
 //sc停留时间判定
 import SCTimer from '../settings/super_chat_staying_time';
+
+import { SuperChat } from '../class/Danmu';
 
 //礼物欢迎语
 let gift_pre_saying = '赠送了';
 
 export default {
     name : 'DanmuDialog',
-    components : { DanmuGroup , SuperChat },
+    components : { DanmuGroup , SuperChat : SuperChatComponent },
     data: () => ({
         danmu_groups : [],
         color_group : color_group,
         current_danmu_count : 0,
-        super_chats : [],
-        current_super_chat : -1,
-        sc_cycling : false
+        super_chats : [ new SuperChat(
+             '碧诗',2,'这是一条测试SC','','','','',30,0,0,'#EDF5FF','#2A60B2','#7497CD',
+            'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
+            'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
+        ) ],
+        current_super_chat : 0,
+        sc_cycling : false,
+        dialog_open : false,
+        opacity : 50,
+        backgound_color : 1,
+        danmu_size : 16,
+        sc_replacing : true
     }),
     computed : {
         text_color(index){
@@ -54,9 +96,34 @@ export default {
                 return index => this.color_group[index %  this.color_group.length];
             else
                 return '#ffffff';
+        },
+        backgroundColor(){
+            return `rgba(${ this.backgound_color === 1 ? '0,0,0' : '255,255,255' },${ this.opacity / 100 })`;
         }
     },
     methods: {
+        handleSetting(){
+            this.dialog_open = !this.dialog_open;
+        },
+        calcOpacity(val){
+            return val / 100;
+        },
+        refreshGlobalSettings(){
+            refreshSettings();
+        },
+        replaceSCAnimation( cb ){
+            //如果下一个和现在的相同，就没得动画，直接开始下一轮展示
+            if(this.super_chats[this.current_super_chat] === this.super_chats[this.current_super_chat+1]){
+                typeof cb === 'function' && cb();
+                return;
+            }
+            //开始动画
+            this.sc_replacing = true;
+            typeof cb === 'function' && setTimeout( () => {
+                cb();
+                this.sc_replacing = false;
+            },700);
+        },
         //装载弹幕接收钩子
         setupRevMsg(){
             //由于这个窗口是在渲染进程中进行的，主进程不能直接获取窗口ID，所以在窗口挂载时向主进程发送窗口ID
@@ -79,6 +146,9 @@ export default {
                     case 'setting-color':
                         this.color_group = msg;
                         break;
+                    case 'refresh_settings':
+                        this.refreshGlobalSettings();
+                        break;
                 }
             });
             //向主窗口发送成功消息
@@ -88,10 +158,18 @@ export default {
         replaceCurrentSuperChat(){
             if(this.current_super_chat === this.super_chats.length - 1){
                 this.sc_cycling = false;
+                this.replaceSCAnimation();
                 return;
             }else{
+                /**
+                 * 如果判断当前SC还有多的，就先运行动画，此时current未改变
+                 * replaceSCAnimation会判断current与current+1是否相同
+                 * 如果相同，不会出现动画，如果不相同，就会运行动画，然后再更改current
+                 */
+                this.replaceSCAnimation( () => {
+                    this.current_super_chat++;
+                });
                 this.sc_cycling = true;
-                this.current_super_chat++;
                 const interval = SCTimer.getEach() * 1000;
                 setTimeout(() => {
                     const current = this.super_chats[this.current_super_chat];
@@ -148,7 +226,8 @@ export default {
             const norepeat_danmus = [];
             danmus.forEach( e => {
                 let index = msg.indexOf(e.message);
-                if(index !== -1){
+                //得要是找到了而且开了折叠弹幕才折叠
+                if(index !== -1 && global_settings['display_module']['auto_fold_repeat_danmu']){
                     norepeat_danmus[index].users.uids.push(e.user.uid);
                     norepeat_danmus[index].user.id = '一般路过群众';
                 }else{
@@ -193,10 +272,10 @@ export default {
     },
     mounted() {
         //linux等平台的窗口拖动
-        const clear = drag('#cover');
+        const clear = drag('#handle');
         //windows和mac的窗口拖动
         if(!drag.supported){
-            document.querySelector('#cover').style['-webkit-app-region'] = 'drag';
+            document.querySelector('#handle').style['-webkit-app-region'] = 'drag';
         }
         this.setupRevMsg();
         //将滑条固定在最底部
@@ -209,14 +288,16 @@ export default {
 
 <style>
     body{
-        margin: 0;
         overflow: hidden;
+        margin-top: 0;
     }
 
     .superchats{
         position: absolute;
         width: 100%;
         z-index: 100;
+        margin-left: -8px;
+        transition: all .4s;
     }
 
     @font-face {
@@ -228,7 +309,6 @@ export default {
         margin: 0;
         padding: 0;
         border: 0;
-        transition: height .2s;
     }
     #cover{
         background-color: rgba(255,255, 255, 0.5);
@@ -236,5 +316,19 @@ export default {
         width: 100%;
         scroll-behavior: smooth;
         overflow: hidden;
+        padding-right: 9px;
+        padding-left: 9px;
+        margin-left: -9px;
+    }
+    #setting{
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        color: white;
+        z-index: 5;
+        -webkit-app-region: no-drag;
+    }
+    #setting-dig{
+        -webkit-app-region: no-drag;
     }
 </style>

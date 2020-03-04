@@ -1,17 +1,21 @@
 import Danmu from './Danmu';
 import { SuperChat , Gift } from './Danmu';
 import store from '../store';
+import Utils from '../class/Utils';
 
 //引入礼物处理
-import GiftStation from './Gift';
+import GiftStation from './GiftStation';
 
-const temp_max_count = 50;
+//获取全局设置
+import { global_settings } from '../settings/global_settings';
+
+const temp_max_count = Utils.varToPointer( () => global_settings['loading_module']['danmu_temp_max_count'] );
 const store_temp_max_count = 2000;
 
 //礼物自动过滤开关
-let auto_filt_low_price = true;
+let auto_filt_low_price = Utils.varToPointer( () => global_settings['loading_module']['auto_filt_low_gift'] );
 //最低的直接显示礼物价值，如果一个礼物的价值高于$direct_gift_trans_min_price，就可以直接显示，否则要丢到礼物处理站处理一下
-let direct_gift_trans_min_price = 9800;
+let direct_gift_trans_min_price = Utils.varToPointer( () => global_settings['loading_module']['direct_trans_gift_min_line'] );
 
 /**
  * 这里说一下，不论是SuperChat还是礼物信息我这里都定义为弹幕
@@ -28,7 +32,7 @@ const speed_list_time = [
     { SPEED : 5 , INTERVAL : 1000 , PRICE_MIN : 5000 , LATIAO_MIN : 50 },
     { SPEED : 2 , INTERVAL : 500 , PRICE_MIN : 1000 , LATIAO_MIN : 5 },
     { SPEED : 0 , INTERVAL : 200 , PRICE_MIN : 100 , LATIAO_MIN : 1 }
-]
+];
 
 export default class MessageHandler{
     constructor(){
@@ -48,6 +52,7 @@ export default class MessageHandler{
                     return;
                 }
             }
+            
 
             this.transGift(res);
         })
@@ -245,6 +250,9 @@ export default class MessageHandler{
                 /**
                  * 多了一个 message_jpn => 日文翻译草，我寻思这要是其他语种的v多了你要怎么整
                  */
+                break;
+            default:
+                console.log(msg);
                 break;
         }
         //弹幕入库

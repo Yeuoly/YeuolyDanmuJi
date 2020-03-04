@@ -1,5 +1,13 @@
 //工具人
 class Utils{
+    varToPointer(fn){
+        const p = function(){};
+        p.toString = function(){
+            return fn();
+        }
+        return p;
+    }
+
     mergeArrayBuffer(ab1, ab2) {
         var u81 = new Uint8Array(ab1),
         u82 = new Uint8Array(ab2),

@@ -50,7 +50,6 @@ export default {
     transform: translateY(25px);
 }
 .superchat-info{
-    height: 35px;
     line-height: 1;
     padding: 3px;
     border-radius: 0px 0px 5px 5px;

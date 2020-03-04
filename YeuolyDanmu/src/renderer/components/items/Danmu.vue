@@ -83,6 +83,6 @@ export default {
 }
 
 .small-gift{
-    width: 30px;
+    width: 25px;
 }
 </style>

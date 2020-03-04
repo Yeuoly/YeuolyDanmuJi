@@ -32,6 +32,33 @@
                     清空弹幕姬
                 </el-button>
             </el-col>
+            <el-col :span="4">
+                <el-button 
+                    type="info" 
+                    plain   
+                    @click="testSC" 
+                >
+                    测试SC
+                </el-button>
+            </el-col>
+            <el-col :span="4">
+                <el-button 
+                    type="info" 
+                    plain   
+                    @click="testDanmu" 
+                >
+                    测试弹幕
+                </el-button>
+            </el-col>
+            <el-col :span="4">
+                <el-button 
+                    type="info" 
+                    plain   
+                    @click="testGift" 
+                >
+                    测试辣条
+                </el-button>
+            </el-col>
         </el-row>
     </div>
 </template>
@@ -42,6 +69,9 @@ import { OrdinaryEventBus } from '../events/evnetBus';
 
 import { room_id_controller } from '../data/settings';
 import { filter_danmu_controller } from '../data/settings';
+
+import Danmu from '../class/Danmu';
+import { SuperChat , Gift } from '../class/Danmu';
 
 const ipc = require('electron').ipcRenderer;
 
@@ -135,10 +165,22 @@ export default {
                 }
             });
         },
-        async openGiftDialog(){
-            // const win = await this.$Win.openWin({
-            //     width: 
-            // })
+        //伪造一个虚假的SC
+        testSC(){
+            const test = new SuperChat(
+                '碧诗',2,'这是一条测试SC','','','','',30,0,0,'#EDF5FF','#2A60B2','#7497CD',
+                'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
+                'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
+            );
+            this.transSuperChat(test);
+        },
+        testDanmu(){
+            const test = new Danmu('Yeuoly',40691233,'测试弹幕','','','','','');
+            this.transDanmus([test]);    
+        },
+        testGift(){
+            const test = new Gift('Yeuoly',40691233,'',1,'辣条',23300,233,'https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png',false);
+            this.transGift(test);
         }
     },
     mounted() {

@@ -1,6 +1,8 @@
+import { global_settings } from './global_settings';
+
 export default {
     getEach(){
-        return 10;
+        return global_settings['display_module']['super_staying_time_each'];
     },
     list : [
     //    >     <=    times
