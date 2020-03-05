@@ -43,6 +43,13 @@ export default new Router({
           meta : {
             title : '选择弹幕颜色'
           }
+        },{
+          name : 'advance-settings',
+          path : '/index/advance-settings',
+          component: require('@/views/AdvanceSettings.vue').default,
+          meta : {
+            title : '高级设置，请根据教程更改，改错了我不背锅（'
+          }
         }
       ]
     },

@@ -12,12 +12,14 @@ import api from '../settings/api';
 import { room_id_controller } from '../data/settings';
 import INFO from './Info';
 import { OrdinaryEventBus } from '../events/evnetBus';
+import Utils from './Utils';
+import { global_settings } from '../settings/global_settings';
 
 //辣条数量检测延迟
-const check_delay = 3000;
+const check_delay = Utils.varToPointer( () => global_settings['loading_module']['gift_buffer_times'] );
 
-//小于10块钱的礼物成为常见礼物
-const ordinary_price = 10000;
+//小于$ordinary的礼物成为常见礼物
+const ordinary_price = Utils.varToPointer( () => global_settings['loading_module']['ordinary_max_price'] );
 
 //默认礼物列表，免得加载失败
 let gift_list = [

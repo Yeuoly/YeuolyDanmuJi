@@ -146,7 +146,7 @@ export default {
                     case 'setting-color':
                         this.color_group = msg;
                         break;
-                    case 'refresh_settings':
+                    case 'refresh-settings':
                         this.refreshGlobalSettings();
                         break;
                 }

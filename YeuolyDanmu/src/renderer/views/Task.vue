@@ -69,6 +69,7 @@ import { OrdinaryEventBus } from '../events/evnetBus';
 
 import { room_id_controller } from '../data/settings';
 import { filter_danmu_controller } from '../data/settings';
+import { global_settings } from '../settings/global_settings';
 
 import Danmu from '../class/Danmu';
 import { SuperChat , Gift } from '../class/Danmu';
@@ -104,6 +105,9 @@ export default {
         //过滤弹幕
         danmusFilter(danmus){
             //这里会过滤掉常见的刷屏弹幕，比如噼哩噼哩干杯
+            if(!global_settings['loading_module']['auto_filt_super_gift_danmu']){
+                return danmus;
+            }
             return danmus.filter( e => {
                 return !filter_danmu_controller.in(e.message);
             });
