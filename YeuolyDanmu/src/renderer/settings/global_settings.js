@@ -1,6 +1,8 @@
 import Store from 'electron-store';
 const store = new Store();
-let global_settings = store.get('global_settings', {
+
+//初始值
+const initial_value = {
     log_module : {
         log_path : 'C:\\Users\\Public\\YeuolyDanmu\\',
         gift_path : 'C:\\Users\\Public\\YeuolyDanmu\\',
@@ -23,16 +25,26 @@ let global_settings = store.get('global_settings', {
     },
     display_module : {
         auto_fold_repeat_danmu : true,
-        super_staying_time_each : 10
+        super_staying_time_each : 10,
+        gift_greet : '赠送了',
     }
-});
+}
+
+let global_settings = store.get('global_settings', initial_value);
 
 const refreshSettings = () => {
     global_settings = store.get('global_settings');
 }
 
 const setSettings = () => {
+    store.delete('global_settings');
     store.set('global_settings',global_settings);
 }
 
-export { global_settings , refreshSettings , setSettings };
+const initSettings = () => {
+    store.delete('global_settings');
+    store.set('global_settings',initial_value);
+    refreshSettings();
+}
+
+export { global_settings , refreshSettings , setSettings , initSettings };

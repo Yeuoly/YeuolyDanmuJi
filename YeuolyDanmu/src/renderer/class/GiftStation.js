@@ -89,13 +89,15 @@ let ordinary_list = [
 ];
 
 //获取常见礼物列表，辣条单独处理
-(function initOrdinaryList(){
+function initOrdinaryList(){
     gift_list.forEach( e => {
         if(e.price < ordinary_price && e.id !== 1){
             ordinary_list.push(e);
         }
     });
-})();
+};
+
+initOrdinaryList();
 
 //默认舰队，免得加载失败
 let guard_list = [
@@ -172,6 +174,7 @@ const GiftStation = {
                 guard_list = data['data']['guard_resources'];
                 //选出常用礼物
                 initOrdinaryList();
+                INFO.log('REFRESH_GIFT_CONFIG','刷新礼物列表成功');
             }else{
                 INFO.warning('REFRESH_GIFT_CONFIG','刷新礼物列表失败');
             }

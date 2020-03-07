@@ -1,6 +1,6 @@
 <template>
     <div class="block advance-settings">
-        <p>
+        <p style="padding:0">
             <el-button type="primary" plain @click="openCourse">点这里看教程</el-button>
         </p>
         <span class="grey demonstration">日志保存路径</span>
@@ -67,14 +67,19 @@
         <el-input placeholder="请输入" v-model.number="origin['display_module']['super_staying_time_each']">
             <template slot="prepend">SuperChat单次停留时间(s)</template>
         </el-input>
+        <el-input placeholder="礼物用语" v-model.number="origin['display_module']['gift_greet']">
+            <template slot="prepend">某某某</template>
+            <template slot="append">233个辣条</template>
+        </el-input>
         <el-button type="primary" style="width:100px;height:40px;margin-top:10px" plain @click="save">保存</el-button>
+        <el-button type="danger" style="width:100px;height:40px;margin-top:10px" plain @click="init">重置</el-button>
     </div>
 </template>
 
 <script>
 const ipc = require('electron').ipcRenderer;
 
-import { global_settings , refreshSettings , setSettings } from '../settings/global_settings';
+import { global_settings , refreshSettings , setSettings , initSettings } from '../settings/global_settings';
 
 export default {
     data : () => ({
@@ -86,6 +91,9 @@ export default {
             setSettings();
             //保存后要通知弹幕窗口更新
             ipc.send('to-danmu','refresh-settings');
+        },
+        init(){
+            initSettings();
         },
         refresh(){
             refreshSettings();

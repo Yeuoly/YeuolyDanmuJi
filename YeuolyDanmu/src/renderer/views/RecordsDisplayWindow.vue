@@ -1,16 +1,19 @@
 <template>
     <div>
-        <div v-for="(i, key) in resource"
-             :key="key"
-        >
-            <SuperChat :Danmu="i" v-if="i.type='super_chat'" />
-            <Gift :Gift="i" v-else-if="i.type='gift'" >
-        </div>
+        <el-row>
+            <el-col :span="12"
+                    v-for="(i, key) in resource"
+                    :key="key"
+            >
+                <SuperChat class="super-chat-records" :Danmu="i" v-if="i.type='super_chat'" />
+                <Gift :Gift="i" v-else-if="i.type='gift'" />
+            </el-col>
+        </el-row>
     </div>
 </template>
 
 <script>
-import { getDailyLogRecordsPointer, getDailyGiftRecordsPointer, getDailySCRecordsPointer } from '../data/settings';
+import { getDailyLogRecordsPointer, getDailyGiftRecordsPointer, getDailySCRecordsPointer } from '../data/logs';
 import SuperChat from '../components/items/SuperChat';
 import Gift from '../components/items/Gift';
 
@@ -30,5 +33,22 @@ export default {
             }
         }
     },
+    watch: {
+        '$route.meta' : {
+            handler(newVal){
+                if(['gift','sc','log'].includes(newVal.type)){
+                    this.loadResource();
+                }
+            },
+            immediate : true
+        }
+    },
 }
 </script>
+
+<style scoped>
+.super-chat-records{
+    padding: 8px;
+    width: 350px;
+}
+</style>

@@ -48,7 +48,23 @@ export default new Router({
           path : '/index/advance-settings',
           component: require('@/views/AdvanceSettings.vue').default,
           meta : {
-            title : '高级设置，请根据教程更改，改错了我不背锅（'
+            title : '高级设置，请根据教程更改，改错了我不背锅（建议保存后重启'
+          }
+        },{
+          name : 'records-gift-window',
+          path : '/index/records-gift-window',
+          component: () => import('@/views/RecordsDisplayWindow.vue'),
+          meta : {
+            title : '礼物记录',
+            type : 'gift'
+          }
+        },{
+          name : 'records-sc-window',
+          path : '/index/records-sc-window',
+          component: () => import('@/views/RecordsDisplayWindow.vue'),
+          meta : {
+            title : 'SC记录',
+            type : 'sc'
           }
         }
       ]

@@ -74,6 +74,10 @@ import { global_settings } from '../settings/global_settings';
 import Danmu from '../class/Danmu';
 import { SuperChat , Gift } from '../class/Danmu';
 
+import { addGift, addLog, addSC } from '../data/logs';
+// const addSC = require('../data/logs').addSC;
+// const addGift = require('../data/logs').addGift;
+
 const ipc = require('electron').ipcRenderer;
 
 export default {
@@ -93,14 +97,18 @@ export default {
         transDanmus(danmus){
             //向弹幕窗口发送新弹幕
             ipc.send('to-danmu','trans-danmu',this.danmusFilter(danmus));
+            //入库保存
+            //但是叭。。这个弹幕量太大的时候我还没想好怎么处理数据。。所以弹幕先不入库了。。
         },
         //传输sc
         transSuperChat(sc){
             ipc.send('to-danmu','trans-sc',sc);
+            addSC(sc);
         },
         transGift(gift){
             //这里最后需要做一点调整，把礼物全部传输到一个单独显示礼物的地方
             ipc.send('to-danmu','trans-gift',gift);
+            addGift(gift);
         },
         //过滤弹幕
         danmusFilter(danmus){

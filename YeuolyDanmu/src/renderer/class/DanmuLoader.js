@@ -116,7 +116,6 @@ export default class DanmuLoader{
 
     //处理消息
     onMessage(e){
-        INFO.log('RevMsg','获取到新数据');
         const data = e.data;
         const bili_decoder = new BiliDataDecoder(data, self => {
             //睿站这里有个很蛋疼的地方，一次传输的消息可能有好几个封装，需要在这里分离开，你说你老老实实用JSON它不香吗
@@ -136,7 +135,6 @@ export default class DanmuLoader{
                         break;
                     case 5:
                         //处理数据主体
-                        INFO.log('RevMsg','接受到主流消息');
                         const data_buf = self.getBodyBuffer();
                         const data_json = Utils.transFormatFromBufferToJson(data_buf);
                         this.message_handler.handleMessage(data_json);

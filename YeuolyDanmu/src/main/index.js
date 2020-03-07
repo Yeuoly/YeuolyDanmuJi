@@ -51,7 +51,7 @@ ipc.on('window-close', function () {
 });
 //向弹幕窗口的通讯
 ipc.on('to-danmu',function(sender,channel,msg){
-  if(danmu_win_id){
+  if( danmu_win_id && BrowserWindow.fromId(danmu_win_id)){
     BrowserWindow.fromId(danmu_win_id).webContents.send('to-danmu',channel,msg);
   }
 });

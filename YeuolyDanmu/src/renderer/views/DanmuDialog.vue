@@ -2,7 +2,7 @@
     <div id="handle" class="danmu-dialog">
         <i class="el-icon-s-tools" 
            id="setting" 
-           @click="handleSetting"
+           @click="handleSettingDialog"
         ></i>        
         <div id="cover" ref="cover" :style="{ backgroundColor: backgroundColor }">
             <SuperChat :Danmu="super_chats[current_super_chat]" 
@@ -10,7 +10,8 @@
                        :style="{ transform : `translateY( -${ sc_replacing ? '160' : '0' }px )` }"
             ></SuperChat>
             <DanmuGroup v-for="i in danmu_groups"
-                        :text-color="text_color(i.id)"
+                        :text-color="color_settings.text_used ? text_color(i.id) : '#fff'"
+                        :uname-color="color_settings.uanme_used ? text_color(i.id) : '#fff'"
                         :key="i.id"
                         :index="i.id"
                         :Danmus="i.value"
@@ -24,18 +25,29 @@
         >
             <div class="block">
                 <span class="demonstration">窗口透明度</span>
-                <el-slider v-model="opacity" :format-tooltip="calcOpacity"></el-slider>
+                <el-slider v-model.lazy="color_settings.opacity" :format-tooltip="calcOpacity"></el-slider>
             </div>
             <div class="block">
                 <span class="demonstration">底色：</span>
-                <el-radio-group v-model="backgound_color">
+                <el-radio-group v-model.lazy="color_settings.backgound_color">
                     <el-radio :label="0">白色</el-radio>
                     <el-radio :label="1">黑色</el-radio>
                 </el-radio-group>
             </div>
-            <span class="demonstration">
+            <p class="demonstration">
                 温馨提示：透明度请以关闭设置窗口后的为准
-            </span>
+            </p>
+            <el-switch 
+                v-model="color_settings.uanme_used"
+                active-text="将用户名与色组绑定"
+                style="padding-bottom:5px"
+            ></el-switch>
+            <el-switch 
+                v-model="color_settings.text_used"
+                active-text="将弹幕文本与色组绑定"
+                style="padding-bottom:5px"
+            ></el-switch>
+            <el-button plain type="primary" @click="saveColorSettings">保存设置</el-button>
         </el-dialog>
     </div>
 </template>
@@ -65,10 +77,20 @@ import { global_settings , refreshSettings } from '../settings/global_settings';
 //sc停留时间判定
 import SCTimer from '../settings/super_chat_staying_time';
 
+//SC类
 import { SuperChat } from '../class/Danmu';
 
-//礼物欢迎语
-let gift_pre_saying = '赠送了';
+//获取礼物欢迎语
+import Utils from '../class/Utils';
+const gift_pre_saying = Utils.varToPointer( () => global_settings['display_module']['gift_greet'] );
+
+//色彩设置
+const color_settings =  store.get('danmu-dialog|color_settings', {
+    uanme_used : true,
+    text_used : false,
+    opacity : 50,
+    backgound_color : 1
+});
 
 export default {
     name : 'DanmuDialog',
@@ -85,10 +107,9 @@ export default {
         current_super_chat : 0,
         sc_cycling : false,
         dialog_open : false,
-        opacity : 50,
-        backgound_color : 1,
+        color_settings : color_settings,
         danmu_size : 16,
-        sc_replacing : true
+        sc_replacing : true,
     }),
     computed : {
         text_color(index){
@@ -98,11 +119,15 @@ export default {
                 return '#ffffff';
         },
         backgroundColor(){
-            return `rgba(${ this.backgound_color === 1 ? '0,0,0' : '255,255,255' },${ this.opacity / 100 })`;
+            return `rgba(${ this.color_settings.backgound_color === 1 ? 
+            '0,0,0' : '255,255,255' },${ this.color_settings.opacity / 100 })`;
         }
     },
     methods: {
-        handleSetting(){
+        saveColorSettings(){
+            store.set('danmu-dialog|color_settings',this.color_settings);
+        },
+        handleSettingDialog(){
             this.dialog_open = !this.dialog_open;
         },
         calcOpacity(val){

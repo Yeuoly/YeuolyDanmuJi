@@ -6,7 +6,7 @@
              :src="i"
         /> -->
         <div ref="text" class="danmu-text"> 
-            <span>{{Danmu.user.id}}:</span> 
+            <span :style="{ color : unameColor }" >{{Danmu.user.id}}:</span> 
             <span :style="{ color : textColor }">
                 <span v-html="Danmu.message"></span>
             </span> 
@@ -20,7 +20,7 @@ import { getAvatar } from '../../class/Avatar';
 
 export default {
     name : 'Danmu',
-    props : ['Danmu','text-color'],
+    props : ['Danmu','text-color','uname-color'],
     mounted() {
         //图片链接加载与图片预加载
         const tot_avt = this.Danmu.users.uids.length;

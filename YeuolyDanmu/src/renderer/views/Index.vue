@@ -34,8 +34,24 @@
                             <el-menu-item index="2-2" @click="$router.push('/index/color-settings')">
                                 颜色设置
                             </el-menu-item>
+                            <template slot="title">高级设置</template>
                             <el-menu-item index="2-3" @click="$router.push('/index/advance-settings')">
                                 高级设置
+                            </el-menu-item>
+                        </el-menu-item-group>
+                    </el-submenu>
+                    <el-submenu index="4">
+                        <template slot="title">
+                            <i class="el-icon-setting"></i>
+                            <span>记录</span>
+                        </template>
+                        <el-menu-item-group>
+                            <template slot="title">SC、礼物记录</template>
+                            <el-menu-item index="4-1" @click="$router.push('/index/records-gift-window')">
+                                礼物记录
+                            </el-menu-item>
+                            <el-menu-item index="4-2" @click="$router.push('/index/records-sc-window')">
+                                SC记录
                             </el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>

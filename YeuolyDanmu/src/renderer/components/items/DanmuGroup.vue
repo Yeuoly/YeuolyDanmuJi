@@ -4,6 +4,7 @@
                :Danmu="i"
                :key="key"
                :text-color="textColor"
+               :uname-color="unameColor"
                @finishedLoadingAvatar="finishedLoadingAvatar"
         ></Danmu>
     </div>
@@ -19,7 +20,7 @@ const max_offset = require('electron').screen.getPrimaryDisplay().workAreaSize.h
 export default {
     name : 'DanmuGroup',
     components : { Danmu },
-    props : ['Danmus','index','textColor'],
+    props : ['Danmus','index','textColor','unameColor'],
     data : () => ({
         isShow : false,
         offset : 0,
