@@ -8,6 +8,7 @@
 
 <script>
   import DanmuLoader from './class/DanmuLoader';
+  import { writeRecords } from './data/logs';
 
   export default {
     name: 'yeuoly_danmu',
@@ -23,9 +24,15 @@
         callback(newVar);
       });
     },
+    beforeDestroy() {
+      writeRecords();
+    },
   }
 </script>
 
 <style>
-  /* CSS */
+  @font-face {
+        font-family: 'DanmuFont';
+        src: url('./assets/SuCaiJiShiKangKangTi-2.ttf');
+    }
 </style>

@@ -56,6 +56,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "electron-drag": "^1.2.2",
+    "electron-log": "^4.0.7",
     "electron-store": "^5.1.0",
     "electron-vue-windows": "^1.0.41",
     "element-ui": "^2.13.0",

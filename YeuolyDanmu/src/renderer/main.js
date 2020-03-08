@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import axios from 'axios'
 
+//初始化设置
+import('../init/index');
+
 axios.defaults.withCredentials = true;
 
 import App from './App'
@@ -27,9 +30,6 @@ Vue.use(ElementUI);
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
-
-//初始化设置
-import('../init');
 
 /* eslint-disable no-new */
 new Vue({

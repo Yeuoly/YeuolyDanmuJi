@@ -22,6 +22,8 @@ const winURL = process.env.NODE_ENV === 'development'
 //定义最大化最小化事件
 const electron = require('electron');
 
+// const fs = require('fs');
+
 const ipc = electron.ipcMain;
 //登录窗口最小化
 ipc.on('window-min', function () {

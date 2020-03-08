@@ -9,6 +9,9 @@
         <el-input type="text" v-model="origin['log_module']['gift_path']"></el-input>
         <span class="grey demonstration">SC信息保存路径</span>
         <el-input type="text" v-model="origin['log_module']['log_path']"></el-input>
+        <el-input placeholder="请输入" v-model.number="origin['log_module']['wirte_interval']">
+            <template slot="prepend">日志保存间隔（s）</template>
+        </el-input>
         <p class="demonstration grey">加载速度信息</p>
         <el-table :data="speed_list"
                   style="width : 100%"

@@ -325,10 +325,6 @@ export default {
         transition: all .4s;
     }
 
-    @font-face {
-        font-family: 'DanmuFont';
-        src: url('../assets/SuCaiJiShiKangKangTi-2.ttf');
-    }
     .danmu-dialog{
         width: 100%;
         margin: 0;

@@ -42,7 +42,7 @@
                     </el-submenu>
                     <el-submenu index="4">
                         <template slot="title">
-                            <i class="el-icon-setting"></i>
+                            <i class="el-icon-reading"></i>
                             <span>记录</span>
                         </template>
                         <el-menu-item-group>

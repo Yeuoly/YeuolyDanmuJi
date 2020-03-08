@@ -1,7 +1,12 @@
 import { InfoEventBus } from '../events/evnetBus';
+const log = require('electron-log');
 
 class Info{
     log(block,message,color){
+        log.log({
+            block : block,
+            message : message,
+        });
         InfoEventBus.$emit(
             'logger-insert',
             `[${new Date().format('yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`,
@@ -10,6 +15,10 @@ class Info{
         );
     }
     error(block,message){
+        log.error({
+            block : block,
+            message : message,
+        });
         InfoEventBus.$emit(
             'logger-insert',
             `[${new Date().format('yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`,
@@ -18,6 +27,10 @@ class Info{
         );
     }
     warning(block,message){
+        log.warn({
+            block : block,
+            message : message,
+        });
         InfoEventBus.$emit(
             'logger-insert',
             `[${new Date().format('yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`,

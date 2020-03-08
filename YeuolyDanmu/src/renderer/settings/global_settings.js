@@ -6,7 +6,8 @@ const initial_value = {
     log_module : {
         log_path : 'C:\\Users\\Public\\YeuolyDanmu\\',
         gift_path : 'C:\\Users\\Public\\YeuolyDanmu\\',
-        sc_path : 'C:\\Users\\Public\\YeuolyDanmu\\'
+        sc_path : 'C:\\Users\\Public\\YeuolyDanmu\\',
+        wirte_interval : 120
     },
     loading_module : {
         auto_filt_low_gift : true,
