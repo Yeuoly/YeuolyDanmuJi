@@ -1,5 +1,19 @@
 <template>
     <div>
+        <i title="过滤器" class="filter-dialog-btn el-icon-finished" @click="handleFilterWindow"></i>
+        <el-dialog width="80%" title="过滤" center :visible.sync="show_filter">
+            <el-switch active-text="显示辣条" v-model="filter.show_latiao" style="width:99%;padding-bottom: 5px;"></el-switch>
+            <el-input placeholder="请输入" v-model.number="filter.price['>']" style="width:48%">
+                <template slot="prepend">
+                    礼物价值大于
+                </template>
+            </el-input>
+            <el-input placeholder="请输入" v-model.number="filter.price['<']" style="width:48%">
+                <template slot="append">
+                    礼物价值小于
+                </template>
+            </el-input>
+        </el-dialog>
         <el-row>
             <el-col :span="12"
                     v-for="(i, key) in current_pages"
@@ -35,7 +49,15 @@ import Gift from '../components/items/Gift';
 export default {
     data : () => ({
         resource : null,
-        current_page : 1
+        current_page : 1,
+        show_filter : false,
+        filter : {
+            price : {
+                '>' : 0,
+                '<' : 99999999
+            },
+            show_latiao : true,
+        }
     }),
     components : { SuperChat , Gift },
     methods: {
@@ -48,9 +70,22 @@ export default {
         },
         jumpPage(page){
             this.current_page = page;
+        },
+        handleFilterWindow(){
+            this.show_filter = !this.show_filter;
         }
     },
     computed: {
+        filted_resource(){
+            if(this.is_sc){
+                return this.resource;
+            }
+            return this.resource.filter( e => {
+                //过滤
+                return ( this.filter.show_latiao || ( !this.filter.show_latiao && e.gift_id !== 1 ) )
+                    && ( e.gift_price > this.filter.price['>'] && e.gift_price < this.filter.price['<'] );
+            });
+        },
         is_sc(){
             return this.$route.meta.type === 'sc';
         },
@@ -58,10 +93,10 @@ export default {
             return this.is_sc ? 8 : 30;
         },
         total_pages(){
-            return parseInt(this.resource.length / this.each_length) + 1;
+            return parseInt(this.filted_resource.length / this.each_length) + 1;
         },
         current_pages(){
-            return this.resource.filter( ( e, i ) => {
+            return this.filted_resource.filter( ( e, i ) => {
                 return  ( i >= ( this.current_page - 1 ) * this.each_length )
                     && ( i < ( this.current_page ) * this.each_length );
             });
@@ -99,5 +134,15 @@ export default {
 .super-chat-records{
     padding: 8px;
     width: 350px;
+}
+.filter-dialog-btn{
+    font-size: 15px;
+    font-weight: bold;
+    color: grey;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 5;
+    cursor: pointer;
 }
 </style>

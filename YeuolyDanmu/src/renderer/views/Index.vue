@@ -55,6 +55,12 @@
                             </el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
+                    <el-menu-item index="5" @click="$router.push('/index/statistic')">
+                        <template slot=title>
+                            <i class="el-icon-pie-chart"></i>
+                            <span>统计</span>
+                        </template>
+                    </el-menu-item>
                 </el-menu>
             </el-aside>
         </el-container>

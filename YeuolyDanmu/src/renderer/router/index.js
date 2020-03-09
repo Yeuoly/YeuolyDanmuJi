@@ -66,6 +66,13 @@ export default new Router({
             title : 'SC记录',
             type : 'sc'
           }
+        },{
+          name : 'statistic',
+          path : '/index/statistic',
+          component: () => import('@/views/Statistic.vue'),
+          meta : {
+            title : '统计数据'
+          }
         }
       ]
     },

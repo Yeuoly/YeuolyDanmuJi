@@ -18,18 +18,26 @@ export default {
     computed: {
         background_color(){
             const p = this.Gift.gift_price;
-            if(p < 9900){
-                return '#2A60B2';
-            }else if(p < 20000){
-                return '#427D9E';
-            }else if(p < 50000){
-                return '#E2B52B';
-            }else if(p < 100000){
-                return '#E09443';
-            }else if(p < 200000){
-                return '#E54D4D';
+            if(this.Gift.gift_id === 1 ){
+                if(p < 50000){
+                    return '#2A60B2';
+                }else{
+                    return '#E09443';
+                }
             }else{
-                return '#AB1A32';
+                if(p < 9900){
+                    return '#E9967A';
+                }else if(p < 20000){
+                    return '#FA8072';
+                }else if(p < 50000){
+                    return '#FFA07A';
+                }else if(p < 100000){
+                    return '#FFA500';
+                }else if(p < 200000){
+                    return '#FF8C00';
+                }else{
+                    return '#FF7F50';
+                }
             }
         }
     },
@@ -41,7 +49,7 @@ export default {
         border-radius: 20px;
         /* background-color: white; */
         margin-bottom: 5px;
-        margin-right: 5px;
+        margin-right: 15px;
     }
 
     .avatar{

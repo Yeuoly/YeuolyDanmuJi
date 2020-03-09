@@ -190,8 +190,8 @@ const GiftStation = {
             }
         }
         for(let i in gift_list){
-            if(ordinary_list[i].id === gid ){
-                return ordinary_list[i].img_basic;
+            if(gift_list[i].id === gid ){
+                return gift_list[i].img_basic;
             }
         }
     },
