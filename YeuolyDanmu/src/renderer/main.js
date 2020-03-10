@@ -4,6 +4,11 @@ import axios from 'axios'
 //初始化设置
 import('../init/index');
 
+//安装图表库
+import VueEcharts from 'vue-echarts';
+import theme from './components/charts/westeros.json';
+VueEcharts.registerTheme('westeros',theme);
+
 axios.defaults.withCredentials = true;
 
 import App from './App'

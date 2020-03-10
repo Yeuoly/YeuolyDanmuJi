@@ -6,6 +6,9 @@ import Utils from '../class/Utils';
 //引入礼物处理
 import GiftStation from './GiftStation';
 
+//传输速度
+import { OrdinaryEventBus } from '../events/evnetBus';
+
 //获取全局设置
 import { global_settings } from '../settings/global_settings';
 
@@ -75,7 +78,14 @@ export default class MessageHandler{
     //计算速度
     speedCalc(){
         const dif = this.danmu_count.now - this.danmu_count.last;
-        const speed = (dif / this.waiting_time) * 1000;
+        const speed = (dif / this.speed_info.waiting_time) * 1000;
+        //传出
+        /**
+         * 加上这个传输速度我的内心是很复杂的，一开始我是想核心模块耦合度要很低的，但是
+         * 这里就有个计算速度的，外边又有个需要速度的统计，那能怎么办，不止于再做一个叭？
+         * 再做一个又会造成性能损耗，那就用吧，耦合度我就不管了
+         */
+        OrdinaryEventBus.$emit('current-speed',{ count : dif , time : this.speed_info.waiting_time });
         for(let i in speed_list_time){
             if( speed >= speed_list_time[i].SPEED ){
                 this.speed_info = { 

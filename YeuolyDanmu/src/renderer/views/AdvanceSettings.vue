@@ -3,11 +3,7 @@
         <p style="padding:0">
             <el-button type="primary" plain @click="openCourse">点这里看教程</el-button>
         </p>
-        <span class="grey demonstration">日志保存路径</span>
-        <el-input type="text" v-model="origin['log_module']['log_path']"></el-input>
-        <span class="grey demonstration">礼物信息保存路径</span>
-        <el-input type="text" v-model="origin['log_module']['gift_path']"></el-input>
-        <span class="grey demonstration">SC信息保存路径</span>
+        <span class="grey demonstration">日志保存路径，大部分数据都会保存在这里</span>
         <el-input type="text" v-model="origin['log_module']['log_path']"></el-input>
         <el-input placeholder="请输入" v-model.number="origin['log_module']['wirte_interval']">
             <template slot="prepend">日志保存间隔（s）</template>

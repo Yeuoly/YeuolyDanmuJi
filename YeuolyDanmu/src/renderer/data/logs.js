@@ -1,5 +1,6 @@
 import { global_settings } from '../settings/global_settings';
 import Utils from '../class/Utils';
+import { OrdinaryEventBus } from '../events/evnetBus';
 import HashList from '../class/HashList';
 //落魄到用日志文件来代替原本的礼物SC记录
 const log = require('electron-log');
@@ -9,7 +10,7 @@ log.transports.console.level = false;
  * 每次写入记录都是 【时间】+【类别】+【文本】这样的格式
  * 每次写入只写入新增记录，具体实现看底下叭，就算写的时候很懵很乱，这点逻辑应该还是很容易看懂的
  */
-log.transports.file.file =  `${global_settings['log_module']['sc_path']}records\\${Utils.formatDate(new Date(),'yyyy-MM-dd-hh')}.txt`;
+log.transports.file.file =  `${global_settings['log_module']['log_path']}records\\${Utils.formatDate(new Date(),'yyyy-MM-dd-hh')}.txt`;
 log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
 
 /**
@@ -36,7 +37,15 @@ const statistics = {
     'danmu_count' : 0,
     'interactional_dd_count' : 0,
     'paied_dd_count' : 0,
-    'total_sc_price' : 0
+    'total_sc_price' : 0,
+    'danmu_speeds' : {  
+        'value' : [ 0 ],
+        'date' : [ Utils.formatDate(new Date(),'hh:mm:ss') ]
+    },
+    'danmu_speed_cache' : {
+        accumulate_time : 0,
+        accumulate_count : 0
+    }
 };
 
 //好了，开始处理hash，参加互动的dd数量级应该是10^3-10^4，用两层表够了，打钱的dd应该在10^2左右，一层表就行了
@@ -58,6 +67,19 @@ export function writeRecords(){
     last_index_sc = daily_sc_records.length;
     last_index_danmu = daily_danmu_records.length;
 }
+
+//挂载速度事件
+OrdinaryEventBus.$on('current-speed', v => {
+    statistics.danmu_speed_cache.accumulate_time += v.time / 1000;
+    statistics.danmu_speed_cache.accumulate_count += v.count;
+    if(statistics.danmu_speed_cache.accumulate_time > 60){
+        statistics.danmu_speeds.value.push(
+            statistics.danmu_speed_cache.accumulate_count / statistics.danmu_speed_cache.accumulate_time
+        );
+        statistics.danmu_speeds.date.push(Utils.formatDate(new Date(),'hh:mm:ss'));
+        statistics.danmu_speed_cache = { accumulate_count : 0, accumulate_time : 0 };
+    }
+});
 
 export function getDailyGiftRecords(){
     return daily_gift_records.slice(0);
@@ -91,6 +113,10 @@ export function addLog(log){
     daily_log_records.push(log);
 }
 export function addGift(gf){
+    //先检测互动过没
+    if(interactional_dd_hash.insert({ uid:gf.user.uid },gf.user.uid)){
+        statistics.interactional_dd_count++;
+    }
     //如果不是辣条那就是打了钱，然后就检测是否打过钱
     if(gf.gift_id !== 1){
         if(paied_dd_hash.insert({ uid:gf.user.uid },gf.user.uid)){
