@@ -1,6 +1,7 @@
 <template>
-    <div id="handle" class="danmu-dialog">
-        <i class="el-icon-s-tools" 
+    <div @click="initSleeper">
+    <div id="handle" class="danmu-dialog" :style="{ transform : master_transform }">
+            <i class="el-icon-s-tools" 
            id="setting" 
            @click="handleSettingDialog"
         ></i>        
@@ -10,14 +11,15 @@
                        :style="{ transform : `translateY( -${ sc_replacing ? '160' : '0' }px )` }"
             ></SuperChat>
             <DanmuGroup v-for="i in danmu_groups"
-                        :text-color="color_settings.text_used ? text_color(i.id) : '#fff'"
-                        :uname-color="color_settings.uanme_used ? text_color(i.id) : '#fff'"
+                        :text-color="screen_settings.text_used ? text_color(i.id) : '#fff'"
+                        :uname-color="screen_settings.uanme_used ? text_color(i.id) : '#fff'"
                         :key="i.id"
                         :index="i.id"
                         :Danmus="i.value"
             ></DanmuGroup>
         </div>
-        <el-dialog width="95%" 
+    </div>
+    <el-dialog width="95%" 
                    title="设置" 
                    :visible.sync="dialog_open"
                    center
@@ -25,11 +27,11 @@
         >
             <div class="block">
                 <span class="demonstration">窗口透明度</span>
-                <el-slider v-model.lazy="color_settings.opacity" :format-tooltip="calcOpacity"></el-slider>
+                <el-slider v-model.lazy="screen_settings.opacity" :format-tooltip="calcOpacity"></el-slider>
             </div>
             <div class="block">
                 <span class="demonstration">底色：</span>
-                <el-radio-group v-model.lazy="color_settings.backgound_color">
+                <el-radio-group v-model.lazy="screen_settings.backgound_color">
                     <el-radio :label="0">白色</el-radio>
                     <el-radio :label="1">黑色</el-radio>
                 </el-radio-group>
@@ -38,18 +40,26 @@
                 温馨提示：透明度请以关闭设置窗口后的为准
             </p>
             <el-switch 
-                v-model="color_settings.uanme_used"
+                v-model="screen_settings.uanme_used"
                 active-text="将用户名与色组绑定"
                 style="padding-bottom:5px"
             ></el-switch>
             <el-switch 
-                v-model="color_settings.text_used"
+                v-model="screen_settings.text_used"
                 active-text="将弹幕文本与色组绑定"
                 style="padding-bottom:5px"
             ></el-switch>
+            <el-switch
+                v-model="screen_settings.sleeper"
+                active-text="启动自动休眠"
+                style="padding-bottom:5px"
+            ></el-switch>
+            <el-input v-model.number="screen_settings.dormancy_interval" style="padding-bottom:5px">
+                <template slot="prepend">休眠时间(s)</template>
+            </el-input>
             <el-button plain type="primary" @click="saveColorSettings">保存设置</el-button>
         </el-dialog>
-    </div>
+    </div>    
 </template>
 
 <script>
@@ -84,13 +94,18 @@ import { SuperChat } from '../class/Danmu';
 import Utils from '../class/Utils';
 const gift_pre_saying = Utils.varToPointer( () => global_settings['display_module']['gift_greet'] );
 
-//色彩设置
-const color_settings =  store.get('danmu-dialog|color_settings', {
+//屏幕设置
+const screen_settings =  store.get('danmu-dialog|screen_settings', {
     uanme_used : true,
     text_used : false,
     opacity : 50,
-    backgound_color : 1
+    backgound_color : 1,
+    dormancy_interval : 60,
+    sleeper : true
 });
+
+//休眠器
+import { IntervalTimer } from '../class/Timer';
 
 export default {
     name : 'DanmuDialog',
@@ -107,9 +122,11 @@ export default {
         current_super_chat : 0,
         sc_cycling : false,
         dialog_open : false,
-        color_settings : color_settings,
+        screen_settings : screen_settings,
         danmu_size : 16,
         sc_replacing : true,
+        hidding_dialog : false,
+        sleep_timer : null
     }),
     computed : {
         text_color(index){
@@ -119,13 +136,21 @@ export default {
                 return '#ffffff';
         },
         backgroundColor(){
-            return `rgba(${ this.color_settings.backgound_color === 1 ? 
-            '0,0,0' : '255,255,255' },${ this.color_settings.opacity / 100 })`;
+            return `rgba(${ this.screen_settings.backgound_color === 1 ? 
+            '0,0,0' : '255,255,255' },${ this.screen_settings.opacity / 100 })`;
+        },
+        master_transform(){
+            return `translateX(${this.hidding_dialog ? 'calc(100% + 18px)' : '0'})`;
         }
     },
     methods: {
+        initSleeper(){
+            if(!this.screen_settings.sleeper)return;
+            this.hidding_dialog = false;
+            this.sleep_timer.$continue('screen-sleep');
+        },
         saveColorSettings(){
-            store.set('danmu-dialog|color_settings',this.color_settings);
+            store.set('danmu-dialog|screen_settings',this.screen_settings);
         },
         handleSettingDialog(){
             this.dialog_open = !this.dialog_open;
@@ -155,6 +180,9 @@ export default {
             ipc.send('danmu-mounted',win_id);
             //用于接收所有传输到弹幕窗口的信息
             ipc.on('to-danmu', ( sender, channel, msg ) => {
+                //重置休眠器
+                this.screen_settings.sleeper && this.sleep_timer.$continue('screen-sleep');
+                this.hidding_dialog = false;
                 switch(channel){
                     case 'trans-danmu':
                         this.loadDanmu(msg);
@@ -210,6 +238,7 @@ export default {
         spendSC(src){
             src.last_tims--;
             this.super_chats.push(src);
+            this.screen_settings.sleeper && this.sleep_timer.$continue('screen-sleep');
         },
         loadGift(gift){
             if(gift.is_super){
@@ -279,6 +308,13 @@ export default {
                 this.danmu_groups = [];
             }
         },
+        setupSleep(){
+            this.sleep_timer = new IntervalTimer();
+            this.sleep_timer.$on('screen-sleep',() => {
+                this.hidding_dialog = true;
+            },this.screen_settings.dormancy_interval);
+            this.screen_settings.sleeper && this.sleep_timer.$continue('screen-sleep');
+        },
         // onFast(flag){
         //     if(this.fast_flag !== flag){
         //         this.fast_flag = flag;
@@ -303,10 +339,8 @@ export default {
             document.querySelector('#handle').style['-webkit-app-region'] = 'drag';
         }
         this.setupRevMsg();
-        //将滑条固定在最底部
-        // this.move_interval = setInterval(() => {
-        //     this.moveScroll();
-        // },100);        
+        //设置睡眠事件
+        this.setupSleep();
     },
 }
 </script>
@@ -319,7 +353,7 @@ export default {
 
     .superchats{
         position: absolute;
-        width: 100%;
+        width: calc(100% + 16px);
         z-index: 100;
         margin-left: -8px;
         transition: all .4s;
@@ -330,6 +364,7 @@ export default {
         margin: 0;
         padding: 0;
         border: 0;
+        transition: all ease-in .5s;
     }
     #cover{
         background-color: rgba(255,255, 255, 0.5);

@@ -13,6 +13,7 @@ export default {
         [ 100 , 300 , 10 ],
         [ 300 , 500 , 20 ],
         [ 500 , 1000, 50 ],
+        [ 1000, 2000, 80 ]
     ],
     getTimes(price){
         for(let i in this.list){
