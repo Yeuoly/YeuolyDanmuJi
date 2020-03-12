@@ -8,12 +8,14 @@ export default class Danmu{
     constructor(
         user_id,user_uid,message,
         medal_level,medal_nickname,medal_up,
-        live_ul,live_ul_rank
+        live_ul,live_ul_rank,
+        guard_type
     ){
         this.user = new User(user_id,user_uid,null,0,live_ul,live_ul_rank);
         this.medal = new Medal(medal_level,medal_nickname,medal_up,0);
         this.message = message;
         this.type = 'normal';
+        this.guard_type = guard_type;
     }
 
     getUserInfo(){ return this.user; }

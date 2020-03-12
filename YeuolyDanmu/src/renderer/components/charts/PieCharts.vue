@@ -68,7 +68,7 @@ export default {
                 left: 'center'
             },
             grid : {
-                left : 73,
+                left : 300,
             },
             tooltip: {
                 trigger: 'item',
@@ -87,8 +87,8 @@ export default {
                 {
                     name: '对象',
                     type: 'pie',
-                    radius: '55%',
-                    center: ['40%', '50%'],
+                    radius: '50%',
+                    center: ['50%', '50%'],
                     data: [],
                     emphasis: {
                         itemStyle: {

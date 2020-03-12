@@ -96,7 +96,6 @@ export default class HashList{
         if(offset === this.offset){
             parent[dict[hash[offset - 1]]] = [ hash , value ];
         }else{
-            console.log(hash);
             this.setByOffsetRecursion(parent[dict[hash[offset - 1]]],hash,value,offset + 1);
         }
     }

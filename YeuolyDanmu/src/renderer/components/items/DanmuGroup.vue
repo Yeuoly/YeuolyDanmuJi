@@ -5,7 +5,6 @@
                :key="key"
                :text-color="textColor"
                :uname-color="unameColor"
-               @finishedLoadingAvatar="finishedLoadingAvatar"
         ></Danmu>
     </div>
 </template>
@@ -30,13 +29,6 @@ export default {
         teleParent(){
             const height = this.$refs.controller.offsetHeight;
             DanmuGroupEventBus.$emit('move',this.index,height);
-            this.show();
-        },
-        finishedLoadingAvatar(){
-            this.finished_children_count++;
-            if(this.finished_children_count === this.Danmus.length){
-                this.teleParent();
-            }
         },
         move(index,offset){
             if(this.index >= index)return;
@@ -55,10 +47,12 @@ export default {
         }
     },
     mounted() {
+        this.teleParent();
         // DanmuGroupEventBus.$on(`show-${this.key}`,this.show);
         DanmuGroupEventBus.$on('move',this.move);
-        //不止于加载这么慢叭
-        setTimeout(() => { this.show(); },500);
+        //不止于加载这么慢叭，
+        setTimeout(() => { this.show(); },300);
+        //this.show();
     },
     beforeDestroy() {
         DanmuGroupEventBus.$off('move',this.move);

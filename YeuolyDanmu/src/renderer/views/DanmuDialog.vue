@@ -107,6 +107,9 @@ const screen_settings =  store.get('danmu-dialog|screen_settings', {
 //休眠器
 import { IntervalTimer } from '../class/Timer';
 
+//获取头像
+import { getAvatar } from '../class/Avatar';
+
 export default {
     name : 'DanmuDialog',
     components : { DanmuGroup , SuperChat : SuperChatComponent },
@@ -245,19 +248,22 @@ export default {
 
             }else{
                 //伪造假弹幕、真礼物，普通礼物就划过去好了，super礼物在上面处理，会停留
-                const Danmu = {
-                    users : {
-                        uids : [ gift.user.uid ]
-                    },
-                    user : {
-                        id : gift.user.id
-                    },
-                    message : `${gift_pre_saying}${gift.gift_num}个<img class="small-gift" src="${gift.gift_image}" />${gift.gift_name}`
-                }
-                this.danmu_groups.push({
-                    value : [ Danmu ],
-                    id : this.current_danmu_count++
-                });
+                //同样需要头像预加载
+                getAvatar(gift.user.uid, src => {
+                    const Danmu = {
+                        users : {
+                            faces : [ src ]
+                        },
+                        user : {
+                            id : gift.user.id
+                        },
+                        message : `${gift_pre_saying}${gift.gift_num}个<img class="small-gift" src="${gift.gift_image}" />${gift.gift_name}`
+                    }
+                    this.appendDanmu({
+                        value : [ Danmu ],
+                        id : this.current_danmu_count++
+                    });
+                })
             }
         },
         loadSuperChat(sc){
@@ -266,6 +272,12 @@ export default {
             this.spendSC(sc);
             if(!this.sc_cycling){
                 this.replaceCurrentSuperChat();
+            }
+        },
+        appendDanmu(group){
+            this.danmu_groups.push(group);
+            if(this.danmu_groups.length > danmu_max_len){
+                this.clear(20);
             }
         },
         loadDanmu(danmus){
@@ -278,27 +290,37 @@ export default {
              */
             const msg = [];
             const norepeat_danmus = [];
+            let len = 0;
+            const full_len = danmus.length;
             danmus.forEach( e => {
                 let index = msg.indexOf(e.message);
-                //得要是找到了而且开了折叠弹幕才折叠
-                if(index !== -1 && global_settings['display_module']['auto_fold_repeat_danmu']){
-                    norepeat_danmus[index].users.uids.push(e.user.uid);
-                    norepeat_danmus[index].user.id = '一般路过群众';
-                }else{
-                    e.users = {
-                        uids : [ e.user.uid ]
+                /**
+                 * 解说一下这里的迷惑操作，preload是用来向目标数组push元素的
+                 * 这里要等待头像全部加载完毕再向目标数组中push元素，而且如你所见，加载是异步的
+                 */
+                const avatar = new Image();
+                getAvatar(e.user.uid, src => {
+                    //得要是找到了而且开了折叠弹幕才折叠
+                    if(index !== -1 && global_settings['display_module']['auto_fold_repeat_danmu']){
+                        norepeat_danmus[index].users.faces.push({ guard : e.guard_type , src : src });
+                        norepeat_danmus[index].user.id = '一般路过群众';
+                    }else{
+                        e.users = { faces : [ { guard : e.guard_type , src : src } ]};
+                        norepeat_danmus.push(e);
+                        msg.push(e.message);
                     }
-                    norepeat_danmus.push(e);
-                    msg.push(e.message);
-                }
-            })
-            this.danmu_groups.push({
-                value : norepeat_danmus,
-                id : this.current_danmu_count++
+                    //先初始化完弹幕对象，再加载头像，感觉要回调地狱了
+                    avatar.src = src;
+                    avatar.onload = () => {
+                        if(++len === full_len){
+                            this.appendDanmu({
+                                id : this.current_danmu_count++,
+                                value : norepeat_danmus
+                            });
+                        }
+                    }
+                });
             });
-            if(this.danmu_groups.length > danmu_max_len){
-                this.clear(20);
-            }
         },
         //当弹幕太多了的时候清除顶部的几个
         clear(end){

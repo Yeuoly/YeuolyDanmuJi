@@ -1,10 +1,11 @@
 <template>
     <div ref="holder" class="danmu-holder">
-        <!-- <img v-for="i in Danmu.users.faces"
-             :key="i"
+        <img v-for="( i, key ) in Danmu.users.faces"
+             :key="key"
              class="avatar" 
-             :src="i"
-        /> -->
+             :src="i.src"
+             :guard="i.guard"
+        />
         <div ref="text" class="danmu-text"> 
             <span :style="{ color : unameColor }" >{{Danmu.user.id}}:</span> 
             <span :style="{ color : textColor }">
@@ -16,39 +17,14 @@
 
 <script>
 
-import { getAvatar } from '../../class/Avatar';
+// import { getAvatar } from '../../class/Avatar';
 
 export default {
     name : 'Danmu',
     props : ['Danmu','text-color','uname-color'],
-    mounted() {
-        //图片链接加载与图片预加载
-        const tot_avt = this.Danmu.users.uids.length;
-        let cur_avt = 0;
-        this.Danmu.users.faces = [];
-        this.Danmu.users.uids.forEach( e => {
-            getAvatar(e, url => {
-                this.Danmu.users.faces.push(url);
-                const image = new Image();
-                image.src = url;
-                // //这里有个很鸡儿蛋疼的问题，v-for有时候会莫名失效，所以就手动添加了
-                //不过u1s1这样写好不美观啊
-                const node = document.createElement('img');
-                node.src = url;
-                node.className = 'avatar';
-                this.$refs.holder.prepend(node);
-                image.onload = () => {
-                    cur_avt++;
-                    if(cur_avt === tot_avt){
-                        this.$emit('finishedLoadingAvatar');
-                    }
-                }
-            });
-        });
-    },
-    methods: {
-    
-    },
+    /**
+     * 原本这里有一堆预加载，现在我把预加载挪出去了，这玩意太卡了
+     */
 }
 </script>
 
@@ -80,9 +56,24 @@ export default {
     border-radius: 50%;
     padding: 5px;
     float: left;
+    background-size: cover;
+    background-position: 0 2px;
+    background-repeat: no-repeat;
 }
 
 .small-gift{
     width: 25px;
+}
+
+.avatar[guard="1"]{
+    background-image: url(//s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/guard-border-1.5823fce.png);    
+}
+
+.avatar[guard="2"]{
+    background-image: url(//s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/guard-border-2.fb413fb.png);
+}
+
+.avatar[guard="3"]{
+    background-image: url(//s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/guard-border-3.26018c5.png);
 }
 </style>
