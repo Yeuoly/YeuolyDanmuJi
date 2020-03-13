@@ -16,6 +16,7 @@
                         :key="i.id"
                         :index="i.id"
                         :Danmus="i.value"
+                        :font="screen_settings.font_family"
             ></DanmuGroup>
         </div>
     </div>
@@ -57,6 +58,18 @@
             <el-input v-model.number="screen_settings.dormancy_interval" style="padding-bottom:5px">
                 <template slot="prepend">休眠时间(s)</template>
             </el-input>
+            <p class="demonstration">
+                选择字体
+            </p>
+            <el-select v-model="screen_settings.font_family">
+                <el-option
+                    v-for="i in font_families"
+                    :key="i.id"
+                    :label="i.label"
+                    :value="i.value"
+                ></el-option>
+            </el-select>
+            <p></p>
             <el-button plain type="primary" @click="saveColorSettings">保存设置</el-button>
         </el-dialog>
     </div>    
@@ -101,7 +114,8 @@ const screen_settings =  store.get('danmu-dialog|screen_settings', {
     opacity : 50,
     backgound_color : 1,
     dormancy_interval : 60,
-    sleeper : true
+    sleeper : true,
+    font_family : 'DanmuFont'
 });
 
 //休眠器
@@ -109,6 +123,9 @@ import { IntervalTimer } from '../class/Timer';
 
 //获取头像
 import { getAvatar } from '../class/Avatar';
+
+//获取可用字体
+import { support_font } from '../class/FontController';
 
 export default {
     name : 'DanmuDialog',
@@ -129,7 +146,12 @@ export default {
         danmu_size : 16,
         sc_replacing : true,
         hidding_dialog : false,
-        sleep_timer : null
+        sleep_timer : null,
+        font_families : [{
+            id : '114514',
+            label : '默认字体',
+            value : 'DanmuFont'
+        },...support_font]
     }),
     computed : {
         text_color(index){
@@ -205,6 +227,9 @@ export default {
                     case 'refresh-settings':
                         this.refreshGlobalSettings();
                         break;
+                    case 'refresh-danmuwindow':
+                        this.initSleeper();
+                        break;
                 }
             });
             //向主窗口发送成功消息
@@ -252,7 +277,7 @@ export default {
                 getAvatar(gift.user.uid, src => {
                     const Danmu = {
                         users : {
-                            faces : [ src ]
+                            faces : [ { guard : 0 , src : src } ]
                         },
                         user : {
                             id : gift.user.id

@@ -36,6 +36,15 @@
                 <el-button 
                     type="info" 
                     plain   
+                    @click="refreshDanmuWindow" 
+                >
+                    唤醒弹幕窗口
+                </el-button>
+            </el-col>
+            <el-col :span="6">
+                <el-button 
+                    type="info" 
+                    plain   
                     @click="testSC30" 
                 >
                     测试30块SC
@@ -148,6 +157,9 @@ export default {
         wirte_records_timer : null
     }),
     methods: {
+        refreshDanmuWindow(){
+            ipc.send('to-danmu','refresh-danmuwindow');
+        },
         //传输普通弹幕
         transDanmus(danmus){
             //向弹幕窗口发送新弹幕

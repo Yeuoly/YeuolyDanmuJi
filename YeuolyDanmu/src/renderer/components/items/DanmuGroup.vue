@@ -5,6 +5,7 @@
                :key="key"
                :text-color="textColor"
                :uname-color="unameColor"
+               :font="font"
         ></Danmu>
     </div>
 </template>
@@ -19,7 +20,7 @@ const max_offset = require('electron').screen.getPrimaryDisplay().workAreaSize.h
 export default {
     name : 'DanmuGroup',
     components : { Danmu },
-    props : ['Danmus','index','textColor','unameColor'],
+    props : ['Danmus','textColor','unameColor','font'],
     data : () => ({
         isShow : false,
         offset : 0,
@@ -28,10 +29,9 @@ export default {
     methods: {
         teleParent(){
             const height = this.$refs.controller.offsetHeight;
-            DanmuGroupEventBus.$emit('move',this.index,height);
+            DanmuGroupEventBus.$emit('move',height);
         },
-        move(index,offset){
-            if(this.index >= index)return;
+        move(offset){
             if(this.offset > max_offset){
                 DanmuGroupEventBus.$off('move',this.move);
                 return;
@@ -43,12 +43,13 @@ export default {
             if(this.isShow)return;
             this.isShow = true;
             this.$refs.controller.style.opacity = 1;
-            // DanmuGroupEventBus.$off(`show-${this.key}`,this.show);
+            // DanmuGroupEventBus.$off(`show-${this.key}`,this.show)
         }
     },
     mounted() {
         this.teleParent();
         // DanmuGroupEventBus.$on(`show-${this.key}`,this.show);
+        //这里teleParent和$on顺序不能反
         DanmuGroupEventBus.$on('move',this.move);
         //不止于加载这么慢叭，
         setTimeout(() => { this.show(); },300);
