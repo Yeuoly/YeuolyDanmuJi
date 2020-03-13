@@ -168,6 +168,8 @@ export default class MessageHandler{
                     //如果是辣条或者价值低的话就丢到处理站里去，由处理站转交Task，如果不是就直接传给Task处理
                     GiftStation.insertGift(gf['uid'],gf['num'],gf['giftId'],danmu);
                     return;
+                }else{
+                    console.log(gf);
                 }
                 break;
             case 'NOTICE_MSG':
@@ -190,6 +192,7 @@ export default class MessageHandler{
                  * uid => 用户uid
                  * username => 用户名
                  */
+                
                 break;
             case 'ROOM_REAL_TIME_MESSAGE_UPDATE':
                 //这个是更新直播间信息的 $data
@@ -250,7 +253,9 @@ export default class MessageHandler{
                 const data = msg['data'];
                 danmu = new SuperChat(
                     data['user_info']['uname'],data['uid'],data['message'],
-                    data['medal_info']['medal_level'],data['medal_info']['medal_name'],data['medal_info']['anchor_uname'],
+                    data['medal_info'] ? data['medal_info']['medal_level'] : 0,
+                    data['medal_info'] ? data['medal_info']['medal_name'] : '',
+                    data['medal_info'] ? data['medal_info']['anchor_uname'] : 0,
                     data['user_info']['user_level'],data['price'],data['start_time'],data['end_time'],
                     data['background_color'],data['background_bottom_color'],data['background_price_color'],
                     data['background_image'],data['user_info']['face']
@@ -260,6 +265,55 @@ export default class MessageHandler{
                 //说出来你们可能不信，sc还有专门的日文包的，参数和上面基本一致 $data
                 /**
                  * 多了一个 message_jpn => 日文翻译草，我寻思这要是其他语种的v多了你要怎么整
+                 */
+                break;
+            case 'ACTIVITY_BANNER_UPDATE_V2':
+                /**
+                 * title => 第几名
+                 */
+                break;
+            case 'COMBO_END':
+                /**
+                 * action:"投喂"
+                    batch_combo_num:1
+                    combo_num:1
+                    end_time:1584118575
+                    gift_id:30509
+                    gift_name:"喵呀"
+                    gift_num:1
+                    guard_level:0
+                    price:1000
+                    r_uname:"Overidea_China"
+                    ruid:18149131
+                    send_master:{}
+                    start_time:1584118575
+                    uid:281764256
+                    uname:"Frpaw"
+                 */
+                break;
+            case 'COMBO_SEND':
+                /**
+                 * 这些combo不想处理了
+                 */
+                break;
+            case 'PREPARING':
+                /**
+                 * 不知道是个啥，好像暂时没啥用
+                 */
+                break;
+            case 'WEEK_STAR_CLOCK':
+                /**
+                 * 周星的信息，没啥用
+                 */
+                break;
+            case 'RAFFLE_START':
+                /**
+                 * 这个是抽奖用的，暂时不需要哦，做挂机脚本可能需要
+                 */
+                break;
+            case 'HOUR_RANK_AWARDS':
+                /**
+                 * 小时排行榜还有奖拿就很神奇
                  */
                 break;
             default:
