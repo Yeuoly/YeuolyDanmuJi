@@ -182,6 +182,13 @@ const GiftStation = {
             INFO.warning('REFRESH_GIFT_CONFIG','刷新礼物列表失败');
         }
     },
+    getGuardInfo(level){
+        for(let i in guard_list){
+            if(guard_list[i].level === level){
+                return guard_list[i];
+            }
+        }
+    },
     getGiftImage(gid){
         //常规礼物里没找到再去全体礼物里找
         for(let i in ordinary_list){

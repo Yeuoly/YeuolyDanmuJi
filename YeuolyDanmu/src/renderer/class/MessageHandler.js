@@ -1,5 +1,5 @@
 import Danmu from './Danmu';
-import { SuperChat , Gift } from './Danmu';
+import { SuperChat , Gift , Guard } from './Danmu';
 import store from '../store';
 import Utils from '../class/Utils';
 
@@ -11,6 +11,7 @@ import { OrdinaryEventBus } from '../events/evnetBus';
 
 //获取全局设置
 import { global_settings } from '../settings/global_settings';
+import { User } from './User';
 
 const temp_max_count = Utils.varToPointer( () => global_settings['loading_module']['danmu_temp_max_count'] );
 const store_temp_max_count = 2000;
@@ -56,7 +57,6 @@ export default class MessageHandler{
                 }
             }
             
-
             this.transGift(res);
         })
         //启动循环
@@ -313,7 +313,32 @@ export default class MessageHandler{
                 break;
             case 'HOUR_RANK_AWARDS':
                 /**
-                 * 小时排行榜还有奖拿就很神奇
+                 * 小时排行榜观众还有奖拿就很神奇
+                 */
+                break;
+            case 'GUARD_BUY':
+                //看了一下底下的消息，还是就用这个好了，底下两个都和抽奖有关，弹幕姬不需要抽奖
+                /**
+                 * gift_name : ep=>舰长
+                 * guard_level : number:[1,2,3]
+                 * num :
+                 * price : 金瓜子数
+                 * start_time : 不需要
+                 * end_time : 不需要
+                 * uid : 
+                 * username : 
+                 */
+                const gb = msg['data'];
+                danmu = new Guard(new User(gb['username'],gb['uid'],'',0,0,0),gb['guard_level'],gb['price']);
+                break;
+            case 'GUARD_MSG':
+                /**
+                 * msg : 可能要用正则提取一下 ?${uname}:?在本房间开通了舰长
+                 */
+                break;
+            case 'GUARD_LOTTERY_START':
+                /**
+                 * lottery : { sender : { face : string , uid : number , uname : string } }
                  */
                 break;
             default:
@@ -336,6 +361,9 @@ export default class MessageHandler{
             return;
         }else if(danmu.type === 'gift'){
             this.transGift(danmu);
+            return;
+        }else if(danmu.type === 'guard'){
+            this.transGuard(danmu);
             return;
         }
 
@@ -374,6 +402,11 @@ export default class MessageHandler{
     //传输礼物，辣条在检测完之后才会传输，普通礼物比较少，所以单个单个传
     transGift(gift){
         typeof this.onGift === 'function' && this.onGift(gift);
+    }
+
+    //传输舰队信息
+    transGuard(guard){
+        typeof this.onGuard === 'function' && this.onGuard(guard);
     }
 
     //弹幕入库

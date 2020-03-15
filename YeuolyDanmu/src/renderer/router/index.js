@@ -73,6 +73,13 @@ export default new Router({
           meta : {
             title : '统计数据'
           }
+        },{
+          name : 'dd-rank',
+          path : '/index/dd-rank',
+          component: () => import('@/views/DDRank.vue'),
+          meta : {
+            title : '统计排名'
+          }
         }
       ]
     },

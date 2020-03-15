@@ -55,12 +55,21 @@
                             </el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
-                    <el-menu-item index="5" @click="$router.push('/index/statistic')">
-                        <template slot=title>
+                    <el-submenu index="5">
+                        <template slot="title">
                             <i class="el-icon-pie-chart"></i>
                             <span>统计</span>
                         </template>
-                    </el-menu-item>
+                        <el-menu-item-group>
+                            <template slot="title">统计模块</template>
+                            <el-menu-item index="5-1" @click="$router.push('/index/statistic')">
+                                数据统计
+                            </el-menu-item>
+                            <el-menu-item index="5-2" @click="$router.push('/index/dd-rank')">
+                                排名
+                            </el-menu-item>
+                        </el-menu-item-group>
+                    </el-submenu>
                 </el-menu>
             </el-aside>
         </el-container>

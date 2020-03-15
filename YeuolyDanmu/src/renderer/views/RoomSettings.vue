@@ -83,17 +83,23 @@ export default {
                     }
                 });
             });
-        }
-    },
-    mounted() {
-        this.cycleLiveInfo();
-        this.cyc_timer = setInterval(() => { this.cycleLiveInfo() },60000);        
-    },
-    beforeDestroy() {
-        if(this.cyc_timer){
+        },
+        setupCycle(){
+            this.cycleLiveInfo();
+            this.cyc_timer = setInterval(() => { this.cycleLiveInfo() },60000);            
+        },
+        clearCycle(){
             clearInterval(this.cyc_timer);
         }
     },
+    watch : {
+        '$route.name' : {
+            handler(v){
+                v === 'room-settings' ? this.setupCycle() : this.clearCycle();
+            }
+        }
+    }
+    
 }
 </script>
 

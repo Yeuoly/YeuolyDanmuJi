@@ -13,26 +13,6 @@ export class User{
     getFaceUrl(){ return this.face; }
 }
 
-export class Guard{
-    constructor(type,up_name,up_uid){
-        this.type = type || 0; // 0无 1舰长 2提督 3总督 
-        this.up_name = up_name || '';
-        this.up_uid = up_uid || '';
-    }
-
-    isGuard(){ return this.type > 0; }
-    getType(){
-        switch(this.type){
-            case 0: return '';
-            case 1: return '舰长';
-            case 2: return '提督';
-            case 3: return '总督';
-        }
-    }
-    getName(){ return this.up_name; }
-    getUid(){ return this.up_uid; }  
-}
-
 export class Medal{
     constructor(lv,medal_name,up_name,up_uid){
         this.lv = lv || 0; 

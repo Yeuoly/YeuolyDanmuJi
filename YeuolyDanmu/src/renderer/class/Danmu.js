@@ -1,4 +1,4 @@
-import { User , Medal , Guard } from './User'
+import { User , Medal } from './User'
 
 /**
  * 所有弹幕、礼物、SC都广义定义为弹幕
@@ -50,6 +50,15 @@ export class SuperChat extends SuperChatBase{
         this.message = message;
         this.user = new User(user_id,user_uid,face,0,live_ul,'none');
         this.medal = new Medal(medal_level,medal_nickname,medal_up,0);
+    }
+}
+
+export class Guard{
+    constructor(user,type,price){
+        this.type = 'guard';
+        this.guard_type = type; // 0无 1舰长 2提督 3总督 
+        this.user = user;
+        this.price = price;
     }
 }
 

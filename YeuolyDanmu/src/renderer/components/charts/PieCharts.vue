@@ -88,7 +88,7 @@ export default {
                     name: '对象',
                     type: 'pie',
                     radius: '50%',
-                    center: ['50%', '50%'],
+                    center: ['50%', '60%'],
                     data: [],
                     emphasis: {
                         itemStyle: {

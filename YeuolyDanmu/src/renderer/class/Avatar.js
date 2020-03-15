@@ -1,7 +1,6 @@
 import axios from 'axios';
 import md5 from 'md5';
 import api from '../settings/api';
-import qs from 'querystring';
 import Store from 'electron-store';
 
 const store = new Store();

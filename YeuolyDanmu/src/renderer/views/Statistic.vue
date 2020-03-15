@@ -10,6 +10,8 @@
                     <el-table-column prop="interactional_dd_count" label="互动了的DD数量"></el-table-column>
                     <el-table-column prop="paied_dd_count" label="打了钱的DD数量"></el-table-column>
                     <el-table-column prop="total_sc_price" label="总共SC"></el-table-column>
+                    <el-table-column prop="total_guard_price" label="总共舰队价值"></el-table-column>
+                    <el-table-column prop="total_guard_count" label="总共舰队数量"></el-table-column>
                 </el-table>
             </el-col>
             <el-col :span="12">
@@ -60,6 +62,9 @@ export default {
             },{
                 name : 'SuperChat',
                 value : 0
+            },{
+                name : '舰队',
+                value : 0
             }]
         },
         table_data : {
@@ -69,7 +74,9 @@ export default {
             danmu_count : 0,
             interactional_dd_count : 0,
             paied_dd_count : 0,
-            total_sc_price : 0
+            total_sc_price : 0,
+            total_guard_price : 0,
+            total_guard_count : 0
         }
     }),
     methods : {
@@ -113,6 +120,17 @@ export default {
             this.watcher_func.push(
                 this.$watch('statistic.total_price', v => {
                     this.table_data.total_price = v;
+                },{immediate:true})
+            );
+            this.watcher_func.push(
+                this.$watch('statistic.total_guard_price', v => {
+                    this.table_data.total_guard_price = v;
+                    this.pie.paied[3]['value'] = v;
+                },{immediate:true})
+            );
+            this.watcher_func.push(
+                this.$watch('statistic.total_guard_count', v => {
+                    this.table_data.total_guard_count = v;
                 },{immediate:true})
             );
         },

@@ -7,7 +7,7 @@
              :guard="i.guard"
         />
         <div ref="text" class="danmu-text" :style="{ fontFamily : font }" > 
-            <span :style="{ color : unameColor }" >{{Danmu.user.id}}:</span> 
+            <span :style="{ color : unameColor }">{{Danmu.user.id ? Danmu.user.id + ':' : ''}}</span> 
             <span :style="{ color : textColor }">
                 <span v-html="Danmu.message"></span>
             </span> 
@@ -35,6 +35,20 @@ export default {
     /* height: 0; 老版处理 */
     transition: all .2s;
     overflow: hidden;
+}
+
+.gold-seed{
+    background-position: 0 -35em;
+    width: 1em;
+    height: 1em;
+    font-size: 24px;
+    vertical-align: middle;
+    display: inline-block;
+    background-image: url(//s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/svg-sprite.e15d8c3.svg);
+    background-repeat: no-repeat;
+    background-size: 1em 116em;
+    margin-top: -4px;
+    padding-right: 2px;
 }
 
 .danmu-text{
@@ -75,5 +89,46 @@ export default {
 
 .avatar[guard="3"]{
     background-image: url(//s1.hdslb.com/bfs/static/blive/blfe-live-room/static/img/guard-border-3.26018c5.png);
+}
+
+.guard-msg{
+    width: calc(100% - 20px);
+    padding: 10px;
+    height: 70px;
+    overflow: hidden;
+    position: relative;
+    background-color: cadetblue;
+    border-radius: 5px;
+    font-size: 17px;
+    /* border-right: 5px; */
+}
+
+.guard-avatar{
+    position: absolute;
+    width: 70px;
+    border-radius: 50%;
+    left: 5px;
+}
+
+.guard-text{
+    position: absolute;
+    left: 85px;
+    top: -5px;
+    line-height: 1.2;
+    word-break: break-all;
+    padding-right: 4px;
+}
+
+.guard-price{
+    position: absolute;
+    right: 10px;
+    bottom: -13px;
+}
+
+.guard-img{
+    width: 84px;
+    position: absolute;
+    left: -2px;
+    top: 2px;
 }
 </style>

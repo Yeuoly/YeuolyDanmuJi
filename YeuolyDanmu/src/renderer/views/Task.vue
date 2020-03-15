@@ -1,7 +1,7 @@
 <template>
     <div>
-        <el-row>
-            <el-col :span="6">
+        <el-row class="_row">
+            <el-col :span="4">
                 <el-button 
                     type="primary" 
                     plain 
@@ -12,7 +12,7 @@
                     启动弹幕姬
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="4">
                 <el-button 
                     type="danger" 
                     plain   
@@ -23,7 +23,7 @@
                     关闭弹幕姬
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="4">
                 <el-button 
                     type="info" 
                     plain   
@@ -32,7 +32,7 @@
                     清空弹幕姬
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="4">
                 <el-button 
                     type="info" 
                     plain   
@@ -41,7 +41,7 @@
                     唤醒弹幕窗口
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="4">
                 <el-button 
                     type="info" 
                     plain   
@@ -50,7 +50,7 @@
                     测试30块SC
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="4">
                 <el-button 
                     type="info" 
                     plain   
@@ -59,7 +59,7 @@
                     测试50块SC
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="4">
                 <el-button 
                     type="info" 
                     plain   
@@ -68,7 +68,7 @@
                     测试100块SC
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="4">
                 <el-button 
                     type="info" 
                     plain   
@@ -77,7 +77,7 @@
                     测试500块SC
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="5">
                 <el-button 
                     type="info" 
                     plain   
@@ -86,7 +86,7 @@
                     测试1000块SC
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="5">
                 <el-button 
                     type="info" 
                     plain   
@@ -95,16 +95,16 @@
                     测试2000块SC
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="3">
                 <el-button 
                     type="info" 
-                    plain   
+                    plain
                     @click="testDanmu" 
                 >
                     测试弹幕
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="3">
                 <el-button 
                     type="info" 
                     plain   
@@ -113,7 +113,16 @@
                     测试辣条
                 </el-button>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="3">
+                <el-button 
+                    type="info" 
+                    plain   
+                    @click="testGuard" 
+                >
+                    测试舰长
+                </el-button>
+            </el-col>
+            <el-col :span="3">
                 <el-button 
                     type="info" 
                     plain   
@@ -135,9 +144,10 @@ import { filter_danmu_controller } from '../data/settings';
 import { global_settings } from '../settings/global_settings';
 
 import Danmu from '../class/Danmu';
-import { SuperChat , Gift } from '../class/Danmu';
+import { SuperChat , Gift , Guard } from '../class/Danmu';
 
-import { addGift, addLog, addSC, writeRecords, addDanmus } from '../data/logs';
+import { addGift, addLog, addSC, writeRecords, addDanmus, addGuard } from '../data/logs';
+import { User } from '../class/User';
 // const addSC = require('../data/logs').addSC;
 // const addGift = require('../data/logs').addGift;
 
@@ -173,10 +183,16 @@ export default {
             ipc.send('to-danmu','trans-sc',sc);
             addSC(sc);
         },
+        //传输gift
         transGift(gift){
             //这里最后需要做一点调整，把礼物全部传输到一个单独显示礼物的地方
             ipc.send('to-danmu','trans-gift',gift);
             addGift(gift);
+        },
+        //传输舰队信息
+        transGuard(guard){
+            ipc.send('to-danmu','trans-guard',guard);
+            addGuard(guard);
         },
         //过滤弹幕
         danmusFilter(danmus){
@@ -206,7 +222,10 @@ export default {
             }
             this.DanmuLoader.onGift = gift => {
                 this.transGift(gift);
-            },
+            }
+            this.DanmuLoader.onGuard = guard => {
+                this.transGuard(guard);
+            }
             this.DanmuLoader.setRoomID(room_id);
             this.DanmuLoader.startLoader(() => {
                 //成功后的回调
@@ -309,6 +328,10 @@ export default {
             );
             this.transGift(test);
         },
+        testGuard(){
+            const test = new Guard(new User('Yeuoly',40691233,'',0,0,0),3,198000);
+            this.transGuard(test);
+        },
         saveRecords(){
             writeRecords();
         }
@@ -324,5 +347,7 @@ export default {
 </script>
 
 <style>
-
+._row{
+    padding-bottom: 5px;
+}
 </style>

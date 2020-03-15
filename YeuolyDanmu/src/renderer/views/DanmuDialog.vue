@@ -1,10 +1,18 @@
 <template>
     <div @click="initSleeper">
     <div id="handle" class="danmu-dialog" :style="{ transform : master_transform }">
-            <i class="el-icon-s-tools" 
-           id="setting" 
-           @click="handleSettingDialog"
-        ></i>        
+        <div id="ctrl-area">
+            <i class="el-icon-setting" 
+                @click="handleSettingDialog"
+                title="页面设置"
+            ></i>        
+            <i :class=" click_locked ? 'el-icon-lock' : 'el-icon-unlock'"
+                @click="handleClickLock"
+                @mouseenter="leaveMaster"
+                @mouseleave="enterMaster"
+                title="穿透锁"
+            ></i>
+        </div>
         <div id="cover" ref="cover" :style="{ backgroundColor: backgroundColor }">
             <SuperChat :Danmu="super_chats[current_super_chat]" 
                        class="superchats"
@@ -21,57 +29,57 @@
         </div>
     </div>
     <el-dialog width="95%" 
-                   title="设置" 
-                   :visible.sync="dialog_open"
-                   center
-                   id="setting-dig"
-        >
-            <div class="block">
-                <span class="demonstration">窗口透明度</span>
-                <el-slider v-model.lazy="screen_settings.opacity" :format-tooltip="calcOpacity"></el-slider>
-            </div>
-            <div class="block">
-                <span class="demonstration">底色：</span>
-                <el-radio-group v-model.lazy="screen_settings.backgound_color">
-                    <el-radio :label="0">白色</el-radio>
-                    <el-radio :label="1">黑色</el-radio>
-                </el-radio-group>
-            </div>
-            <p class="demonstration">
-                温馨提示：透明度请以关闭设置窗口后的为准
-            </p>
-            <el-switch 
-                v-model="screen_settings.uanme_used"
-                active-text="将用户名与色组绑定"
-                style="padding-bottom:5px"
-            ></el-switch>
-            <el-switch 
-                v-model="screen_settings.text_used"
-                active-text="将弹幕文本与色组绑定"
-                style="padding-bottom:5px"
-            ></el-switch>
-            <el-switch
-                v-model="screen_settings.sleeper"
-                active-text="启动自动休眠"
-                style="padding-bottom:5px"
-            ></el-switch>
-            <el-input v-model.number="screen_settings.dormancy_interval" style="padding-bottom:5px">
-                <template slot="prepend">休眠时间(s)</template>
-            </el-input>
-            <p class="demonstration">
-                选择字体
-            </p>
-            <el-select v-model="screen_settings.font_family">
-                <el-option
-                    v-for="i in font_families"
-                    :key="i.id"
-                    :label="i.label"
-                    :value="i.value"
-                ></el-option>
-            </el-select>
-            <p></p>
-            <el-button plain type="primary" @click="saveColorSettings">保存设置</el-button>
-        </el-dialog>
+               title="设置" 
+               :visible.sync="dialog_open"
+               center
+               id="setting-dig"
+    >
+        <div class="block">
+            <span class="demonstration">窗口透明度</span>
+            <el-slider v-model.lazy="screen_settings.opacity" :format-tooltip="calcOpacity"></el-slider>
+        </div>
+        <div class="block">
+            <span class="demonstration">底色：</span>
+            <el-radio-group v-model.lazy="screen_settings.backgound_color">
+                <el-radio :label="0">白色</el-radio>
+                <el-radio :label="1">黑色</el-radio>
+            </el-radio-group>
+        </div>
+        <p class="demonstration">
+            温馨提示：透明度请以关闭设置窗口后的为准
+        </p>
+        <el-switch 
+            v-model="screen_settings.uanme_used"
+            active-text="将用户名与色组绑定"
+            style="padding-bottom:5px"
+        ></el-switch>
+        <el-switch 
+            v-model="screen_settings.text_used"
+            active-text="将弹幕文本与色组绑定"
+            style="padding-bottom:5px"
+        ></el-switch>
+        <el-switch
+            v-model="screen_settings.sleeper"
+            active-text="启动自动休眠"
+            style="padding-bottom:5px"
+        ></el-switch>
+        <el-input v-model.number="screen_settings.dormancy_interval" style="padding-bottom:5px">
+            <template slot="prepend">休眠时间(s)</template>
+        </el-input>
+        <p class="demonstration">
+            选择字体
+        </p>
+        <el-select v-model="screen_settings.font_family">
+            <el-option
+                v-for="i in font_families"
+                :key="i.id"
+                :label="i.label"
+                :value="i.value"
+            ></el-option>
+        </el-select>
+        <p></p>
+        <el-button plain type="primary" @click="saveColorSettings">保存设置</el-button>
+    </el-dialog>
     </div>    
 </template>
 
@@ -81,13 +89,13 @@ import SuperChatComponent from '../components/items/SuperChat';
 
 const drag = require('electron-drag');
 const ipc = require('electron').ipcRenderer;
-const win_id = require('electron').remote.getCurrentWindow().id;
+const win = require('electron').remote.getCurrentWindow();
+const win_id = win.id;
 require('electron').remote.getCurrentWindow().setAlwaysOnTop(true);
 
 //十万的时候清理一下，100000个在沙月的直播间大概要5 * 1000分钟，完全够了
 //就算弹幕速度快5倍也能用1000分钟，一天就24 * 60分钟
 const danmu_max_len = 50;
-const delete_time = 5;
 
 //初始化颜色信息
 import Store from 'electron-store';
@@ -127,6 +135,11 @@ import { getAvatar } from '../class/Avatar';
 //获取可用字体
 import { support_font } from '../class/FontController';
 
+//获取舰队信息
+import GiftStation from '../class/GiftStation';
+
+const getGuardInfo = GiftStation.getGuardInfo;
+
 export default {
     name : 'DanmuDialog',
     components : { DanmuGroup , SuperChat : SuperChatComponent },
@@ -151,7 +164,8 @@ export default {
             id : '114514',
             label : '默认字体',
             value : 'DanmuFont'
-        },...support_font]
+        },...support_font],
+        click_locked : false
     }),
     computed : {
         text_color(index){
@@ -179,6 +193,19 @@ export default {
         },
         handleSettingDialog(){
             this.dialog_open = !this.dialog_open;
+        },
+        handleClickLock(boot){
+            this.click_locked = !this.click_locked;
+        },
+        enterMaster(e){
+            if(this.click_locked){
+                win.setIgnoreMouseEvents(true,{ forward : true });
+            }
+        },
+        leaveMaster(e){
+            if(this.click_locked){
+                win.setIgnoreMouseEvents(false,{ forward : false });
+            }
         },
         calcOpacity(val){
             return val / 100;
@@ -217,6 +244,9 @@ export default {
                         break;
                     case 'trans-gift':
                         this.loadGift(msg);
+                        break;
+                    case 'trans-guard':
+                        this.loadGuard(msg);
                         break;
                     case 'clear':
                         this.clear();
@@ -305,6 +335,28 @@ export default {
                 this.clear(20);
             }
         },
+        loadGuard(guard){
+            //来了来了，伪造弹幕文本，舰队文本不需要前置头像，名字都不需要
+            const guard_info = getGuardInfo(guard.guard_type);
+            getAvatar(guard.user.uid, src => {
+                const Danmu = {
+                    users : { faces : [] },
+                    user : { id : '' },
+                    message : `
+                        <div class="guard-msg">
+                            <img class="guard-avatar" src="${src}" />
+                            <img class="guard-img" src="${guard_info.img}"/>
+                            <p class="guard-text">${guard.user.id}开通了${guard_info.name}</p>
+                            <p class="guard-price"><i class="gold-seed"></i>${guard.price}</p>
+                        </div>
+                    `
+                };
+                this.appendDanmu({
+                    value : [Danmu],
+                    id : this.current_danmu_count++
+                });
+            });
+        },
         loadDanmu(danmus){
             //要考虑处理一下重复弹幕，肝，它痛了起来
             //开始处理叭
@@ -388,6 +440,8 @@ export default {
         this.setupRevMsg();
         //设置睡眠事件
         this.setupSleep();
+        //重置一下窗口穿透，开发者模式下不重置会很蛋疼
+        win.setIgnoreMouseEvents(false);
     },
 }
 </script>
@@ -423,13 +477,22 @@ export default {
         padding-left: 9px;
         margin-left: -9px;
     }
-    #setting{
+    #app-cover{
+        z-index: 3;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+    }
+    #ctrl-area{
         position: absolute;
         right: 5px;
         top: 5px;
-        color: white;
         z-index: 5;
         -webkit-app-region: no-drag;
+        width: 20px;
+    }
+    #ctrl-area > * {
+        color: white;
     }
     #setting-dig{
         -webkit-app-region: no-drag;

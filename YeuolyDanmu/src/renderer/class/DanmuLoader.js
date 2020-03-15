@@ -42,6 +42,9 @@ export default class DanmuLoader{
         this.message_handler.onGift = gift => {
             typeof this.onGift === 'function' && this.onGift(gift);
         }
+        this.message_handler.onGuard = guard => {
+            typeof this.onGuard === 'function' && this.onGuard(guard);
+        }
     }
 
     onDanmu = null;

@@ -24,6 +24,8 @@ const daily_sc_records = [];
 
 const daily_danmu_records = [];
 
+const daily_guard_records = [];
+
 /**
  * 悲，由于我tm脑子有坑又加了一个互动过的dd，现在要加一个hash分表了，头像加载那边由于装载了以前
  * 的头像，用不了，需要单独加表，虽然理论上可以给那边加上一个互动过的属性，但这样就要每次启动都重置一下
@@ -31,18 +33,20 @@ const daily_danmu_records = [];
  * 不过想了想我还是加弄一个类来处理hash好了，不然显得太臃肿了。
  */
 const statistics = {
-    'total_price' : 0,
-    'au_price' : 0,
-    'ag_price' : 0,
-    'danmu_count' : 0,
-    'interactional_dd_count' : 0,
-    'paied_dd_count' : 0,
-    'total_sc_price' : 0,
-    'danmu_speeds' : {  
-        'value' : [ 0 ],
-        'date' : [ Utils.formatDate(new Date(),'hh:mm:ss') ]
+    total_price : 0,
+    au_price : 0,
+    ag_price : 0,
+    danmu_count : 0,
+    interactional_dd_count : 0,
+    paied_dd_count : 0,
+    total_sc_price : 0,
+    total_guard_price : 0,
+    total_guard_count : 0,
+    danmu_speeds : {  
+        value : [ 0 ],
+        date : [ Utils.formatDate(new Date(),'hh:mm:ss') ]
     },
-    'danmu_speed_cache' : {
+    danmu_speed_cache : {
         accumulate_time : 0,
         accumulate_count : 0
     }
@@ -56,7 +60,55 @@ let last_index_sc = 0;
 let last_index_gift = 0;
 let last_index_danmu = 0;
 
+//更新互动DD
+function updateInteractionalDD(id,uid){
+    //一个临时变量，用来存hash
+    let hash_c = null;
+    //检测这个dd互动过没
+    if(interactional_dd_hash.insert({
+        uid : uid,  //UID
+        id : id,    //ID
+        times : 1           //互动次数
+    },uid, hash => {
+        //这个回调会优先调用
+        hash_c = hash;
+    }))
+    {
+        //如果没有互动过就互动++
+        statistics.interactional_dd_count++;
+    }else{
+        //互动过就times++
+        interactional_dd_hash.modify(hash_c, item => {
+            item['times']++;
+        });
+    }
+}
+//更新打钱DD
+function updatePaiedDD(id,uid,price){
+    //一个临时变量，用来存hash
+    let hash_c = null;
+    //检测这个dd打过钱没
+    if(true === paied_dd_hash.insert({
+        uid : uid,              //UID
+        id : id,                //ID
+        price : price           //打钱总价值
+    },uid, hash => {
+        //这个回调会优先调用
+        hash_c = hash;
+    }))
+    {
+        //如果没有打过钱，也就是插入成功，那就打钱++
+        statistics.paied_dd_count++;
+    }else{
+        //打过钱那就price+
+        paied_dd_hash.modify(hash_c, item => {
+            item['price'] += price;
+        });
+    }
+}
+
 export function writeRecords(){
+    //只要知道是在写日志就行了
     if(last_index_sc !== daily_sc_records.length)
         log.log(JSON.stringify(daily_sc_records.slice(last_index_sc)));
     if(last_index_gift !== daily_gift_records.length)
@@ -70,6 +122,7 @@ export function writeRecords(){
 
 //挂载速度事件
 OrdinaryEventBus.$on('current-speed', v => {
+    //我知道这里代码可读性跟屎一样，反正只要知道这是个算平均速度的就行了
     statistics.danmu_speed_cache.accumulate_time += v.time / 1000;
     statistics.danmu_speed_cache.accumulate_count += v.count;
     if(statistics.danmu_speed_cache.accumulate_time > 60){
@@ -77,6 +130,7 @@ OrdinaryEventBus.$on('current-speed', v => {
             statistics.danmu_speed_cache.accumulate_count / statistics.danmu_speed_cache.accumulate_time
         );
         statistics.danmu_speeds.date.push(Utils.formatDate(new Date(),'hh:mm:ss'));
+        delete statistics.danmu_speed_cache;
         statistics.danmu_speed_cache = { accumulate_count : 0, accumulate_time : 0 };
     }
 });
@@ -90,6 +144,12 @@ export function getDailyLogRecords(){
 export function getDailySCRecords(){
     return daily_sc_records.slice(0);
 }
+export function getInteractionalDDs(){
+    return interactional_dd_hash.clone();
+}
+export function getPaiedDDs(){
+    return paied_dd_hash.clone();
+}
 export function getDailyLogRecordsPointer(){
     return daily_log_records;
 }
@@ -99,13 +159,14 @@ export function getDailyGiftRecordsPointer(){
 export function getDailySCRecordsPointer(){
     return daily_sc_records;
 }
+export function getDailyGuardRecords(){
+    return daily_guard_records;
+}
 export function addDanmus(danmus){
     danmus.forEach( e => {
         statistics.danmu_count++;
-        //处理hash
-        if(interactional_dd_hash.insert({ uid : e.user.uid },e.user.uid)){
-            statistics.interactional_dd_count++;
-        }
+        //更新互动
+        updateInteractionalDD(e.user.id,e.user.uid);
         daily_danmu_records.push({ uid:e.user.uid, id:e.user.id, message:e.message });
     });
 }
@@ -113,15 +174,12 @@ export function addLog(log){
     daily_log_records.push(log);
 }
 export function addGift(gf){
-    //先检测互动过没
-    if(interactional_dd_hash.insert({ uid:gf.user.uid },gf.user.uid)){
-        statistics.interactional_dd_count++;
-    }
+    //更新互动
+    updateInteractionalDD(gf.user.id, gf.user.uid);
     //如果不是辣条那就是打了钱，然后就检测是否打过钱
     if(gf.gift_id !== 1){
-        if(paied_dd_hash.insert({ uid:gf.user.uid },gf.user.uid)){
-            statistics.paied_dd_count++;
-        }
+        //更新打钱
+        updatePaiedDD(gf.user.id, gf.user.uid, gf.gift_price);
         statistics.au_price += gf.gift_price;
     }else{
         statistics.ag_price += gf.gift_price;
@@ -130,11 +188,21 @@ export function addGift(gf){
     daily_gift_records.push(gf);
 }
 export function addSC(sc){
-    if(paied_dd_hash.insert({ uid:sc.user.uid },sc.user.uid)){
-        statistics.paied_dd_count++;
-    }
+    //更新打钱
+    updatePaiedDD(sc.user.id,sc.user.uid,sc.price * 1000);
+    //更新互动
+    updateInteractionalDD(sc.user.id,sc.user.uid);
     statistics.total_sc_price += sc.price;
     daily_sc_records.push(sc);
+}
+export function addGuard(guard){
+    //更新打钱
+    updatePaiedDD(guard.user.id, guard.user.uid, guard.price);
+    //更新互动
+    updateInteractionalDD(guard.user.id, guard.user.uid);
+    statistics.total_guard_price += guard.price;
+    statistics.total_guard_count++;
+    daily_guard_records.push(guard);
 }
 export function getStatisticPointer(){
     return statistics;
