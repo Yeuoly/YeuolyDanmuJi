@@ -329,7 +329,7 @@ export default {
             this.transGift(test);
         },
         testGuard(){
-            const test = new Guard(new User('Yeuoly',40691233,'',0,0,0),3,198000);
+            const test = new Guard(new User('Yeuoly',40691233,'https://i2.hdslb.com/bfs/face/dc664955fedaa4527d794abad384019a0c63f488.jpg',0,0,0),3,198000);
             this.transGuard(test);
         },
         saveRecords(){

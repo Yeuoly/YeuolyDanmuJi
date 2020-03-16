@@ -135,11 +135,6 @@ import { getAvatar } from '../class/Avatar';
 //获取可用字体
 import { support_font } from '../class/FontController';
 
-//获取舰队信息
-import GiftStation from '../class/GiftStation';
-
-const getGuardInfo = GiftStation.getGuardInfo;
-
 export default {
     name : 'DanmuDialog',
     components : { DanmuGroup , SuperChat : SuperChatComponent },
@@ -337,24 +332,21 @@ export default {
         },
         loadGuard(guard){
             //来了来了，伪造弹幕文本，舰队文本不需要前置头像，名字都不需要
-            const guard_info = getGuardInfo(guard.guard_type);
-            getAvatar(guard.user.uid, src => {
-                const Danmu = {
-                    users : { faces : [] },
-                    user : { id : '' },
-                    message : `
-                        <div class="guard-msg">
-                            <img class="guard-avatar" src="${src}" />
-                            <img class="guard-img" src="${guard_info.img}"/>
-                            <p class="guard-text">${guard.user.id}开通了${guard_info.name}</p>
-                            <p class="guard-price"><i class="gold-seed"></i>${guard.price}</p>
-                        </div>
-                    `
-                };
-                this.appendDanmu({
-                    value : [Danmu],
-                    id : this.current_danmu_count++
-                });
+            const Danmu = {
+                users : { faces : [] },
+                user : { id : '' },
+                message : `
+                    <div class="guard-msg">
+                        <img class="guard-avatar" src="${guard.user.face}" />
+                        <img class="guard-img" src="${guard.img}"/>
+                        <p class="guard-text">${guard.user.id}开通了${guard.name}</p>
+                        <p class="guard-price"><i class="gold-seed"></i>${guard.price}</p>
+                    </div>
+                `
+            };
+            this.appendDanmu({
+                value : [Danmu],
+                id : this.current_danmu_count++
             });
         },
         loadDanmu(danmus){

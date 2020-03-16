@@ -67,6 +67,13 @@ export default new Router({
             type : 'sc'
           }
         },{
+          name : 'records-guard-window',
+          path : '/index/records-guard-window',
+          component: () => import('@/views/GuardDisplayWindow.vue'),
+          meta : {
+            title : '舰长记录',
+          }
+        },{
           name : 'statistic',
           path : '/index/statistic',
           component: () => import('@/views/Statistic.vue'),

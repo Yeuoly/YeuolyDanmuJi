@@ -15,6 +15,8 @@ log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
 
 /**
  * 以下都是统计数据
+ * 这里有个严肃的事情，如果要上统计模块就要计算大量md5，不计算更惨，造成了CPU占用率提升了个3%左右
+ * 当流量大的时候最惨，所以准备加一个开关用来开关统计模块，这玩意真的太占资源了
  */
 const daily_log_records = [];
 
@@ -49,7 +51,9 @@ const statistics = {
     danmu_speed_cache : {
         accumulate_time : 0,
         accumulate_count : 0
-    }
+    },
+    //这个是为后续统计做的，但考虑到现在的CPU已经挺蛋疼了，就暂时不做了
+    gift_classfiy_count : []
 };
 
 //好了，开始处理hash，参加互动的dd数量级应该是10^3-10^4，用两层表够了，打钱的dd应该在10^2左右，一层表就行了
@@ -95,8 +99,7 @@ function updatePaiedDD(id,uid,price){
     },uid, hash => {
         //这个回调会优先调用
         hash_c = hash;
-    }))
-    {
+    })){
         //如果没有打过钱，也就是插入成功，那就打钱++
         statistics.paied_dd_count++;
     }else{
@@ -159,7 +162,7 @@ export function getDailyGiftRecordsPointer(){
 export function getDailySCRecordsPointer(){
     return daily_sc_records;
 }
-export function getDailyGuardRecords(){
+export function getDailyGuardRecordsPointer(){
     return daily_guard_records;
 }
 export function addDanmus(danmus){

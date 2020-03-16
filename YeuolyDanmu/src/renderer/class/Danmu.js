@@ -1,5 +1,7 @@
 import { User , Medal } from './User'
 
+import GiftStation from './GiftStation';
+
 /**
  * 所有弹幕、礼物、SC都广义定义为弹幕
  */
@@ -59,6 +61,10 @@ export class Guard{
         this.guard_type = type; // 0无 1舰长 2提督 3总督 
         this.user = user;
         this.price = price;
+        //初始化一下
+        const info = GiftStation.getGuardInfo(type);
+        this.name = info['name'];
+        this.img = info['img'];
     }
 }
 

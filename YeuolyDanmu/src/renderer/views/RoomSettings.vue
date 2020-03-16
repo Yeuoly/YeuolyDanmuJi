@@ -15,6 +15,7 @@
         >
             <el-table-column label="房间短号" prop="short_id"></el-table-column>
             <el-table-column label="房间号" prop="room_id"></el-table-column>
+            <el-table-column label="uid" prop="uid"></el-table-column>
             <el-table-column label="更新日期" prop="date"></el-table-column>
             <el-table-column label="up主" prop="up_name"></el-table-column>
             <el-table-column label="上次标题" prop="title"></el-table-column>
@@ -96,7 +97,8 @@ export default {
         '$route.name' : {
             handler(v){
                 v === 'room-settings' ? this.setupCycle() : this.clearCycle();
-            }
+            },
+            immediate : true
         }
     }
     

@@ -1,9 +1,22 @@
 <template>
     <div>
         <el-row>
+            <el-col :span="24" >
+                <el-table :data="seven_rank" stripe>
+                    <el-table-column prop="rank" label="七日榜排名"></el-table-column>
+                    <el-table-column prop="uname" label="昵称"></el-table-column>
+                    <el-table-column prop="uid" label="uid"></el-table-column>
+                    <el-table-column prop="score" label="金瓜子"></el-table-column>
+                    <el-table-column label="舰队">
+                        <template slot-scope="scope">
+                            <span>{{ guard_name(scope.row.guard_level) }}</span>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-col>
             <el-col :span="24">
-                <el-table :data="paied_rank">
-                    <el-table-column label="排名">
+                <el-table :data="paied_rank" stripe>
+                    <el-table-column label="本次打钱排名">
                         <template slot-scope="scope">
                             <span>{{ scope.$index + 1 }}</span>
                         </template>
@@ -15,8 +28,8 @@
             </el-col>
             <hr />
             <el-col :span="24">
-                <el-table :data="danmu_rank">
-                    <el-table-column label="排名">
+                <el-table :data="danmu_rank" stripe>
+                    <el-table-column label="互动排名">
                         <template slot-scope="scope">
                             <span>{{ scope.$index + 1 }}</span>
                         </template>
@@ -32,6 +45,10 @@
 
 <script>
 import { getInteractionalDDs, getPaiedDDs } from '../data/logs';
+import { room_id_controller } from '../data/settings';
+import Axios from 'axios';
+import api from '../settings/api';
+import Info from '../class/Info';
 
 export default {
     name : "DDRank",
@@ -41,7 +58,26 @@ export default {
         danmu_rank : [],
     }),
     methods : {
-        computeRank(){
+        async computeRank(){
+            //拿uid和room_id，这里不知道为什么，拿七日榜同时需要uid和room_id
+            const room_info = room_id_controller.getHistory();
+            const current_room_id = room_id_controller.getCurrent();
+            const target_info = { uid : 0, room_id : current_room_id };
+            for(let i in room_info){
+                if(room_info[i].room_id === current_room_id){
+                    target_info.uid = room_info[i].uid;
+                    break;
+                }
+            }
+            try{
+                const response = await Axios.get(
+                    `${api.bili_get_seven_rank}?roomid=${target_info.room_id}&ruid=${target_info.uid}`
+                );
+                this.seven_rank = response.data['data']['list'];
+                Info.log('GET_SEVEN_RANK','获取七日榜成功','green');
+            }catch(e){
+                Info.warning('GET_SEVEN_RANK','获取七日榜失败');
+            }
             const rank_i = getInteractionalDDs();
             const rank_p = getPaiedDDs();
             //一开始是准备用链表排序的，但最后还是选择用快排了
@@ -83,6 +119,22 @@ export default {
             }
             for(let i = 0; i < max_len_p; i++){
                 this.paied_rank.push(rank_p[len_p - i - 1]);
+            }
+        }
+    },
+    computed : {
+        guard_name(level){
+            return level => {
+                switch(level){
+                    case 0:
+                        return '非舰队成员';
+                    case 1:
+                        return '总督';
+                    case 2:
+                        return '提督';
+                    case 3:
+                        return '舰长';
+                }
             }
         }
     },

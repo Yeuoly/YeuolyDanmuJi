@@ -21,6 +21,7 @@
             >
                 <SuperChat class="super-chat-records" :Danmu="i" v-if="i.type === 'super_chat'" />
                 <Gift :Gift="i" v-else-if="i.type === 'gift'" />
+                <Guard />
             </el-col>
         </el-row>
         <el-row>
@@ -43,7 +44,6 @@
 import { getDailyLogRecordsPointer, getDailyGiftRecordsPointer, getDailySCRecordsPointer } from '../data/logs';
 import SuperChat from '../components/items/SuperChat';
 import Gift from '../components/items/Gift';
-
 
 
 export default {

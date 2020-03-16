@@ -53,6 +53,9 @@
                             <el-menu-item index="4-2" @click="$router.push('/index/records-sc-window')">
                                 SC记录
                             </el-menu-item>
+                            <el-menu-item index="4-3" @click="$router.push('/index/records-guard-window')">
+                                舰长记录
+                            </el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
                     <el-submenu index="5">

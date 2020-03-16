@@ -3,6 +3,8 @@ import { SuperChat , Gift , Guard } from './Danmu';
 import store from '../store';
 import Utils from '../class/Utils';
 
+import { getAvatar } from '../class/Avatar';
+
 //引入礼物处理
 import GiftStation from './GiftStation';
 
@@ -168,8 +170,6 @@ export default class MessageHandler{
                     //如果是辣条或者价值低的话就丢到处理站里去，由处理站转交Task，如果不是就直接传给Task处理
                     GiftStation.insertGift(gf['uid'],gf['num'],gf['giftId'],danmu);
                     return;
-                }else{
-                    console.log(gf);
                 }
                 break;
             case 'NOTICE_MSG':
@@ -328,9 +328,15 @@ export default class MessageHandler{
                  * uid : 
                  * username : 
                  */
+                //装载一下头像
+                //设置一下基础信息
                 const gb = msg['data'];
-                danmu = new Guard(new User(gb['username'],gb['uid'],'',0,0,0),gb['guard_level'],gb['price']);
-                break;
+                getAvatar(gb['uid'], src => {
+                    //本来我是不想这里这样弄的，但是两个窗口传输数据全都不是引用类数据，所以只能在这里异步处理一下了
+                    danmu = new Guard(new User(gb['username'],gb['uid'],src,0,0,0),gb['guard_level'],gb['price']);
+                    this.transGuard(danmu);
+                });
+                return;
             case 'GUARD_MSG':
                 /**
                  * msg : 可能要用正则提取一下 ?${uname}:?在本房间开通了舰长

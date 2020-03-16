@@ -4,5 +4,7 @@ export default {
     bili_get_space_info : 'https://api.bilibili.com/x/space/acc/info',
     bili_get_live_info : 'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom',
     bili_get_gift_config : 'https://api.live.bilibili.com/gift/v4/Live/giftConfig',
-    bili_get_seven_rank : 'https://api.live.bilibili.com/rankdb/v1/RoomRank/webSevenRank'
+    bili_get_seven_rank : 'https://api.live.bilibili.com/rankdb/v1/RoomRank/webSevenRank',
+
+    cny_get_exchangerate : 'https://api.exchangerate-api.com/v4/latest/CNY'
 }

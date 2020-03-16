@@ -14,6 +14,15 @@
                     <el-table-column prop="total_guard_count" label="总共舰队数量"></el-table-column>
                 </el-table>
             </el-col>
+            <el-col :span="24">
+                <el-table :data="[converse_currency]">
+                    <el-table-column prop="CNY" label="人民币"></el-table-column>
+                    <el-table-column prop="JPY" label="日本円です"></el-table-column>
+                    <el-table-column prop="KRW" label="원 1"></el-table-column>
+                    <el-table-column prop="USD" label="United States Dollar"></el-table-column>
+                    <el-table-column prop="EUR" label="Eurodollar"></el-table-column>
+                </el-table>
+            </el-col>
             <el-col :span="12">
                 <PieCharts class="pie" title="DD比例" subtext="不同种类DD所占比例" :model="{data:pie.all}" />
             </el-col>
@@ -34,6 +43,7 @@
 
 <script>
 import { getStatisticPointer } from '../data/logs';
+import { cny_exchangerate_controller } from '../data/settings';
 
 import PieCharts from '../components/charts/PieCharts';
 import DateValueSmoothCharts from '../components/charts/DateValueSmoothCharts';
@@ -77,7 +87,8 @@ export default {
             total_sc_price : 0,
             total_guard_price : 0,
             total_guard_count : 0
-        }
+        },
+        exchangerate : {}
     }),
     methods : {
         initWatcher(){
@@ -137,10 +148,27 @@ export default {
         offWatcher(){
             this.watcher_func.forEach( e => { e(); } );
             this.watcher_func = [];
+        },
+    },
+    computed : {
+        converse_currency(){
+            const CNY = this.table_data.total_sc_price + this.table_data.total_guard_price / 1000
+                + this.table_data.au_price / 1000;
+            return {
+                CNY : CNY,
+                USD : ( CNY * this.exchangerate.USD ).toFixed(3),
+                JPY : ( CNY * this.exchangerate.JPY ).toFixed(3),
+                EUR : ( CNY * this.exchangerate.EUR ).toFixed(3),
+                KRW : ( CNY * this.exchangerate.KRW ).toFixed(3)
+            }
         }
     },
     beforeDestroy() {
         this.offWatcher();
+    },
+    mounted(){
+        //抓一波汇率
+        this.exchangerate = cny_exchangerate_controller.get();
     },
     watch : {
         '$route.name' : {
