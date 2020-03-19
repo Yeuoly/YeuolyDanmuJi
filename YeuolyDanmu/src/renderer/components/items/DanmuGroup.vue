@@ -1,26 +1,42 @@
 <template>
     <div ref="controller" class="danmu-group">
-        <Danmu v-for="( i , key ) in Danmus"
+        <div v-if="type === 'normal'">
+            <Danmu v-for="( i , key ) in Danmus"
                :Danmu="i"
                :key="key"
                :text-color="textColor"
                :uname-color="unameColor"
                :font="font"
-        ></Danmu>
+            ></Danmu>
+        </div>
+        <div v-else-if="type === 'guard'">
+            <Guard :Guard="Danmus[0]" 
+                :font="font"
+            />
+        </div>
+        <div v-else-if="type === 'gift'">
+            <GiftDanmu :Gift="Danmus[0]" 
+                :uname-color="unameColor"
+                :text-color="textColor"
+                :font="font"
+            />
+        </div>
     </div>
 </template>
 
 <script>
 
 import Danmu from './Danmu';
+import Guard from './Guard';
+import GiftDanmu from './GiftDanmu';
 import { DanmuGroupEventBus } from '../../events/evnetBus';
 
 const max_offset = require('electron').screen.getPrimaryDisplay().workAreaSize.height;
 
 export default {
     name : 'DanmuGroup',
-    components : { Danmu },
-    props : ['Danmus','textColor','unameColor','font'],
+    components : { Danmu, Guard, GiftDanmu },
+    props : ['Danmus','textColor','unameColor','font','type'],
     data : () => ({
         isShow : false,
         offset : 0,
@@ -60,15 +76,3 @@ export default {
     },
 }
 </script>
-
-<style scoped>
-.danmu-group{
-    opacity: 0;
-    transition: all .4s;
-    position: absolute;
-    overflow: auto;
-    bottom: 0;
-    width: 100%;
-    margin-left: -9px;
-}
-</style>

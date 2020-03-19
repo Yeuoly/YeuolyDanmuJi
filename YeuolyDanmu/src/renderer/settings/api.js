@@ -5,6 +5,9 @@ export default {
     bili_get_live_info : 'https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom',
     bili_get_gift_config : 'https://api.live.bilibili.com/gift/v4/Live/giftConfig',
     bili_get_seven_rank : 'https://api.live.bilibili.com/rankdb/v1/RoomRank/webSevenRank',
+    bili_get_follow_info : 'https://api.bilibili.com/x/web-interface/card',
 
-    cny_get_exchangerate : 'https://api.exchangerate-api.com/v4/latest/CNY'
+    cny_get_exchangerate : 'https://api.exchangerate-api.com/v4/latest/CNY',
+
+    yeuoly_feedback : 'https://api.ylday.srmxy.cn/v3/feedback'
 }

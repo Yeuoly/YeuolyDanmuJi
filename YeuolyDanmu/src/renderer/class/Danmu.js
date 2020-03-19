@@ -1,6 +1,7 @@
 import { User , Medal } from './User'
 
 import GiftStation from './GiftStation';
+import { global_settings } from '../settings/global_settings';
 
 /**
  * 所有弹幕、礼物、SC都广义定义为弹幕
@@ -71,7 +72,7 @@ export class Guard{
 export class Gift{
     constructor(
         user_id,user_uid,face,
-        gift_id,gift_name,gift_price,gift_num,gift_image,
+        gift_id,gift_name,gift_price,gift_num,
         is_super
     ){
         this.type = 'gift';
@@ -80,7 +81,12 @@ export class Gift{
         this.gift_name = gift_name;
         this.gift_price = gift_price;
         this.gift_num = gift_num;
-        this.gift_image = gift_image;
+        this.gift_image = GiftStation.getGiftImage(gift_id);
         this.is_super = is_super;
+        this.initMessage();
+    }
+
+    initMessage(){
+        this.message = `${global_settings['display_module']['gift_greet']}${this.gift_num}个${this.gift_name}`;
     }
 }

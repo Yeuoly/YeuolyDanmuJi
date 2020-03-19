@@ -87,6 +87,20 @@ export default new Router({
           meta : {
             title : '统计排名'
           }
+        },{
+          name : 'qiafan',
+          path : '/index/qiafan',
+          component: () => import('@/views/QiaFan.vue'),
+          meta : {
+            title : '恰饭'
+          }
+        },{
+          name : 'feedback',
+          path : '/index/feedback',
+          component: () => import('@/views/Feedback.vue'),
+          meta : {
+            title : '反馈'
+          }
         }
       ]
     },

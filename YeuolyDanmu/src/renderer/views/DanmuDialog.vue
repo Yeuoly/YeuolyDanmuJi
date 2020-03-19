@@ -1,86 +1,107 @@
 <template>
-    <div @click="initSleeper">
-    <div id="handle" class="danmu-dialog" :style="{ transform : master_transform }">
-        <div id="ctrl-area">
-            <i class="el-icon-setting" 
-                @click="handleSettingDialog"
-                title="页面设置"
-            ></i>        
-            <i :class=" click_locked ? 'el-icon-lock' : 'el-icon-unlock'"
-                @click="handleClickLock"
-                @mouseenter="leaveMaster"
-                @mouseleave="enterMaster"
-                title="穿透锁"
-            ></i>
+    <div @click="initSleeper" style="height:100%">
+        <div id="handle" class="danmu-dialog"  :style="{ transform : master_transform }">
+            <div id="ctrl-area">
+                <i class="el-icon-setting" 
+                    @click="handleSettingDialog"
+                    title="页面设置"
+                ></i>        
+                <i :class=" click_locked ? 'el-icon-lock' : 'el-icon-unlock'"
+                    @click="handleClickLock"
+                    @mouseenter="leaveMaster"
+                    @mouseleave="enterMaster"
+                    title="穿透锁"
+                ></i>
+            </div>
+            <div id="cover" ref="cover" :style="{ backgroundColor: backgroundColor }">
+                <SuperChat :Danmu="super_chats[current_super_chat]" 
+                        class="superchats"
+                        :style="{ transform : `translateY( -${ sc_replacing ? '160' : '0' }px )` }"
+                ></SuperChat>
+                <DanmuGroup v-for="i in danmu_groups"
+                            :text-color="screen_settings.text_used ? text_color(i.id) : '#fff'"
+                            :uname-color="screen_settings.uanme_used ? text_color(i.id) : '#fff'"
+                            :key="i.id"
+                            :index="i.id"
+                            :Danmus="i.value"
+                            :font="screen_settings.font_family"
+                            :type="i.type"
+                ></DanmuGroup>
+            </div>
         </div>
-        <div id="cover" ref="cover" :style="{ backgroundColor: backgroundColor }">
-            <SuperChat :Danmu="super_chats[current_super_chat]" 
-                       class="superchats"
-                       :style="{ transform : `translateY( -${ sc_replacing ? '160' : '0' }px )` }"
-            ></SuperChat>
-            <DanmuGroup v-for="i in danmu_groups"
-                        :text-color="screen_settings.text_used ? text_color(i.id) : '#fff'"
-                        :uname-color="screen_settings.uanme_used ? text_color(i.id) : '#fff'"
-                        :key="i.id"
-                        :index="i.id"
-                        :Danmus="i.value"
-                        :font="screen_settings.font_family"
-            ></DanmuGroup>
+        <el-dialog width="95%" 
+                title="设置" 
+                :visible.sync="dialog_open"
+                center
+                id="setting-dig"
+        >
+            <div class="block">
+                <span class="demonstration">窗口透明度</span>
+                <el-slider v-model.lazy="screen_settings.opacity" :format-tooltip="calcOpacity"></el-slider>
+            </div>
+            <div class="block">
+                <span class="demonstration">底色：</span>
+                <el-radio-group v-model.lazy="screen_settings.backgound_color">
+                    <el-radio :label="0">白色</el-radio>
+                    <el-radio :label="1">黑色</el-radio>
+                </el-radio-group>
+            </div>
+            <p class="demonstration">
+                温馨提示：透明度请以关闭设置窗口后的为准
+            </p>
+            <el-switch 
+                v-model="screen_settings.uanme_used"
+                active-text="将用户名与色组绑定"
+                style="padding-bottom:5px"
+            ></el-switch>
+            <el-switch 
+                v-model="screen_settings.text_used"
+                active-text="将弹幕文本与色组绑定"
+                style="padding-bottom:5px"
+            ></el-switch>
+            <p></p>
+            <el-switch 
+                v-model="screen_settings.show_live_info"
+                active-text="显示直播状态"
+                style="padding-bottom:5px"
+            ></el-switch>
+            <p></p>
+            <el-switch
+                v-model="screen_settings.sleeper"
+                active-text="启动自动休眠"
+                style="padding-bottom:5px"
+            ></el-switch>
+            <el-input v-model.number="screen_settings.dormancy_interval" style="padding-bottom:5px">
+                <template slot="prepend">休眠时间(s)</template>
+            </el-input>
+            <p class="demonstration">
+                选择字体
+            </p>
+            <el-select v-model="screen_settings.font_family">
+                <el-option
+                    v-for="i in font_families"
+                    :key="i.id"
+                    :label="i.label"
+                    :value="i.value"
+                ></el-option>
+            </el-select>
+            <p></p>
+            <el-button plain type="primary" @click="saveColorSettings">保存设置</el-button>
+        </el-dialog>
+        <div id="live-info" 
+            :style="live_info_style" 
+            v-show="screen_settings.show_live_info"
+        >
+            <el-row>
+                <el-col :span="12">
+                    人气值:{{live.popular}}
+                </el-col>
+                <el-col :span="12">
+                    粉丝数:{{live.fans}}
+                </el-col>
+            </el-row>
         </div>
     </div>
-    <el-dialog width="95%" 
-               title="设置" 
-               :visible.sync="dialog_open"
-               center
-               id="setting-dig"
-    >
-        <div class="block">
-            <span class="demonstration">窗口透明度</span>
-            <el-slider v-model.lazy="screen_settings.opacity" :format-tooltip="calcOpacity"></el-slider>
-        </div>
-        <div class="block">
-            <span class="demonstration">底色：</span>
-            <el-radio-group v-model.lazy="screen_settings.backgound_color">
-                <el-radio :label="0">白色</el-radio>
-                <el-radio :label="1">黑色</el-radio>
-            </el-radio-group>
-        </div>
-        <p class="demonstration">
-            温馨提示：透明度请以关闭设置窗口后的为准
-        </p>
-        <el-switch 
-            v-model="screen_settings.uanme_used"
-            active-text="将用户名与色组绑定"
-            style="padding-bottom:5px"
-        ></el-switch>
-        <el-switch 
-            v-model="screen_settings.text_used"
-            active-text="将弹幕文本与色组绑定"
-            style="padding-bottom:5px"
-        ></el-switch>
-        <el-switch
-            v-model="screen_settings.sleeper"
-            active-text="启动自动休眠"
-            style="padding-bottom:5px"
-        ></el-switch>
-        <el-input v-model.number="screen_settings.dormancy_interval" style="padding-bottom:5px">
-            <template slot="prepend">休眠时间(s)</template>
-        </el-input>
-        <p class="demonstration">
-            选择字体
-        </p>
-        <el-select v-model="screen_settings.font_family">
-            <el-option
-                v-for="i in font_families"
-                :key="i.id"
-                :label="i.label"
-                :value="i.value"
-            ></el-option>
-        </el-select>
-        <p></p>
-        <el-button plain type="primary" @click="saveColorSettings">保存设置</el-button>
-    </el-dialog>
-    </div>    
 </template>
 
 <script>
@@ -123,7 +144,8 @@ const screen_settings =  store.get('danmu-dialog|screen_settings', {
     backgound_color : 1,
     dormancy_interval : 60,
     sleeper : true,
-    font_family : 'DanmuFont'
+    font_family : 'DanmuFont',
+    show_live_info : true
 });
 
 //休眠器
@@ -160,7 +182,11 @@ export default {
             label : '默认字体',
             value : 'DanmuFont'
         },...support_font],
-        click_locked : false
+        click_locked : false,
+        live : {
+            fans : 0,
+            popular : 0
+        }
     }),
     computed : {
         text_color(index){
@@ -175,6 +201,13 @@ export default {
         },
         master_transform(){
             return `translateX(${this.hidding_dialog ? 'calc(100% + 18px)' : '0'})`;
+        },
+        live_info_style(){
+            return {
+                fontFamily : this.screen_settings.font_family,
+                transform : this.master_transform,
+                color : '#fff'
+            }
         }
     },
     methods: {
@@ -243,6 +276,9 @@ export default {
                     case 'trans-guard':
                         this.loadGuard(msg);
                         break;
+                    case 'trans-live-info':
+                        this.refreshLiveInfo(msg);
+                        break;
                     case 'clear':
                         this.clear();
                         break;
@@ -300,18 +336,11 @@ export default {
                 //伪造假弹幕、真礼物，普通礼物就划过去好了，super礼物在上面处理，会停留
                 //同样需要头像预加载
                 getAvatar(gift.user.uid, src => {
-                    const Danmu = {
-                        users : {
-                            faces : [ { guard : 0 , src : src } ]
-                        },
-                        user : {
-                            id : gift.user.id
-                        },
-                        message : `${gift_pre_saying}${gift.gift_num}个<img class="small-gift" src="${gift.gift_image}" />${gift.gift_name}`
-                    }
+                    gift.user.face = src;
                     this.appendDanmu({
-                        value : [ Danmu ],
-                        id : this.current_danmu_count++
+                        id : this.current_danmu_count++,
+                        value : [gift],
+                        type :'gift'
                     });
                 })
             }
@@ -331,22 +360,10 @@ export default {
             }
         },
         loadGuard(guard){
-            //来了来了，伪造弹幕文本，舰队文本不需要前置头像，名字都不需要
-            const Danmu = {
-                users : { faces : [] },
-                user : { id : '' },
-                message : `
-                    <div class="guard-msg">
-                        <img class="guard-avatar" src="${guard.user.face}" />
-                        <img class="guard-img" src="${guard.img}"/>
-                        <p class="guard-text">${guard.user.id}开通了${guard.name}</p>
-                        <p class="guard-price"><i class="gold-seed"></i>${guard.price}</p>
-                    </div>
-                `
-            };
             this.appendDanmu({
-                value : [Danmu],
-                id : this.current_danmu_count++
+                value : [guard],
+                id : this.current_danmu_count++,
+                type : 'guard'
             });
         },
         loadDanmu(danmus){
@@ -384,12 +401,18 @@ export default {
                         if(++len === full_len){
                             this.appendDanmu({
                                 id : this.current_danmu_count++,
-                                value : norepeat_danmus
+                                value : norepeat_danmus,
+                                type : 'normal'
                             });
                         }
                     }
                 });
             });
+        },
+        //更新实时信息
+        refreshLiveInfo({ fans , popular }){
+            fans && ( this.live.fans = fans );
+            popular && ( this.live.popular = popular );
         },
         //当弹幕太多了的时候清除顶部的几个
         clear(end){
@@ -434,6 +457,10 @@ export default {
         this.setupSleep();
         //重置一下窗口穿透，开发者模式下不重置会很蛋疼
         win.setIgnoreMouseEvents(false);
+        //获取初始信息
+        const data = this.$Win.getParameter();
+        this.live.fans = data.fans;
+        this.live.popular = data.popular;
     },
 }
 </script>
@@ -442,12 +469,17 @@ export default {
     body{
         overflow: hidden;
         margin-top: 0;
+        padding-right: 0 !important;
+    }
+
+    #app{
+        height: 750px;
     }
 
     .superchats{
         position: absolute;
-        width: calc(100% + 16px);
-        z-index: 100;
+        width: calc(100% + 8px);
+        z-index: 1;
         margin-left: -8px;
         transition: all .4s;
     }
@@ -457,16 +489,16 @@ export default {
         margin: 0;
         padding: 0;
         border: 0;
+        height: calc(100% - 40px);
         transition: all ease-in .5s;
     }
     #cover{
-        background-color: rgba(255,255, 255, 0.5);
-        height: 700px;
+        height: 750px;
         width: 100%;
         scroll-behavior: smooth;
         overflow: hidden;
-        padding-right: 9px;
         padding-left: 9px;
+        padding-right: 9px;
         margin-left: -9px;
     }
     #app-cover{
@@ -488,5 +520,11 @@ export default {
     }
     #setting-dig{
         -webkit-app-region: no-drag;
+    }
+    #live-info{
+        display: block;
+        height: 20px;
+        line-height: 1;
+        font-weight: 600
     }
 </style>

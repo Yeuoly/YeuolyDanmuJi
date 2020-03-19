@@ -120,16 +120,13 @@ export default class MessageHandler{
         switch(msg['cmd']){
             case 'DANMU_MSG':
                 /** $info
-                * 0 5 6 8 10 11 12 13 14暂时不知道是啥东西 谁能告诉我舰长是哪个？？？
+                * 0 5 6 8 10 11 12 13 14暂时不知道是啥玩意
                 * 1为弹幕信息 就是一个字符串
                 * 2为用户信息 uid-昵称-?-?-?-?-?-?
                 * 3为狗牌信息 狗牌等级-狗牌昵称-UP昵称-?-?-?-?
                 * 4为用户等级 直播间等级-?-全站排名
                 * 7舰队等级，这个我找得好累啊 1是总督 2是提督 3是舰长
                 * 9为弹幕设置 ?-?
-                * 
-                * 我最想知道的是怎么这里为什么不给出舰长信息，还是说我tm得每次自己去取舰长信息
-                * 在每次启动的时候去B站拿着个直播间所有的舰长信息，再在创建弹幕对象的时候检测是不是舰长？？？？
                 */
                 const info = msg['info'];
                 danmu = new Danmu(
@@ -164,7 +161,7 @@ export default class MessageHandler{
                 }
                 danmu = new Gift(
                     gf['uname'],gf['uid'],gf['face'],gf['giftId'],gf['giftName'],
-                    gf['price'],gf['num'],GiftStation.getGiftImage(gf['giftId']),false
+                    gf['price'],gf['num'],false
                 );
                 if(gf['giftId'] === 1 || gf['price'] < direct_gift_trans_min_price ){
                     //如果是辣条或者价值低的话就丢到处理站里去，由处理站转交Task，如果不是就直接传给Task处理
@@ -173,7 +170,6 @@ export default class MessageHandler{
                 }
                 break;
             case 'NOTICE_MSG':
-                //这个是全站抽奖广播 $data
                 break;
             case 'WELCOME':
                 //这个是欢迎老爷
@@ -200,6 +196,11 @@ export default class MessageHandler{
                  * fans => 实时粉丝数
                  * roomid => 房间号，不是，房间号还会变的？？？
                  */
+                this.transLiveInfo({ fans : msg['data']['fans'] });
+                return;
+            case 'YEUOLY_CUREENT_POPULAR':
+                this.transLiveInfo({ popular : msg['data']['popular'] });
+                return;
             case 'ENTRY_EFFECT':
                 //高贵用户的入场特性，我人傻了，特效还专门传的，不想做了，想做的就改这里叭（ $data
                 break;
@@ -413,6 +414,11 @@ export default class MessageHandler{
     //传输舰队信息
     transGuard(guard){
         typeof this.onGuard === 'function' && this.onGuard(guard);
+    }
+
+    //实时直播信息
+    transLiveInfo(info){
+        typeof this.onLiveInfo === 'function' && this.onLiveInfo(info);
     }
 
     //弹幕入库

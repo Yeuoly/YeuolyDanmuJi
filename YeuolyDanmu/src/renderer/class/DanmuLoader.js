@@ -45,6 +45,9 @@ export default class DanmuLoader{
         this.message_handler.onGuard = guard => {
             typeof this.onGuard === 'function' && this.onGuard(guard);
         }
+        this.message_handler.onLiveInfo = info => {
+            typeof this.onLiveInfo === 'function' && this.onLiveInfo(info);
+        }
     }
 
     onDanmu = null;
@@ -62,7 +65,24 @@ export default class DanmuLoader{
     }
 
     //加载入口，提供两个钩子，一个成功调用，一个用于修改连接状态为关闭
-    startLoader(fn_suc,fn_fai){
+    async startLoader(fn_suc,fn_fai){
+        //正在初始化房间信息
+        const live_status = {
+            fans : 0,
+            popular : 0
+        }
+        try{
+            const response = await axios.get(`${api.bili_get_live_info}?room_id=${this.room_id}`);
+            const data = response.data;
+            if(data['code'] === 0){
+                INFO.log('INIT_ROOM_STATUS','获取初始信息成功','green');
+                live_status.fans = data['data']['anchor_info']['relation_info']['attention'];
+            }else{
+                INFO.warning('INIT_ROOM_STATUS','获取初始信息失败');
+            }
+        }catch(e){
+            INFO.warning('INIT_ROOM_STATUS','获取初始信息失败');
+        }
         INFO.log('WSConnection',`开始连接至直播间，当前房间号：${this.room_id}`);
         //获取服务器信息与token
         this.getConf(() => {
@@ -74,7 +94,9 @@ export default class DanmuLoader{
                 this.onMessage(e);
             };
             this.socket.onopen = e => {
-                setTimeout(fn_suc,0);
+                setTimeout(() => {
+                    fn_suc(live_status);
+                },0);
                 this.onOpen(e);
             };
             this.socket.onerror = e => {
@@ -132,9 +154,16 @@ export default class DanmuLoader{
                         this.heart_beat_interval = setInterval(() => { this.heartBeat() }, heart_beat_time);
                         break;
                     case 3:
-                        //心跳成功
+                        //心跳成功，这里获取人气值
                         this.heart_beat_times++;
-                        INFO.log('HeartBeat',`心跳成功！心跳-总次数:${this.heart_beat_times}`);
+                        const popular = self.getBodyView().getUint32(0);
+                        INFO.log('HeartBeat',`心跳成功！心跳-总次数:${this.heart_beat_times}，当前人气值：${popular}`);
+                        this.message_handler.handleMessage({
+                            cmd : 'YEUOLY_CUREENT_POPULAR',
+                            data : {
+                                popular : popular
+                            }
+                        });
                         break;
                     case 5:
                         //处理数据主体

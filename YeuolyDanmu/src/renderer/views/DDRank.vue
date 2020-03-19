@@ -14,6 +14,7 @@
                     </el-table-column>
                 </el-table>
             </el-col>
+            <hr />
             <el-col :span="24">
                 <el-table :data="paied_rank" stripe>
                     <el-table-column label="本次打钱排名">

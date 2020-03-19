@@ -41,7 +41,11 @@ class Utils{
     transFormatFromBufferToJson(msg){
         const ary = new Uint8Array(msg);
         const str = this.byteToString(ary);
-        return JSON.parse(str);
+        try{
+            return JSON.parse(str);
+        }catch(e){
+            return JSON.parse(decodeURIComponent(str));
+        }
     }
 
     //网上抄的

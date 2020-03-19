@@ -142,6 +142,7 @@ function check(origin_count,uid,gid){
         //更新价值与数量
         res.gift_price = origin_count * getGiftPrice(res.gift_id);
         res.gift_num = origin_count;
+        res.initMessage();
         gift_hash[index_0].splice(index_1,1);
         sender(res);
     //如果有变化，就再等待$check_delay
@@ -174,7 +175,7 @@ const GiftStation = {
                 guard_list = data['data']['guard_resources'];
                 //选出常用礼物
                 initOrdinaryList();
-                INFO.log('REFRESH_GIFT_CONFIG','刷新礼物列表成功');
+                INFO.log('REFRESH_GIFT_CONFIG','刷新礼物列表成功','green');
             }else{
                 INFO.warning('REFRESH_GIFT_CONFIG','刷新礼物列表失败');
             }

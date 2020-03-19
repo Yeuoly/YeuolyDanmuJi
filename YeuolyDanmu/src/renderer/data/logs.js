@@ -210,3 +210,13 @@ export function addGuard(guard){
 export function getStatisticPointer(){
     return statistics;
 }
+
+export function clearStatistic(){
+    for(let i in statistics){
+        if(typeof statistics[i] === 'number'){
+            statistics[i] = 0;
+        }
+    }
+    paied_dd_hash.clear();
+    interactional_dd_hash.clear();
+}

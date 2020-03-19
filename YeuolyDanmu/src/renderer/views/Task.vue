@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div id="task-page">
         <el-row class="_row">
             <el-col :span="4">
-                <el-button 
+                <div class="task-item"><el-button 
                     type="primary" 
                     plain 
                     @click="startDanmuLoader" 
@@ -10,10 +10,10 @@
                     :loading="starting"
                 >
                     启动弹幕姬
-                </el-button>
+                </el-button></div>
             </el-col>
             <el-col :span="4">
-                <el-button 
+                <div class="task-item"><el-button 
                     type="danger" 
                     plain   
                     @click="closeDanmuLoader" 
@@ -21,115 +21,124 @@
                     :loading="closing"
                 >
                     关闭弹幕姬
-                </el-button>
+                </el-button></div>
             </el-col>
             <el-col :span="4">
-                <el-button 
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="clearDanmu" 
                 >
                     清空弹幕姬
-                </el-button>
+                </el-button></div>
             </el-col>
             <el-col :span="4">
-                <el-button 
+                <div class="task-item"><el-button 
+                    type="info" 
+                    plain   
+                    @click="clearStatistic" 
+                >
+                    清空统计
+                </el-button></div>
+            </el-col>
+            <el-col :span="4">
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="refreshDanmuWindow" 
                 >
                     唤醒弹幕窗口
-                </el-button>
+                </el-button></div>
             </el-col>
             <el-col :span="4">
-                <el-button 
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="testSC30" 
                 >
                     测试30块SC
-                </el-button>
+                </el-button></div>
             </el-col>
             <el-col :span="4">
-                <el-button 
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="testSC50" 
                 >
                     测试50块SC
-                </el-button>
+                </el-button></div>
             </el-col>
             <el-col :span="4">
-                <el-button 
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="testSC100" 
                 >
                     测试100块SC
-                </el-button>
+                </el-button></div>
             </el-col>
             <el-col :span="4">
-                <el-button 
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="testSC500" 
                 >
                     测试500块SC
-                </el-button>
+                </el-button></div>
             </el-col>
-            <el-col :span="5">
-                <el-button 
+            <el-col :span="4">
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="testSC1000" 
                 >
-                    测试1000块SC
-                </el-button>
+                    测试1k块SC
+                </el-button></div>
             </el-col>
-            <el-col :span="5">
-                <el-button 
+            <el-col :span="4">
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="testSC2000" 
                 >
-                    测试2000块SC
-                </el-button>
+                    测试2k块SC
+                </el-button></div>
             </el-col>
-            <el-col :span="3">
-                <el-button 
+            <el-col :span="4">
+                <div class="task-item"><el-button 
                     type="info" 
                     plain
                     @click="testDanmu" 
                 >
                     测试弹幕
-                </el-button>
+                </el-button></div>
             </el-col>
-            <el-col :span="3">
-                <el-button 
+            <el-col :span="4">
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="testGift" 
                 >
                     测试辣条
-                </el-button>
+                </el-button></div>
             </el-col>
-            <el-col :span="3">
-                <el-button 
+            <el-col :span="4">
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="testGuard" 
                 >
                     测试舰长
-                </el-button>
+                </el-button></div>
             </el-col>
-            <el-col :span="3">
-                <el-button 
+            <el-col :span="4">
+                <div class="task-item"><el-button 
                     type="info" 
                     plain   
                     @click="saveRecords" 
                 >
                     保存日志
-                </el-button>
+                </el-button></div>
             </el-col>
         </el-row>
     </div>
@@ -146,8 +155,11 @@ import { global_settings } from '../settings/global_settings';
 import Danmu from '../class/Danmu';
 import { SuperChat , Gift , Guard } from '../class/Danmu';
 
-import { addGift, addLog, addSC, writeRecords, addDanmus, addGuard } from '../data/logs';
+import { addGift, addLog, addSC, writeRecords, addDanmus, addGuard, clearStatistic } from '../data/logs';
 import { User } from '../class/User';
+import Axios from 'axios';
+import api from '../settings/api';
+import Info from '../class/Info';
 // const addSC = require('../data/logs').addSC;
 // const addGift = require('../data/logs').addGift;
 
@@ -194,6 +206,9 @@ export default {
             ipc.send('to-danmu','trans-guard',guard);
             addGuard(guard);
         },
+        transLiveInfo(info){
+            ipc.send('to-danmu','trans-live-info',info);
+        },
         //过滤弹幕
         danmusFilter(danmus){
             //这里会过滤掉常见的刷屏弹幕，比如噼哩噼哩干杯
@@ -206,11 +221,6 @@ export default {
         },
         //启动弹幕加载
         startDanmuLoader(){
-            //首先打开弹幕窗口，初始化窗口信息
-            if(!this.danmu_dialog_flag){
-                this.openDanmuDialog();
-            }
-            //禁止再次启动
             this.starting = true;
             const room_id = room_id_controller.current;
             //把弹幕分裂钩子挂到Loader上
@@ -226,16 +236,25 @@ export default {
             this.DanmuLoader.onGuard = guard => {
                 this.transGuard(guard);
             }
+            this.DanmuLoader.onLiveInfo = info => {
+                this.transLiveInfo(info);
+            }
             this.DanmuLoader.setRoomID(room_id);
-            this.DanmuLoader.startLoader(() => {
+            this.DanmuLoader.startLoader( live_status => {
                 //成功后的回调
                 OrdinaryEventBus.$emit('start-loader');
-                this.danmu_dialog_flag = true;
                 this.starting = false;
                 this.started = true;
                 this.wirte_records_timer = setInterval(() => {
                     writeRecords();
                 },global_settings['log_module']['wirte_interval'] * 1000);
+                //打开弹幕窗口，初始化窗口信息，避免重复打开
+                if(!this.danmu_dialog_flag){
+                    this.danmu_dialog_flag = true;
+                    this.openDanmuDialog(live_status);
+                }
+                //然后发一下，这个是避免二次启动的时候初始化信息传不过去
+                ipc.send('to-danmu','trans-live-info',live_status);
             });
         },
         closeDanmuLoader(){
@@ -250,10 +269,10 @@ export default {
         clearDanmu(){
             ipc.send('to-danmu','clear');
         },
-        async openDanmuDialog(){
+        async openDanmuDialog(live_status){
             const win = await this.$Win.openWin({
                 width: 300,
-                height: 700,
+                height: 750,
                 useContentSize: true,
                 webPreferences : {
                     webSecurity : false
@@ -265,8 +284,20 @@ export default {
                 windowConfig : {
                     router : '/danmu',
                     name : '弹幕窗口',
+                    data : live_status
                 }
             });
+            //获取一下粉丝数
+            try{
+                const { data : data } = Axios.get(`${api.bili_get_follow_info}?mid=${room_id_controller.getCurrent()}`);
+                if(data['code'] === 0){
+                    
+                }else{
+                    Info.warning('GET_UP_INITIAL_INFO','获取房间初始信息失败');
+                }
+            }catch(e){
+                Info.warning('GET_UP_INITIAL_INFO','获取房间初始信息失败');
+            }
         },
         //伪造一个虚假的30块SC
         testSC30(){
@@ -324,7 +355,7 @@ export default {
         },
         testGift(){
             const test = new Gift('Yeuoly',40691233,'http://i2.hdslb.com/bfs/face/dc664955fedaa4527d794abad384019a0c63f488.jpg',
-                1,'辣条',23300,233,'https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png',false
+                1,'辣条',23300,233,false
             );
             this.transGift(test);
         },
@@ -334,10 +365,10 @@ export default {
         },
         saveRecords(){
             writeRecords();
+        },
+        clearStatistic(){
+            clearStatistic();
         }
-    },
-    mounted() {
-        
     },
     beforeDestroy() {
         ipc.send('window-close-danmu');
@@ -347,7 +378,12 @@ export default {
 </script>
 
 <style>
-._row{
-    padding-bottom: 5px;
-}
+    #task-page .el-button{
+        width: 100%;
+    }
+
+    .task-item{
+        padding-bottom: 5px;
+        padding-right: 5px;
+    }
 </style>

@@ -115,6 +115,11 @@ export default {
         border: 0;
         height: 100%;
         background-color: rgb(30,30,30);
+        font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: rgba(0, 0, 0, 0.87);
+        background-color: #fafafa;
     }
     .logger{
         height: calc(100% - 15px);

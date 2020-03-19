@@ -73,6 +73,21 @@
                             </el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
+                    <el-submenu index="6">
+                        <template slot="title">
+                            <i class="el-icon-more"></i>
+                            <span>其他</span>
+                        </template>
+                        <el-menu-item-group>
+                            <template slot="title">其他</template>
+                            <el-menu-item index="6-1" @click="$router.push('/index/qiafan')">
+                                恰饭
+                            </el-menu-item>
+                            <el-menu-item index="6-2" @click="$router.push('/index/feedback')">
+                                反馈
+                            </el-menu-item>
+                        </el-menu-item-group>
+                    </el-submenu>
                 </el-menu>
             </el-aside>
         </el-container>

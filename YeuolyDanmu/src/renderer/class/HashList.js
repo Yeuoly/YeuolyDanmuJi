@@ -29,6 +29,11 @@ export default class HashList{
         this.pushArray(this.list,this.offset);
     }
 
+    clear(){
+        this.list = [];
+        this.pushArray(this.list,this.offset);
+    }
+
     /**
      * @param {any} item 对象
      * @param {any} item_sign 这个对象的唯一标识

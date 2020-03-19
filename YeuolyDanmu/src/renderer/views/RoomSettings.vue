@@ -77,6 +77,8 @@ export default {
                         e.title = data['data']['room_info']['title'];
                         e.date = new Date().format('MM-dd hh:mm:ss');
                         e.live_status = data['data']['room_info']['live_status'];
+                        e.uid = data['data']['room_info']['uid'];
+                        e.short_id = data['data']['room_info']['short_id'];
                         e.up_name = data['data']['anchor_info']['base_info']['uname'];
                         if(index === tot_len - 1){
                             this.save();

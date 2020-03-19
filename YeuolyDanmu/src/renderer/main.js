@@ -2,12 +2,9 @@ import Vue from 'vue'
 import axios from 'axios'
 
 //初始化设置
-import('../init/index');
-
-//安装图表库
-import VueEcharts from 'vue-echarts';
-import theme from './components/charts/westeros.json';
-VueEcharts.registerTheme('westeros',theme);
+import '../init/index';
+import './style/danmu.css';
+import './style/index.css';
 
 axios.defaults.withCredentials = true;
 
