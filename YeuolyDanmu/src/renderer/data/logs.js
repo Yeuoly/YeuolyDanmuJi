@@ -66,45 +66,28 @@ let last_index_danmu = 0;
 
 //更新互动DD
 function updateInteractionalDD(id,uid){
-    //一个临时变量，用来存hash
-    let hash_c = null;
-    //检测这个dd互动过没
-    if(interactional_dd_hash.insert({
-        uid : uid,  //UID
-        id : id,    //ID
-        times : 1           //互动次数
-    },uid, hash => {
-        //这个回调会优先调用
-        hash_c = hash;
-    }))
-    {
-        //如果没有互动过就互动++
+    if(interactional_dd_hash.operate(uid).insert({
+        uid : uid,
+        id : id,
+        times : 1
+    }).result){
         statistics.interactional_dd_count++;
     }else{
-        //互动过就times++
-        interactional_dd_hash.modify(hash_c, item => {
+        interactional_dd_hash.opter.change( item => {
             item['times']++;
         });
     }
 }
 //更新打钱DD
 function updatePaiedDD(id,uid,price){
-    //一个临时变量，用来存hash
-    let hash_c = null;
-    //检测这个dd打过钱没
-    if(true === paied_dd_hash.insert({
-        uid : uid,              //UID
-        id : id,                //ID
-        price : price           //打钱总价值
-    },uid, hash => {
-        //这个回调会优先调用
-        hash_c = hash;
-    })){
-        //如果没有打过钱，也就是插入成功，那就打钱++
+    if(paied_dd_hash.operate(uid).insert({
+        uid : uid,
+        id : id,
+        price : price
+    }).result){
         statistics.paied_dd_count++;
     }else{
-        //打过钱那就price+
-        paied_dd_hash.modify(hash_c, item => {
+        paied_dd_hash.opter.change( item => {
             item['price'] += price;
         });
     }
@@ -148,10 +131,10 @@ export function getDailySCRecords(){
     return daily_sc_records.slice(0);
 }
 export function getInteractionalDDs(){
-    return interactional_dd_hash.clone();
+    return interactional_dd_hash.opter.clone().result;
 }
 export function getPaiedDDs(){
-    return paied_dd_hash.clone();
+    return paied_dd_hash.opter.clone().result;
 }
 export function getDailyLogRecordsPointer(){
     return daily_log_records;

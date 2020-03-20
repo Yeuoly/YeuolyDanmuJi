@@ -39,6 +39,7 @@
 import { room_id_controller } from '../data/settings';
 import api from '../settings/api';
 import axios from 'axios';
+import Info from '../class/Info';
 
 export default {
     name : 'RoomSettings',
@@ -63,29 +64,40 @@ export default {
             this.room_id = room_id;
             this.setRoomID();
         },
-        cycleLiveInfo(){
+        async cycleLiveInfo(){
             const tot_len = this.history.length;
             let cur_len = 0;
-            this.history.forEach( ( e , index ) => {
-                axios.get(`${api.bili_get_live_info}?room_id=${e.room_id}`).then( r => {
+            const checkRoom = async ( index ) => {
+                try{
+                    const r = await axios.get(`${api.bili_get_live_info}?room_id=${this.history[index].room_id}`);
                     const data = r.data;
                     if(data['code'] !== 0){
                         cur_len++;
-                        INFO.error('GET_LIVE_INFO',`代号:${data['code']}`);
+                        Info.error('GET_LIVE_INFO',`代号:${data['code']}`);
                     }else{
                         cur_len++;
-                        e.title = data['data']['room_info']['title'];
-                        e.date = new Date().format('MM-dd hh:mm:ss');
-                        e.live_status = data['data']['room_info']['live_status'];
-                        e.uid = data['data']['room_info']['uid'];
-                        e.short_id = data['data']['room_info']['short_id'];
-                        e.up_name = data['data']['anchor_info']['base_info']['uname'];
+                        this.history[index].title = data['data']['room_info']['title'];
+                        this.history[index].date = new Date().format('MM-dd hh:mm:ss');
+                        this.history[index].live_status = data['data']['room_info']['live_status'];
+                        this.history[index].uid = data['data']['room_info']['uid'];
+                        this.history[index].short_id = data['data']['room_info']['short_id'];
+                        this.history[index].up_name = data['data']['anchor_info']['base_info']['uname'];
+                        Info.log('GET_LIVE_INFO',`获取房间信息成功，房间号：${this.history[index].room_id}`);
                         if(index === tot_len - 1){
                             this.save();
-                        }  
+                        }
                     }
-                });
-            });
+                }catch(error){
+                    Info.error('GET_LIVE_INFO','获取房间信息失败');           
+                }
+                //这里有必要设个300ms延迟，避免被B站banIP
+                setTimeout(() => {
+                    if(index !== tot_len - 1){
+                        checkRoom(index + 1);
+                    }
+                },300);
+            }
+            checkRoom(0);
         },
         setupCycle(){
             this.cycleLiveInfo();

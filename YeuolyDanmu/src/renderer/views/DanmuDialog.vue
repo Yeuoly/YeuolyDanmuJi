@@ -333,8 +333,6 @@ export default {
             if(gift.is_super){
 
             }else{
-                //伪造假弹幕、真礼物，普通礼物就划过去好了，super礼物在上面处理，会停留
-                //同样需要头像预加载
                 getAvatar(gift.user.uid, src => {
                     gift.user.face = src;
                     this.appendDanmu({

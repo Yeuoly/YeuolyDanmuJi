@@ -76,3 +76,37 @@
 .pb3{ padding-bottom: 8px; }
 .pb4{ padding-bottom: 11px; }
 .pb5{ padding-bottom: 15px; }
+
+/*************************************/
+
+.w100{ width: 100%; }
+.w90{ width: 90%; }
+.w80{ width: 80%; }
+.w75{ width: 75%; }
+.w60{ width: 60%; }
+.w40{ width: 40%; }
+.w25{ width: 25%; }
+.w20{ width: 20%; }
+.w10{ width: 10%; }
+.w5 { width: 5%; }
+
+/*************************************/
+
+.text-grey{ color: grey; }
+.text-white{ color: white; }
+.text-green{ color: green; }
+.text-black{ color: black; }
+
+.text-10{ font-size: 10px; }
+.text-11{ font-size: 11px; }
+.text-12{ font-size: 12px; }
+.text-13{ font-size: 13px; }
+.text-14{ font-size: 14px; }
+.text-15{ font-size: 15px; }
+.text-16{ font-size: 16px; }
+.text-17{ font-size: 17px; }
+.text-18{ font-size: 18px; }
+.text-19{ font-size: 19px; }
+.text-20{ font-size: 20px; }
+.text-21{ font-size: 21px; }
+.text-22{ font-size: 22px; }

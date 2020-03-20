@@ -158,12 +158,16 @@ export default class DanmuLoader{
                         this.heart_beat_times++;
                         const popular = self.getBodyView().getUint32(0);
                         INFO.log('HeartBeat',`心跳成功！心跳-总次数:${this.heart_beat_times}，当前人气值：${popular}`);
-                        this.message_handler.handleMessage({
-                            cmd : 'YEUOLY_CUREENT_POPULAR',
-                            data : {
-                                popular : popular
-                            }
-                        });
+                        //这要保证数据到的时候要合适，最初启动的时候会有点尴尬，数据不会立即过去
+                        //所以加一个5s延迟，弹幕窗口启动应该5s是够了
+                        setTimeout(() => {
+                            this.message_handler.handleMessage({
+                                cmd : 'YEUOLY_CUREENT_POPULAR',
+                                data : {
+                                    popular : popular
+                                }
+                            });
+                        },5000);
                         break;
                     case 5:
                         //处理数据主体

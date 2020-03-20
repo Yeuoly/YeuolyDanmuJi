@@ -14,7 +14,12 @@
               您的邮箱地址
           </template>
       </el-input>
-      <el-button type="primary" @click="submit" plain>提交</el-button>
+      <el-button type="primary" 
+          class="w20" 
+          @click="submit" 
+          plain 
+          :loading="submitting"
+      >提交</el-button>
   </div>
 </template>
 
@@ -29,7 +34,8 @@ export default {
     name : 'FeedBack',
     data : () => ({
         message : '',
-        email : ''
+        email : '',
+        submitting : false
     }),
     methods : {
         async submit(){
@@ -41,12 +47,18 @@ export default {
                 }));
                 const data = response.data;
                 if(data['data']['res'] === -250){
-                    MessageBox.alert(data['data']['error']);
+                    MessageBox.alert(data['data']['error']).finally( () => {
+                        this.submitting = false;
+                    });
                 }else{
-                    MessageBox.confirm('发送成功，求你们了大哥哥，不要炸服啊QAQ');
+                    MessageBox.confirm('发送成功，求你们了大哥哥，不要炸服啊QAQ').finally( () => {
+                        this.submitting = false;
+                    });
                 }
             }catch(e){
-                MessageBox.alert('与服务器连接出错');
+                MessageBox.alert('与服务器连接出错').finally( () => {
+                    this.submitting = false;
+                });
             }
         }
     }
