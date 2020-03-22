@@ -4,9 +4,8 @@ const store = new Store();
 //初始值
 const initial_value = {
     log_module : {
-        log_path : 'C:\\Users\\Public\\YeuolyDanmu\\',
-        gift_path : 'C:\\Users\\Public\\YeuolyDanmu\\',
-        sc_path : 'C:\\Users\\Public\\YeuolyDanmu\\',
+        log_path : 'C:\\Users\\Public\\YeuolyDanmu\\logs\\',
+        plugins_path : 'C:\\Users\\Public\\YeuolyDanmu\\plugins\\',
         wirte_interval : 120
     },
     loading_module : {

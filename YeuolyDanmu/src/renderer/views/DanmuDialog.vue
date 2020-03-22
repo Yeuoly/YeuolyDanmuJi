@@ -476,7 +476,7 @@ export default {
 
     .superchats{
         position: absolute;
-        width: calc(100% + 8px);
+        width: calc(100% + 16px);
         z-index: 1;
         margin-left: -8px;
         transition: all .4s;

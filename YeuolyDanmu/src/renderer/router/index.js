@@ -88,6 +88,13 @@ export default new Router({
             title : '统计排名'
           }
         },{
+          name : 'plugins',
+          path : '/index/plugins',
+          component: () => import('@/views/Plugins.vue'),
+          meta : {
+            title : '插件列表'
+          }
+        },{
           name : 'qiafan',
           path : '/index/qiafan',
           component: () => import('@/views/QiaFan.vue'),

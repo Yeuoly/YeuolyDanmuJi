@@ -1,4 +1,4 @@
-import { app, BrowserWindow, remote } from 'electron'
+import { app, BrowserWindow } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -75,7 +75,8 @@ function createWindow () {
     useContentSize: true,
     width: 1000,
     webPreferences : {
-      webSecurity : false
+      webSecurity : false,
+      nodeIntegration : true
     },
     resizable: false,
     frame: false,

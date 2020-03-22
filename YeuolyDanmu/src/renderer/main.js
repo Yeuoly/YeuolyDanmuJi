@@ -16,6 +16,9 @@ import store from './store'
 import vcolorpicker from 'vcolorpicker';
 Vue.use(vcolorpicker);
 
+//安装插件
+import './boot/plugin';
+
 //多窗口初始化
 import Win from 'electron-vue-windows';
 Win.init(router,{

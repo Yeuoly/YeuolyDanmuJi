@@ -40,6 +40,7 @@ export default {
     methods : {
         async submit(){
             try{
+                this.submitting = true;
                 const response = await Axios.post(api.yeuoly_feedback,qs.stringify({
                     email : this.email,
                     project : 1,

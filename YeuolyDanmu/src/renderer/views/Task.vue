@@ -272,7 +272,7 @@ export default {
         async openDanmuDialog(live_status){
             const win = await this.$Win.openWin({
                 width: 300,
-                height: 750,
+                height: 730,
                 useContentSize: true,
                 webPreferences : {
                     webSecurity : false

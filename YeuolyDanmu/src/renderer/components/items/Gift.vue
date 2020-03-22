@@ -2,7 +2,7 @@
     <div class="gift" :style="{ backgroundColor : background_color }">
         <img class="avatar" :src="Gift.user.face">
         <div ref="text" class="danmu-text"> 
-            <span>{{Gift.user.id}}:</span> 
+            <span>{{Gift.user.id}}：</span> 
             <span>
                 {{Gift.message}}
                 <img class="small-gift" :src="Gift.gift_image">

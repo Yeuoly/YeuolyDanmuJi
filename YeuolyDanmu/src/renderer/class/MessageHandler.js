@@ -33,16 +33,12 @@ let direct_gift_trans_min_price = Utils.varToPointer( () => global_settings['loa
  * 
  */
 
-const speed_list_time = [
-    { SPEED : 8 , INTERVAL : 2000 , RPICE_MIN : 10000 , LATIAO_MIN : 100 },
-    { SPEED : 5 , INTERVAL : 1000 , PRICE_MIN : 5000 , LATIAO_MIN : 50 },
-    { SPEED : 2 , INTERVAL : 500 , PRICE_MIN : 1000 , LATIAO_MIN : 5 },
-    { SPEED : 0 , INTERVAL : 200 , PRICE_MIN : 100 , LATIAO_MIN : 1 }
-];
+const speed_list_time = global_settings['loading_module']['speed_list_info'];
 
 export default class MessageHandler{
     constructor(){
         //初始化礼物处理站
+        const self = this;
         GiftStation.setSender( res => {
             /**
              * 根据速度判断是否打开礼物过滤
@@ -52,15 +48,15 @@ export default class MessageHandler{
              * 如果礼物不是辣条，那就得总价值超过10000金瓜子才会显示，否则过滤掉
              */
             if(auto_filt_low_price){
-                if(res.gift_id === 1 && res.gift_num < this.speed_info.latiao_min){
+                if(res.gift_id === 1 && res.gift_num < self.speed_info.latiao_min){
                     return;
-                }else if(res.gift_id !== 1 && res.gift_price < this.speed_info.price_min){
+                }else if(res.gift_id !== 1 && res.gift_price < self.speed_info.price_min){
                     return;
                 }
             }
             
             this.transGift(res);
-        })
+        });
         //启动循环
         this.setupLoop();
     }
@@ -180,6 +176,7 @@ export default class MessageHandler{
                  * uname => 用户名
                  * uid => 用户uid
                  */
+
                 break;
             case 'WELCOME_GUARD':
                 //这个是欢迎舰队 $data
@@ -188,7 +185,9 @@ export default class MessageHandler{
                  * uid => 用户uid
                  * username => 用户名
                  */
-                
+                const wg = msg['data'];
+                const gi = GiftStation.getGuardInfo(wg['guard_level']);
+                danmu = new Danmu(wg['username'],wg['uid'],`${gi['name']}进入了直播间`,0,0,0,0,0,wg['guard_level']);
                 break;
             case 'ROOM_REAL_TIME_MESSAGE_UPDATE':
                 //这个是更新直播间信息的 $data

@@ -5,6 +5,8 @@
         </p>
         <span class="grey demonstration">日志保存路径，大部分数据都会保存在这里</span>
         <el-input type="text" v-model="origin['log_module']['log_path']"></el-input>
+        <span class="grey demonstration">插件目录，会从该目录下读取插件</span>
+        <el-input type="text" v-model="origin['log_module']['plugins_path']"></el-input>
         <el-input placeholder="请输入" v-model.number="origin['log_module']['wirte_interval']">
             <template slot="prepend">日志保存间隔（s）</template>
         </el-input>

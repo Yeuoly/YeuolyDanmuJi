@@ -73,17 +73,23 @@
                             </el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
-                    <el-submenu index="6">
+                    <el-menu-item index="6" @click="$router.push('/index/plugins')">
+                        <template slot=title>
+                            <i class="el-icon-paperclip"></i>
+                            <span>插件</span>
+                        </template>
+                    </el-menu-item>
+                    <el-submenu index="7">
                         <template slot="title">
                             <i class="el-icon-more"></i>
                             <span>其他</span>
                         </template>
                         <el-menu-item-group>
                             <template slot="title">其他</template>
-                            <el-menu-item index="6-1" @click="$router.push('/index/qiafan')">
+                            <el-menu-item index="7-1" @click="$router.push('/index/qiafan')">
                                 恰饭
                             </el-menu-item>
-                            <el-menu-item index="6-2" @click="$router.push('/index/feedback')">
+                            <el-menu-item index="7-2" @click="$router.push('/index/feedback')">
                                 反馈
                             </el-menu-item>
                         </el-menu-item-group>

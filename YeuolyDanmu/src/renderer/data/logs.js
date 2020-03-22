@@ -29,6 +29,11 @@ const daily_danmu_records = [];
 const daily_guard_records = [];
 
 /**
+ * 管道监听器，emmm说清楚点就是，如果有点发了弹幕，那就会调用监听器，将弹幕传输给监听程序
+ */
+const channel_listenners = [[],[],[],[],[]];
+
+/**
  * 悲，由于我tm脑子有坑又加了一个互动过的dd，现在要加一个hash分表了，头像加载那边由于装载了以前
  * 的头像，用不了，需要单独加表，虽然理论上可以给那边加上一个互动过的属性，但这样就要每次启动都重置一下
  * 想来想去都觉得好麻烦，而且那边接过来也好麻烦，懒得改了，单独加表吧，反正hash也不难，
@@ -154,10 +159,13 @@ export function addDanmus(danmus){
         //更新互动
         updateInteractionalDD(e.user.id,e.user.uid);
         daily_danmu_records.push({ uid:e.user.uid, id:e.user.id, message:e.message });
+        //开始监听咯
+        channel_listenners[0].forEach( event => { event(e); } );
     });
 }
 export function addLog(log){
     daily_log_records.push(log);
+    channel_listenners[1].forEach( event => { event(log); } );
 }
 export function addGift(gf){
     //更新互动
@@ -172,6 +180,7 @@ export function addGift(gf){
     }
     statistics.total_price += gf.gift_price;
     daily_gift_records.push(gf);
+    channel_listenners[2].forEach( event => { event(gf); } );
 }
 export function addSC(sc){
     //更新打钱
@@ -180,6 +189,7 @@ export function addSC(sc){
     updateInteractionalDD(sc.user.id,sc.user.uid);
     statistics.total_sc_price += sc.price;
     daily_sc_records.push(sc);
+    channel_listenners[3].forEach( event => { event(sc); } );
 }
 export function addGuard(guard){
     //更新打钱
@@ -189,6 +199,7 @@ export function addGuard(guard){
     statistics.total_guard_price += guard.price;
     statistics.total_guard_count++;
     daily_guard_records.push(guard);
+    channel_listenners[4].forEach( event => { event(guard); } );
 }
 export function getStatisticPointer(){
     return statistics;
@@ -202,4 +213,43 @@ export function clearStatistic(){
     }
     paied_dd_hash.clear();
     interactional_dd_hash.clear();
+}
+
+function getChannel(channel){
+    switch(channel){
+        case 'danmu':
+            return channel_listenners[0];
+        case 'gift':
+            return channel_listenners[2];
+        case 'sc':
+            return channel_listenners[3];
+        case 'guard':
+            return channel_listenners[4];
+    }
+    return null;
+}
+
+/**
+ * @param {string} channel 将该监听器绑定至的频道，现有频道："danmu" "gift" "sc" "guard" 
+ * @param {function(msg)} messager 监听器，将会把消息传入其中
+ */
+export function setListenner(channel,messager){
+    const c = getChannel(channel);
+    if(!c)return;
+    c.push(messager);
+}
+
+/**
+ * @param {string} channel 指定的监听频道
+ * @param {function(msg)} messager 监听器，将会移除该监听器
+ */
+export function removeListenner(channel,messager){
+    const c = getChannel(channel);
+    if(!c)return;
+    for(let i in c){
+        if(c[i] === messager){
+            c.splice(i,1);
+            return;
+        }
+    }
 }
