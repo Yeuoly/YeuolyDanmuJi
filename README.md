@@ -1,8 +1,9 @@
-#创建接口
+# 插件系统
+## 创建接口
 YeuolyDanmu提供了一个全局接口 createPlugin
 其参数为插件对象
 
-###参数
+### 参数
 ```
 window.createPlugin({
     label : '插件中文名',
