@@ -75,4 +75,4 @@ window.createPlugin({
 ```
 这就是一个简单的创建插件的例子，它会记录弹幕姬启动到现在的时间
 
-######以上就是YeuolyDanmu的创建插件向导，如果还有不会的话可以联系我，邮箱：admin@yeuoly.moe
+#### 以上就是YeuolyDanmu的创建插件向导，如果还有不会的话可以联系我，邮箱：admin@yeuoly.moe
