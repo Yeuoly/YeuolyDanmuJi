@@ -1,4 +1,4 @@
-##创建接口
+#创建接口
 YeuolyDanmu提供了一个全局接口 createPlugin
 其参数为插件对象
 
