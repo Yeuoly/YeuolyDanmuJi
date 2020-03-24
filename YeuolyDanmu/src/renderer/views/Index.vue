@@ -208,6 +208,7 @@ export default {
         bottom: 0;
         overflow-y: none;
         /* background-color: rgb(37,37,38); */
+        border-radius: 10px 0 0 10px;
     }
     .el-header{
         height: 70px !important;
@@ -217,15 +218,18 @@ export default {
         top: 0;
         right: 0;
         background-color: rgb(50,50,51);
+        border-radius: 0 10px 0 0;
     }
     .el-main{
         display: block;
         position: absolute;
+        background-color: white;
         top: 70px;
         bottom: 0px;
         left: 199px;
         right: 0;
         padding: 5px;
         /* background-color: rgb(30,30,30);  */
+        border-radius: 0 0 10px 0;
     }
 </style>

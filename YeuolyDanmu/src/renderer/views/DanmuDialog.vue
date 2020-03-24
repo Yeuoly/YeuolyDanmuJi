@@ -507,7 +507,7 @@ export default {
     }
     #ctrl-area{
         position: absolute;
-        right: 5px;
+        right: -5px;
         top: 5px;
         z-index: 5;
         -webkit-app-region: no-drag;

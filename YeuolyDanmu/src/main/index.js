@@ -80,11 +80,12 @@ function createWindow () {
     },
     resizable: false,
     frame: false,
+    transparent : true,
     titleBarStyle: false,
     show: false
-  })
+  });
 
-  mainWindow.loadURL(winURL)
+  mainWindow.loadURL(winURL);
 
   mainWindow.on('closed', () => {
     mainWindow = null

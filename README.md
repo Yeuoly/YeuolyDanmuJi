@@ -37,6 +37,7 @@ controller : {
 ```
 其中 setListenner用来设置监听器，其参数channel可以为[ 'danmu', 'guard', 'sc' , 'gift', 'log']中的一个，cb为回调函数，当设置好监听器后，YeuolyDanmu会将消息作为第一个参数传入cb中
 removeListenner与setListenner正好相反
+
 7. mount()：挂载方法，YeuolyDanmu会调用它来挂载UI，YeuolyDanmu事先准备好了一个div，其ID为之前设置的el_id，我们只需要使用类似
 ```
 const dom = document.createElement('div');
