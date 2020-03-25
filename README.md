@@ -30,8 +30,14 @@ controller : {
   Vue : Class,
   helper : {
     HashList : Class,
+<<<<<<< HEAD
     Axios : Object,
     console : Object
+=======
+    axios : Object,
+    console : Object
+    getAvatar : function
+>>>>>>> 23d4b4e78a01852798e2884cca3c2cc66ba699dd
   }
 }
 ```
@@ -75,5 +81,52 @@ window.createPlugin({
 });
 ```
 这就是一个简单的创建插件的例子，它会记录弹幕姬启动到现在的时间
+<<<<<<< HEAD
 
+=======
+那么如何使用原生js来实现这个插件呢？如下
+```
+window.createPlugin({
+  label : '记录启动时间',
+  name : 'example',
+  id : 114514,
+  el_id : 'example',
+  data : {
+    time : 0
+  },
+  default_boot : true,
+  boot : false,
+  console : null,
+  run(controller){
+    this.console = controller.helper.console;
+    this.timer = setInterval(() => { this.data.time++; }, 1000);
+    this.boot = true;
+  },
+  mount(){
+    try{
+      const dom = document.getElementById(this.el_id);
+      dom.innerHTML = '已经启动了' + this.data.time + '秒';
+      this.console.log('Example',this.data.time);
+      clearInterval(this.timer);
+      this.timer = setInterval(() => {
+        this.data.time++;
+        dom.innerHTML = '已经启动了' + this.data.time + '秒';
+      },1000);
+    }catch(e){
+      this.console.error('Example',e);
+    }
+  }
+});
+```
+这只是数据少的情况下，原生js就已经看着很蹩脚了，而且我这里做了简单处理，时间并不准确，一旦逻辑和数据复杂起来原生js是很难顶的，所以这里还是建议使用框架，我这里只提供了Vue，各位使用React或者Angular的可以先载入它们的源文件，这里建议直接把他们丢到插件文件夹中就行了，YeuolyDanmu会自动载入的
+
+我这里简单介绍了一下怎么使用console，console我提供了log error waring三个方法，其第一个参数是所处模块的模块名，比如这个例子的模块名就叫Example，第二个参数为消息本体，log还提供了第三个参数color，可以取green red grey，所有日志信息都会在YeuolyDanmu的日志界面中显示，调试的时候就可以使用try catch配合console来完成
+
+再说一下getAvatar，我就直接放一个例子吧，应该看得懂
+```
+getAvatar(用户uid, 头像链接 => {
+  用户.头像链接 = 头像链接;
+});
+```
+>>>>>>> 23d4b4e78a01852798e2884cca3c2cc66ba699dd
 #### 以上就是YeuolyDanmu的创建插件向导，如果还有不会的话可以联系我，邮箱：admin@yeuoly.moe

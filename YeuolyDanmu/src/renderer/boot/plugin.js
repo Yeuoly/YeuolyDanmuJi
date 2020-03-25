@@ -6,10 +6,12 @@ const fs = require('fs');
 const path = require('path');
 import Vue from 'vue';
 import Axios from 'axios';
+import Info from '../class/Info';
 import HashList from '../class/HashList';
 import { getAvatar } from '../class/Avatar';
 
 export const plugins = [];
+export const plugin_ids = [];
 
 //创建插件接口，开放Vue接口
 window.createPlugin = obj => {
@@ -25,7 +27,7 @@ const plugins_controller = {
     helper : {
         HashList,
         getAvatar,
-        console : console,
+        console : Info,
         axios : Axios,
     }
 }
@@ -34,10 +36,51 @@ const plugins_controller = {
 import { global_settings } from '../settings/global_settings';
 const plugins_path = global_settings['log_module']['plugins_path'];
 
+function checkPlugin(e){
+    const errors = [];
+    if(typeof e.label !== 'string' || !e.label.match(/^[^\s]{2,20}$/g)){
+        errors.push('label应该为一个string类型的长度在2~20之间的字符串（不含空字符）');
+    }
+    if(typeof e.name !== 'string' || !e.name.match(/^[a-zA-Z0-9]{3,20}$/g)){
+        errors.push('name应该为一个string类型的长度在3~20之间的英文数字组合（不含空字符）');
+    }
+    if(typeof e.el_id !== 'string' || !e.el_id.match(/^[a-zA-Z0-9]{3,20}$/g)){
+        errors.push('el_id应为一个string类型的长度在3~20之间的英文数字组合（不含空字符）');
+    }
+    if(typeof e.id !== 'number' || plugin_ids.includes(e.id)){
+        errors.push('id应该为一个数字且不能与其他插件id重复');
+    }else{
+        plugin_ids.push(e.id);
+    }
+    if(typeof e.default_boot !== 'boolean'){
+        errors.push('default_boot应该为一个布尔值');
+    }
+    if(typeof e.boot !== 'boolean'){
+        errors.push('boot应该为一个布尔值');
+    }
+    if(typeof e.run !== 'function'){
+        errors.push('run应该为一个函数');
+    }
+    if(typeof e.mount !== 'function'){
+        errors.push('mount应该为一个函数');
+    }
+    if(errors.length === 0){
+        Info.log('LOAD_PLUGINS',`插件【${e.label}】验证通过`,'green');
+        return true;
+    }else{
+        Info.error('LOAD_PLUGINS',errors.join(' | '));
+    }
+}
+
 function bootPlugins(){
     plugins.forEach( e => {
-        if(e.default_boot){
-            e.run(plugins_controller);
+        if( checkPlugin(e) && e.default_boot){
+            try{
+                e.run(plugins_controller);
+                Info.log('BOOT_PLUGINS',`插件【${e.label}】启动成功`,'green');
+            }catch(e){
+                Info.error('BOOT_PLUGINS', e.message + '<br />' + e.stack);
+            }
         }
     });
 }
@@ -66,6 +109,12 @@ function getPlugins(){
                     }
                     dom.src = plugins_path + e;
                     document.body.appendChild(dom);
+                }else if(ext === '.css'){
+                    const dom = document.createElement('link');
+                    dom.href = plugins_path + e;
+                    dom.rel = 'stylesheet';
+                    dom.type = 'text/css';
+                    document.head.appendChild(dom);
                 }
             });
         }

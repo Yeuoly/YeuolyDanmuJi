@@ -1,5 +1,5 @@
-import { InfoEventBus } from '../events/evnetBus';
 import Utils from './Utils';
+import { addLog } from '../data/logs';
 const log = require('electron-log');
 
 class Info{
@@ -8,8 +8,7 @@ class Info{
             block : block,
             message : message,
         });
-        InfoEventBus.$emit(
-            'logger-insert',
+        addLog(
             `[${Utils.formatDate(new Date(),'yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`,
             color || 'grey',
             'info'
@@ -20,8 +19,7 @@ class Info{
             block : block,
             message : message,
         });
-        InfoEventBus.$emit(
-            'logger-insert',
+        addLog(
             `[${new Date().format('yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`,
             'red',
             'error'
@@ -32,8 +30,7 @@ class Info{
             block : block,
             message : message,
         });
-        InfoEventBus.$emit(
-            'logger-insert',
+        addLog(
             `[${new Date().format('yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`,
             'orange',
             'warning'

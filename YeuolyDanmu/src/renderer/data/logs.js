@@ -1,6 +1,6 @@
 import { global_settings } from '../settings/global_settings';
+import { OrdinaryEventBus, InfoEventBus } from '../events/evnetBus';
 import Utils from '../class/Utils';
-import { OrdinaryEventBus } from '../events/evnetBus';
 import HashList from '../class/HashList';
 //落魄到用日志文件来代替原本的礼物SC记录
 const log = require('electron-log');
@@ -18,7 +18,23 @@ log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
  * 这里有个严肃的事情，如果要上统计模块就要计算大量md5，不计算更惨，造成了CPU占用率提升了个3%左右
  * 当流量大的时候最惨，所以准备加一个开关用来开关统计模块，这玩意真的太占资源了
  */
-const daily_log_records = [];
+const daily_log_records = [{
+    class_name : 'grey',
+    log : '[LogConsole]:日志模块已启动',
+    type : 'info',
+    line_id : 0
+},{
+    class_name : 'grey',
+    log : '大佬好，我是这个弹幕姬的作者Yeuoly，这个破弹幕姬基于Electron+Vue+ElementUI开发，' +
+        '希望您能用着舒服。如果大佬们想参加发开的话我留个链接放这里orz https://github.com/Yeuoly/YeuolyDanmuJI',
+    type : 'info',
+    line_id : 1
+},{
+    class_name : 'grey',
+    log : '顺便再放一个联系方式：QQ2035914926',
+    type : 'info',
+    line_id : 2
+}];
 
 const daily_gift_records = [];
 
@@ -163,7 +179,13 @@ export function addDanmus(danmus){
         channel_listenners[0].forEach( event => { event(e); } );
     });
 }
-export function addLog(log){
+export function addLog(text,color,type){
+    const log = { 
+        class_name : color, 
+        log : text, 
+        type : type, 
+        line_id : daily_log_records.length 
+    };
     daily_log_records.push(log);
     channel_listenners[1].forEach( event => { event(log); } );
 }
