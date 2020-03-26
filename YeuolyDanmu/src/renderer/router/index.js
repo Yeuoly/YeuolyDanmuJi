@@ -48,7 +48,7 @@ export default new Router({
           path : '/index/advance-settings',
           component: require('@/views/AdvanceSettings.vue').default,
           meta : {
-            title : '高级设置，请根据教程更改，改错了我不背锅（建议保存后重启'
+            title : '高级设置，请根据教程更改，部分设置重启生效'
           }
         },{
           name : 'records-gift-window',
@@ -107,6 +107,13 @@ export default new Router({
           component: () => import('@/views/Feedback.vue'),
           meta : {
             title : '反馈'
+          }
+        },{
+          name : 'ys-login',
+          path : '/index/ys-login',
+          component: () => import('@/views/YSLoginPage.vue'),
+          meta : {
+            title : '登录YS账号'
           }
         }
       ]

@@ -9,5 +9,6 @@ export default {
 
     cny_get_exchangerate : 'https://api.exchangerate-api.com/v4/latest/CNY',
 
-    yeuoly_feedback : 'https://api.ylday.srmxy.cn/v3/feedback'
+    yeuoly_feedback : 'https://api.ylday.srmxy.cn/v3/feedback',
+    yeuoly_account_ordinary_action : 'https://api.ylday.srmxy.cn/v1/account/ordinary/action'
 }

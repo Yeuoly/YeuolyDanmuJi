@@ -47,6 +47,10 @@
                 <div id="drag_area"></div>
                 <i id="close" class="controller el-icon-close" @click="closeProgress"></i>
                 <i id="minimize" class="controller el-icon-minus" @click="minimizeProgress"></i>
+                <div id="index-user">
+                    <span id="index-name">{{user.name}}</span>
+                    <div id="index-face" :style="{ backgroundImage : `url(${user.face})` }"></div>
+                </div>
             </el-header>
             <el-main>
                 <keep-alive>
@@ -58,9 +62,12 @@
 </template>
 
 <script>
+import { DanmuTransBus, OrdinaryEventBus } from '../events/evnetBus';
+
 import Logger from '../components/items/Logger.vue';
-import { DanmuTransBus } from '../events/evnetBus';
 import INFO from '../class/Info';
+import Account from '../data/user';
+
 const drag = require('electron-drag');
 const { ipcRenderer : ipc } = require('electron');
 
@@ -89,6 +96,14 @@ export default {
             },{
                 name : '高级设置',
                 url : '/index/advance-settings'
+            }]
+        },{
+            name : '账户',
+            icon : 'el-icon-user',
+            subtitle : '账号管理',
+            children : [{
+                name : '登录YS账号',
+                url : '/index/ys-login'
             }]
         },{
             name : '记录',
@@ -134,7 +149,11 @@ export default {
                 name : '恰饭',
                 url : '/index/qiafan'
             }]
-        }]
+        }],
+        user : {
+            name : '未登录',
+            face : 'http://i0.hdslb.com/bfs/album/6389ef2f437a4b00d0dc863b44f4084bf6b4165a.jpg'
+        }
     }),
     methods: {
         closeProgress(){
@@ -158,6 +177,16 @@ export default {
         router(url){
             if(url === this.$route.path)return;
             this.$router.push(url);
+        },
+        setUserInfo(){
+            Account.master.get((id, uid, face) => {
+                this.user.name = id;
+                this.user.face = face;
+            });
+        },
+        initAccount(){
+            OrdinaryEventBus.$on('master-login-succeed',this.setUserInfo);
+            Account.init();
         }
     },
     mounted() {
@@ -167,11 +196,46 @@ export default {
         if(!drag.supported){
             document.querySelector('#drag_area').style['-webkit-app-region'] = 'drag';
         }
+        //登录
+        this.initAccount();
     },
 }
 </script>
 
 <style scoped>
+    #index-user{
+        position: absolute;
+        right: 75px;
+        top: 23px;
+    }
+    #index-face{
+        width: 25px;
+        /* z-index: 0; */
+        height: 25px;
+        /* position: absolute; */
+        border-radius: 50%;
+        /* top: 35px; */
+        /* right: 10px; */
+        float: right;
+        background-size: cover;
+        background-position: center center;
+    }
+    #index-name{
+        /* position: absolute; */
+        /* top: 37px; */
+        /* right: 40px; */
+        height: 35px;
+        color: grey;
+        /* line-height: 1; */
+        font-size: 16px;
+        font-family: '黑体';
+        /* line-height: 1; */
+        text-align: right;
+        float: right;
+        padding-left: 5px;
+        margin-top: 2px;
+    }
+
     .el-main > * {
         background-color: transparent;
     }
@@ -191,26 +255,24 @@ export default {
         width: 20px;
         height: 20px;
         transition: all .1s;
-        font-weight: 700
+        font-weight: 700;
+        border-radius: 50%;
     }
-    #close:hover{
-        color: red;
-    }
-    #minimize:hover{
-        color: white;
+    .controller:hover{
+        background-color: rgb(230,230,230);
     }
     #close{
         position: absolute;
-        top: 10px;
+        top: 25px;
         right: 10px;
     }
     #minimize{
         position: absolute;
-        top: 10px;
+        top: 25px;
         right: 40px;
     }
     .title{
-        color: black;
+        color: grey;
         font-family: '黑体';
     }
 
