@@ -40,6 +40,7 @@ import { room_id_controller } from '../data/settings';
 import api from '../settings/api';
 import axios from 'axios';
 import Info from '../class/Info';
+import Utils from '../class/Utils';
 
 export default {
     name : 'RoomSettings',
@@ -77,7 +78,7 @@ export default {
                     }else{
                         cur_len++;
                         this.history[index].title = data['data']['room_info']['title'];
-                        this.history[index].date = new Date().format('MM-dd hh:mm:ss');
+                        this.history[index].date = Utils.formatDate(new Date(),'MM-dd hh:mm:ss');
                         this.history[index].live_status = data['data']['room_info']['live_status'];
                         this.history[index].uid = data['data']['room_info']['uid'];
                         this.history[index].short_id = data['data']['room_info']['short_id'];
@@ -88,7 +89,7 @@ export default {
                         }
                     }
                 }catch(error){
-                    Info.error('GET_LIVE_INFO','获取房间信息失败');           
+                    Info.error('GET_LIVE_INFO','获取房间信息失败');
                 }
                 //这里有必要设个300ms延迟，避免被B站banIP
                 setTimeout(() => {

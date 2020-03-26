@@ -226,7 +226,4 @@ const GiftStation = {
     }
 };
 
-//挂载默认事件
-OrdinaryEventBus.$on('start-loader',GiftStation.getGiftConfig);
-
 export default GiftStation;

@@ -9,26 +9,26 @@
             <span class="color-group-title"> &lt;= 当前色组</span><color-group v-model="current_color_group"></color-group>
         </div>
         <hr>
-        <div v-for="( i , key ) in default_color_groups" 
-            :key="key"
+        <div v-for="( i , key_g ) in default_color_groups" 
+            :key="key_g"
             class="group-holder"
         >
-            <span class="color-group-title"> &lt;= 预设色组{{ key + 1 }}</span>
+            <span class="color-group-title"> &lt;= 预设色组{{ key_g + 1 }}</span>
             <color-group :value="i" :disabled="true" ></color-group>
             <div class="color-btns">
-                <el-button size="small" @click="use('default',key)">选中替换当前色组</el-button>
+                <el-button size="small" @click="use('default',key_g)">选中替换当前色组</el-button>
             </div>
         </div>
         <hr>
-        <div v-for="( i , key ) in mine_color_groups" 
-            :key="key"
+        <div v-for="( i , key_m ) in mine_color_groups" 
+            :key="'m' + key_m"
             class="group-holder"
         >
-            <span class="color-group-title"> &lt;= 我的色组{{ key + 1 }}</span>
+            <span class="color-group-title"> &lt;= 我的色组{{ key_m + 1 }}</span>
             <color-group :value="i" :disabled="true" ></color-group>
             <div class="color-btns">
-                <el-button size="small" @click="use('mine',key)">选中替换当前色组</el-button>
-                <el-button size="small" @click="deleteThis(key)">删除色组</el-button>
+                <el-button size="small" @click="use('mine',key_m)">选中替换当前色组</el-button>
+                <el-button size="small" @click="deleteThis(key_m)">删除色组</el-button>
             </div>
         </div>
     </div>

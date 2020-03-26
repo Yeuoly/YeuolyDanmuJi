@@ -81,45 +81,35 @@ export default {
             }
             const rank_i = getInteractionalDDs();
             const rank_p = getPaiedDDs();
-            //一开始是准备用链表排序的，但最后还是选择用快排了
-            //u1s1，我对快排还是不熟悉，或者说没有完全理解，还是需要多在纸上练几次，理解一下快排的思想
-            function quickSort(src,l,r,index){
-                //如果右边小了就退出
+            const len_i = rank_i.length;
+            const len_p = rank_p.length;
+            const max_len_i = Math.min(len_i, 100);
+            const max_len_p = Math.min(len_p, 100);
+            function quickSort(src, l, r, index, max){
                 if(r <= l)return;
-                //选取基准数
                 const stanrd = src[l];
                 let i = l, j = r;
                 while(i < j){
-                    //开始从后往前找一个比基准数小的
-                    while(src[j][index] >= stanrd[index] && i < j)j--;
-                    //找到了一个比标准值小的，替换
+                    while(src[j][index] < stanrd[index] && i < j)j--;
                     if(i < j) src[i++] = src[j];
-                    //现在坑留在了j，开始从前往后找一个比基准数大的
-                    while(src[i][index] < stanrd[index] && i < j)i++;
-                    //找到了一个比标准值大的，替换
+                    while(src[i][index] >= stanrd[index] && i < j)i++;
                     if(i < j) src[j--] = src[i];
-                    //现在坑留在了i，如果i<j，就会跑上面那个while了
                 }
-                //让我们把最后那个留下来的坑填了，其实这时候i=j
                 src[i] = stanrd;
-                //让我们开始下一轮迫害
-                quickSort(src, l, i - 1, index);
-                quickSort(src, i + 1, r, index);
+                //人多了会栈溢出，一开始没注意到这一点，做一下优化，只排需要显示的
+                quickSort(src, l, i - 1, index, max);
+                if(i < max - 1)quickSort(src, i + 1 ,r ,index, max);
             }
             //开始排序
-            quickSort(rank_i, 0 ,rank_i.length - 1,'times');
-            quickSort(rank_p, 0 ,rank_p.length - 1,'price');
-            const len_i = rank_i.length;
-            const len_p = rank_p.length;
-            const max_len_i = Math.min(len_i,100);
-            const max_len_p = Math.min(len_p,100);
-            this.danmu_rank.splice(0,this.danmu_rank.length);
-            this.paied_rank.splice(0,this.paied_rank.length);
+            quickSort(rank_i, 0, rank_i.length - 1, 'times', max_len_i);
+            quickSort(rank_p, 0, rank_p.length - 1, 'price', max_len_p);
+            this.danmu_rank.splice(0, this.danmu_rank.length);
+            this.paied_rank.splice(0, this.paied_rank.length);
             for(let i = 0; i < max_len_i; i++){
-                this.danmu_rank.push(rank_i[len_i - i - 1]);
+                this.danmu_rank.push(rank_i[i]);
             }
             for(let i = 0; i < max_len_p; i++){
-                this.paied_rank.push(rank_p[len_p - i - 1]);
+                this.paied_rank.push(rank_p[i]);
             }
         }
     },

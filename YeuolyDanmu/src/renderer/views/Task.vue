@@ -2,7 +2,7 @@
     <div id="task-page">
         <el-row class="_row">
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="primary" 
                     plain 
                     @click="startDanmuLoader" 
@@ -13,7 +13,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="danger" 
                     plain   
                     @click="closeDanmuLoader" 
@@ -24,7 +24,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="clearDanmu" 
@@ -33,7 +33,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="clearStatistic" 
@@ -42,7 +42,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="refreshDanmuWindow" 
@@ -51,7 +51,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="testSC30" 
@@ -60,7 +60,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="testSC50" 
@@ -69,7 +69,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="testSC100" 
@@ -78,7 +78,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="testSC500" 
@@ -87,7 +87,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="testSC1000" 
@@ -96,7 +96,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="testSC2000" 
@@ -105,7 +105,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain
                     @click="testDanmu" 
@@ -114,7 +114,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="testGift" 
@@ -123,7 +123,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="testGuard" 
@@ -132,7 +132,7 @@
                 </el-button></div>
             </el-col>
             <el-col :span="4">
-                <div class="task-item"><el-button 
+                <div class="task-item"><el-button round 
                     type="info" 
                     plain   
                     @click="saveRecords" 
@@ -287,17 +287,6 @@ export default {
                     data : live_status
                 }
             });
-            //获取一下粉丝数
-            try{
-                const { data : data } = Axios.get(`${api.bili_get_follow_info}?mid=${room_id_controller.getCurrent()}`);
-                if(data['code'] === 0){
-                    
-                }else{
-                    Info.warning('GET_UP_INITIAL_INFO','获取房间初始信息失败');
-                }
-            }catch(e){
-                Info.warning('GET_UP_INITIAL_INFO','获取房间初始信息失败');
-            }
         },
         //伪造一个虚假的30块SC
         testSC30(){

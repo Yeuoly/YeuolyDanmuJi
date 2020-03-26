@@ -2,7 +2,6 @@ import Vue from 'vue'
 import axios from 'axios'
 
 //初始化设置
-import '../init/index';
 import './style/danmu.css';
 import './style/index.css';
 
@@ -18,6 +17,10 @@ Vue.use(vcolorpicker);
 
 //安装插件
 import './boot/plugin';
+
+//初始化礼物
+import GiftStation from './class/GiftStation';
+GiftStation.getGiftConfig();
 
 //多窗口初始化
 import Win from 'electron-vue-windows';

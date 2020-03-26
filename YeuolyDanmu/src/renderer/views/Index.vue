@@ -3,97 +3,41 @@
         <el-container>
             <el-aside width="200px">
                 <el-menu
-                    class="el-menu-vertical-demo"
                     style="height:100%"
-                    background-color="#252526"
-                    active-background-color="#2A2D2E"
+                    background-color="#3B3F52"
                     text-color="#fff"
                 >
-                    <el-menu-item index="1" @click="$router.push('/index/log')">
-                        <template slot=title>
-                            <i class="el-icon-location"></i>
-                            <span>日志</span>
-                        </template>
-                    </el-menu-item>
-                    <el-menu-item index="2" @click="$router.push('/index/task')">
-                        <template slot=title>
-                            <i class="el-icon-document"></i>
-                            <span>任务</span>
-                        </template>
-                    </el-menu-item>
-                    <el-submenu index="3">
-                        <template slot="title">
-                            <i class="el-icon-setting"></i>
-                            <span>设置</span>
-                        </template>
-                        <el-menu-item-group>
-                            <template slot="title">基础设置</template>
-                            <el-menu-item index="2-1" @click="$router.push('/index/room-settings')">
-                                房间信息
-                            </el-menu-item>
-                            <el-menu-item index="2-2" @click="$router.push('/index/color-settings')">
-                                颜色设置
-                            </el-menu-item>
-                            <template slot="title">高级设置</template>
-                            <el-menu-item index="2-3" @click="$router.push('/index/advance-settings')">
-                                高级设置
-                            </el-menu-item>
-                        </el-menu-item-group>
-                    </el-submenu>
-                    <el-submenu index="4">
-                        <template slot="title">
-                            <i class="el-icon-reading"></i>
-                            <span>记录</span>
-                        </template>
-                        <el-menu-item-group>
-                            <template slot="title">SC、礼物记录</template>
-                            <el-menu-item index="4-1" @click="$router.push('/index/records-gift-window')">
-                                礼物记录
-                            </el-menu-item>
-                            <el-menu-item index="4-2" @click="$router.push('/index/records-sc-window')">
-                                SC记录
-                            </el-menu-item>
-                            <el-menu-item index="4-3" @click="$router.push('/index/records-guard-window')">
-                                舰长记录
-                            </el-menu-item>
-                        </el-menu-item-group>
-                    </el-submenu>
-                    <el-submenu index="5">
-                        <template slot="title">
-                            <i class="el-icon-pie-chart"></i>
-                            <span>统计</span>
-                        </template>
-                        <el-menu-item-group>
-                            <template slot="title">统计模块</template>
-                            <el-menu-item index="5-1" @click="$router.push('/index/statistic')">
-                                数据统计
-                            </el-menu-item>
-                            <el-menu-item index="5-2" @click="$router.push('/index/dd-rank')">
-                                排名
-                            </el-menu-item>
-                        </el-menu-item-group>
-                    </el-submenu>
-                    <el-menu-item index="6" @click="$router.push('/index/plugins')">
-                        <template slot=title>
-                            <i class="el-icon-paperclip"></i>
-                            <span>插件</span>
-                        </template>
-                    </el-menu-item>
-                    <el-submenu index="7">
-                        <template slot="title">
-                            <i class="el-icon-more"></i>
-                            <span>其他</span>
-                        </template>
-                        <el-menu-item-group>
-                            <template slot="title">其他</template>
-                            <el-menu-item index="7-1" @click="$router.push('/index/qiafan')">
-                                恰饭
-                            </el-menu-item>
-                            <el-menu-item index="7-2" @click="$router.push('/index/feedback')">
-                                反馈
-                            </el-menu-item>
-                        </el-menu-item-group>
-                    </el-submenu>
+                    <div v-for="(i, key) in routes"
+                        :key="key"
+                    >
+                        <el-menu-item :index="key.toString()" 
+                            v-if="!i.children"
+                            @click="router(i.url)"
+                        >
+                            <template slot=title>
+                                <i :class="i.icon"></i>
+                                <span>{{i.name}}</span>
+                            </template>
+                        </el-menu-item>
+                        <el-submenu v-else 
+                            :index="key.toString()"
+                        >
+                            <template slot=title>
+                                <i :class="i.icon"></i>
+                                <span>{{i.name}}</span>
+                            </template>
+                            <el-menu-item-group>
+                                <template slot="title">{{i.subtitle}}</template>    
+                                <el-menu-item v-for="( t, key_t ) in i.children"
+                                    :key="key_t"
+                                    :index="`${key}-${key_t}`"
+                                    @click="router(t.url)"
+                                >
+                                    {{t.name}}
+                                </el-menu-item>
+                            </el-menu-item-group>
+                        </el-submenu>
+                    </div>
                 </el-menu>
             </el-aside>
         </el-container>
@@ -123,6 +67,75 @@ const { ipcRenderer : ipc } = require('electron');
 export default {
     name : 'Index',
     components : { Logger },
+    data : () => ({
+        routes : [{
+            name : '日志',
+            icon : 'el-icon-location',
+            url : '/index/log'
+        },{
+            name : '任务',
+            icon : 'el-icon-document',
+            url : '/index/task'
+        },{
+            name : '设置',
+            icon : 'el-icon-setting',
+            subtitle : '基础设置',
+            children : [{
+                name : '房间设置',
+                url : '/index/room-settings'
+            },{
+                name : '颜色设置',
+                url : '/index/color-settings'
+            },{
+                name : '高级设置',
+                url : '/index/advance-settings'
+            }]
+        },{
+            name : '记录',
+            icon : 'el-icon-reading',
+            subtitle : '舰长、SC、礼物等记录',
+            children : [{
+                name : '礼物记录',
+                url : '/index/records-gift-window'
+            },{
+                name : 'SC记录',
+                url : '/index/records-sc-window'
+            },{
+                name : '舰长记录',
+                url : '/index/records-guard-window'
+            }]
+        },{
+            name : '统计',
+            icon : 'el-icon-pie-chart',
+            subtitle : '统计模块',
+            children : [{
+                name : '统计总览',
+                url : '/index/statistic'
+            },{
+                name : '排名',
+                url : '/index/dd-rank'
+            }]
+        },{
+            name : '插件',
+            icon : 'el-icon-paperclip',
+            subtitle : '插件模块',
+            children : [{
+                name : '插件列表',
+                url : '/index/plugins-list'
+            }]
+        },{
+            name : '更多',
+            icon : 'el-icon-more',
+            subtitle : '一些杂七杂八的功能',
+            children : [{
+                name : '反馈',
+                url : '/index/feedback'
+            },{
+                name : '恰饭',
+                url : '/index/qiafan'
+            }]
+        }]
+    }),
     methods: {
         closeProgress(){
             ipc.send('window-close');
@@ -141,6 +154,10 @@ export default {
         },
         transInfo(block,info,color){
             INFO.log(block,info,color);
+        },
+        router(url){
+            if(url === this.$route.path)return;
+            this.$router.push(url);
         }
     },
     mounted() {
@@ -174,6 +191,7 @@ export default {
         width: 20px;
         height: 20px;
         transition: all .1s;
+        font-weight: 700
     }
     #close:hover{
         color: red;
@@ -192,14 +210,10 @@ export default {
         right: 40px;
     }
     .title{
-        color: rgb(208,208,208);
+        color: black;
+        font-family: '黑体';
     }
-    .el-menu{
-        overflow: hidden;
-    }
-    .el-menu-item .is-active:hover{
-        background-color: red !important;
-    }
+
     .el-aside {
         display: block;
         position: absolute;
@@ -210,6 +224,11 @@ export default {
         /* background-color: rgb(37,37,38); */
         border-radius: 10px 0 0 10px;
     }
+
+    .el-aside::-webkit-scrollbar{
+        display: none;
+    }
+
     .el-header{
         height: 70px !important;
         display: block;
@@ -217,7 +236,7 @@ export default {
         left: 199px;
         top: 0;
         right: 0;
-        background-color: rgb(50,50,51);
+        background-color: rgb(249,251,252);
         border-radius: 0 10px 0 0;
     }
     .el-main{

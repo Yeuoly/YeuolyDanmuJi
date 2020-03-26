@@ -17,7 +17,7 @@
 import { plugins } from '../boot/plugin';
 
 export default {
-    name : 'Plugins',
+    name : 'PluginsList',
     data : () => ({
         plugins : plugins,
         active_name : 'default'

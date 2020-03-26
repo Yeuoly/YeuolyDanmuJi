@@ -88,9 +88,9 @@ export default new Router({
             title : '统计排名'
           }
         },{
-          name : 'plugins',
-          path : '/index/plugins',
-          component: () => import('@/views/Plugins.vue'),
+          name : 'plugins-list',
+          path : '/index/plugins-list',
+          component: () => import('@/views/PluginsList.vue'),
           meta : {
             title : '插件列表'
           }

@@ -2,6 +2,10 @@ import Utils from './Utils';
 import { addLog } from '../data/logs';
 const log = require('electron-log');
 
+function getDate(){
+    return Utils.formatDate(new Date(),'yyyy-MM-dd hh:mm:ss');
+}
+
 class Info{
     log(block,message,color){
         log.log({
@@ -9,7 +13,7 @@ class Info{
             message : message,
         });
         addLog(
-            `[${Utils.formatDate(new Date(),'yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`,
+            `[${getDate()}}][${block}]:${message}`,
             color || 'grey',
             'info'
         );
@@ -20,7 +24,7 @@ class Info{
             message : message,
         });
         addLog(
-            `[${new Date().format('yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`,
+            `[${getDate()}][${block}]:${message}`,
             'red',
             'error'
         );
@@ -31,7 +35,7 @@ class Info{
             message : message,
         });
         addLog(
-            `[${new Date().format('yyyy-MM-dd hh:mm:ss')}][${block}]:${message}`,
+            `[${getDate()}][${block}]:${message}`,
             'orange',
             'warning'
         );
