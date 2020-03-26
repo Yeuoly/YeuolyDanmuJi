@@ -30,14 +30,9 @@ controller : {
   Vue : Class,
   helper : {
     HashList : Class,
-<<<<<<< HEAD
-    Axios : Object,
-    console : Object
-=======
     axios : Object,
     console : Object
     getAvatar : function
->>>>>>> 23d4b4e78a01852798e2884cca3c2cc66ba699dd
   }
 }
 ```
@@ -81,9 +76,6 @@ window.createPlugin({
 });
 ```
 这就是一个简单的创建插件的例子，它会记录弹幕姬启动到现在的时间
-<<<<<<< HEAD
-
-=======
 那么如何使用原生js来实现这个插件呢？如下
 ```
 window.createPlugin({
@@ -128,5 +120,4 @@ getAvatar(用户uid, 头像链接 => {
   用户.头像链接 = 头像链接;
 });
 ```
->>>>>>> 23d4b4e78a01852798e2884cca3c2cc66ba699dd
 #### 以上就是YeuolyDanmu的创建插件向导，如果还有不会的话可以联系我，邮箱：admin@yeuoly.moe

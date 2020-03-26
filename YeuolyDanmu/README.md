@@ -1,6 +1,6 @@
 # yeuoly_danmu
 
-> A bilibili danmuji
+> A tool for Bilibili-Live-Danmu
 
 #### Build Setup
 
