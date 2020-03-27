@@ -86,7 +86,7 @@ function createWindow () {
     maximizable: false
   });
 
-  mainWindow.setIcon(require('path').join(__dirname,'./../assets/logo.ico'));
+  //mainWindow.setIcon(require('path').join(__dirname,'./../assets/logo.ico'));
 
   mainWindow.loadURL(winURL);
 

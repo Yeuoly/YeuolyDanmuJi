@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="room-settings">
         <el-input style="background-color:transparent;" placeholder="房间号" v-model.number="room_id">
             <el-button style="background-color:transparent"
                 :loading="room_id_lock"
@@ -13,13 +13,13 @@
                   max-height="440px"
                   stripe
         >
-            <el-table-column label="房间短号" prop="short_id"></el-table-column>
-            <el-table-column label="房间号" prop="room_id"></el-table-column>
-            <el-table-column label="uid" prop="uid"></el-table-column>
-            <el-table-column label="更新日期" prop="date"></el-table-column>
+            <el-table-column width="70" label="短号" prop="short_id"></el-table-column>
+            <el-table-column width="90" label="房间号" prop="room_id"></el-table-column>
+            <el-table-column width="90" label="uid" prop="uid"></el-table-column>
+            <el-table-column width="130" label="更新日期" prop="date"></el-table-column>
             <el-table-column label="up主" prop="up_name"></el-table-column>
             <el-table-column label="上次标题" prop="title"></el-table-column>
-            <el-table-column label="直播状态">
+            <el-table-column width="75" label="状态">
                 <template slot-scope="scope">
                     <span :style="{ color : scope.row.live_status === 1 ? '#54a954' : 'grey' }"
                     >{{ scope.row.live_status === 1 ? '直播中' : '未开播' }}</span>
@@ -27,8 +27,8 @@
             </el-table-column>
             <el-table-column fixed="right" label="操作">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" @click="selectHistory(scope.row.room_id)">选中</el-button>
-                    <el-button size="mini" type="text" @click="removeHistory(scope.row.room_id)">移除</el-button>
+                    <el-button size="mini" type="success" @click="selectHistory(scope.row.room_id)" circle icon="el-icon-check"></el-button>
+                    <el-button size="mini" type="danger" @click="removeHistory(scope.row.room_id)" circle icon="el-icon-delete"></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -121,5 +121,7 @@ export default {
 </script>
 
 <style>
-
+#room-settings > *{
+    text-align: center;
+}
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-container>
-            <el-aside width="200px">
+            <el-aside width="150px">
                 <el-menu
                     style="height:100%"
                     background-color="#3B3F52"
@@ -330,7 +330,7 @@ export default {
         height: 70px !important;
         display: block;
         position: absolute;
-        left: 199px;
+        left: 149px;
         top: 0;
         right: 0;
         background-color: rgb(249,251,252);
@@ -342,7 +342,7 @@ export default {
         background-color: white;
         top: 70px;
         bottom: 0px;
-        left: 199px;
+        left: 149px;
         right: 0;
         padding: 5px;
         /* background-color: rgb(30,30,30);  */
