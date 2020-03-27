@@ -82,10 +82,11 @@ function createWindow () {
     frame: false,
     transparent : true,
     titleBarStyle: false,
-    show: false
+    show: false,
+    maximizable: false
   });
 
-  //mainWindow.setIcon(require('path').join(__dirname,'/../assets/logo.ico'));
+  mainWindow.setIcon(require('path').join(__dirname,'./../assets/logo.ico'));
 
   mainWindow.loadURL(winURL);
 

@@ -10,7 +10,7 @@
         </el-input>
         <el-table :data="history" 
                   style="width :100%;margin-top:15px"
-                  max-height="450px"
+                  max-height="440px"
                   stripe
         >
             <el-table-column label="房间短号" prop="short_id"></el-table-column>

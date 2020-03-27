@@ -6,14 +6,15 @@
         <el-button @click="save" round>保存为我的色组</el-button>
         <hr>
         <div class="group-holder">
-            <span class="color-group-title"> &lt;= 当前色组</span><color-group v-model="current_color_group"></color-group>
+            <color-group v-model="current_color_group"></color-group>
+            <span class="color-group-title"> | 当前色组</span>
         </div>
         <hr>
         <div v-for="( i , key_g ) in default_color_groups" 
             :key="key_g"
             class="group-holder"
         >
-            <span class="color-group-title"> &lt;= 预设色组{{ key_g + 1 }}</span>
+            <span class="color-group-title"> | 预设色组{{ key_g + 1 }}</span>
             <color-group :value="i" :disabled="true" ></color-group>
             <div class="color-btns">
                 <el-button size="small" @click="use('default',key_g)">选中替换当前色组</el-button>
@@ -24,7 +25,7 @@
             :key="'m' + key_m"
             class="group-holder"
         >
-            <span class="color-group-title"> &lt;= 我的色组{{ key_m + 1 }}</span>
+            <span class="color-group-title"> | 我的色组{{ key_m + 1 }}</span>
             <color-group :value="i" :disabled="true" ></color-group>
             <div class="color-btns">
                 <el-button size="small" @click="use('mine',key_m)">选中替换当前色组</el-button>

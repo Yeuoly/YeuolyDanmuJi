@@ -13,7 +13,7 @@ class Info{
             message : message,
         });
         addLog(
-            `[${getDate()}}][${block}]:${message}`,
+            `[${getDate()}][${block}]:${message}`,
             color || 'grey',
             'info'
         );

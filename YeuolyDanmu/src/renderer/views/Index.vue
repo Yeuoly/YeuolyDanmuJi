@@ -53,9 +53,15 @@
                 </div>
             </el-header>
             <el-main>
-                <keep-alive>
-                    <router-view></router-view>
-                </keep-alive>
+                <div class="px1 pb3" style="overflow:auto;height:500px">
+                    <keep-alive>
+                        <router-view></router-view>
+                    </keep-alive>
+                    <div v-if="$route.name === 'index'" id="index-logo">
+                        <img :src="meta.logo" id="index-icon" />
+                        <div class="pl3" id="icon-text">YeuolyOrg</div>
+                    </div>
+                </div>
             </el-main>
         </el-container>
     </div>
@@ -70,14 +76,19 @@ import Account from '../data/user';
 
 const drag = require('electron-drag');
 const { ipcRenderer : ipc } = require('electron');
+const logo = require('../assets/logo.png');
 
 export default {
     name : 'Index',
     components : { Logger },
     data : () => ({
         routes : [{
+            name : '主页',
+            icon : 'el-icon-video-play',
+            url : '/'
+        },{
             name : '日志',
-            icon : 'el-icon-location',
+            icon : 'el-icon-monitor',
             url : '/index/log'
         },{
             name : '任务',
@@ -153,6 +164,9 @@ export default {
         user : {
             name : '未登录',
             face : 'http://i0.hdslb.com/bfs/album/6389ef2f437a4b00d0dc863b44f4084bf6b4165a.jpg'
+        },
+        meta : {
+            logo
         }
     }),
     methods: {
@@ -203,10 +217,31 @@ export default {
 </script>
 
 <style scoped>
+    #index-logo{
+        width: 80%;
+        margin: 0 auto;
+        overflow: hidden;
+        margin-top: 20vh;
+        color: #00B9FF;
+        font-family: 'SourceCodePro';
+        font-size: 60px;
+        line-height: 2.5;
+        user-select: none;
+    }
+    #index-icon{
+        height: 150px;
+        float: left;
+        padding-right: 30px;
+        padding-left: 50px;
+    }
+    #icon-text{
+        height: 150px;
+    }
     #index-user{
         position: absolute;
         right: 75px;
         top: 23px;
+        user-select: none;
     }
     #index-face{
         width: 25px;
