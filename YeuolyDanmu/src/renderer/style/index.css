@@ -77,6 +77,85 @@
 .pb4{ padding-bottom: 11px; }
 .pb5{ padding-bottom: 15px; }
 
+.my1{
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.my2{
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.my3{
+   margin-top: 8px;
+   margin-bottom: 8px;
+}
+
+.my4{
+  margin-top: 11px;
+  margin-bottom: 11px;
+}
+
+.my5{
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+/********/
+
+.mx1{
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+.mx2{
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.mx3{
+   margin-left: 8px;
+   margin-right: 8px;
+}
+
+.mx4{
+  margin-left: 11px;
+  margin-right: 11px;
+}
+
+.mx5{
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+/*********************/
+
+.ml1{ margin-left: 3px; }
+.ml2{ margin-left: 5px; }
+.ml3{ margin-left: 8px; }
+.ml4{ margin-left: 11px; }
+.ml5{ margin-left: 15px; }
+
+.mr1{ margin-right: 3px; }
+.mr2{ margin-right: 5px; }
+.mr3{ margin-right: 8px; }
+.mr4{ margin-right: 11px; }
+.mr5{ margin-right: 15px; }
+
+.mt1{ margin-top: 3px; }
+.mt2{ margin-top: 5px; }
+.mt3{ margin-top: 8px; }
+.mt4{ margin-top: 11px; }
+.mt5{ margin-top: 15px; }
+
+
+.mb1{ margin-bottom: 3px; }
+.mb2{ margin-bottom: 5px; }
+.mb3{ margin-bottom: 8px; }
+.mb4{ margin-bottom: 11px; }
+.mb5{ margin-bottom: 15px; }
+
 /*************************************/
 
 .w100{ width: 100%; }
@@ -110,3 +189,6 @@
 .text-20{ font-size: 20px; }
 .text-21{ font-size: 21px; }
 .text-22{ font-size: 22px; }
+
+.left{ float: left; }
+.right{ float: right; }

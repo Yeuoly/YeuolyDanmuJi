@@ -1,16 +1,44 @@
 <template>
     <div id="room-settings">
-        <el-input style="background-color:transparent;" placeholder="房间号" v-model.number="room_id">
-            <el-button style="background-color:transparent"
-                :loading="room_id_lock"
-                :disabled="!room_id" 
-                slot="append" 
-                @click="setRoomID"
-            >保存</el-button> 
-        </el-input>
+        <el-autocomplete placeholder="房间信息"
+                         v-model="search.kw"
+                         popper-class="input-width-select w100"
+                         :fetch-suggestions="emitSearcher"
+                         class="w100"
+                         @select="select"
+        >
+            <template slot-scope="{ item }">
+                <LiveRoomShortcut :uname="item.uname"
+                                  :room_id="item.room_id"
+                                  :face="item.face"
+                                  :live_status="item.live_status"
+                 />
+            </template>
+            <el-select slot="prepend" 
+                       v-model="search.value"
+            >
+                <el-option v-for="i in search.options" 
+                           :key="i.value" 
+                           :value="i.value" 
+                           :label="i.label"
+                ></el-option>
+            </el-select>
+            <div slot="append">
+                <el-button
+                    @click="handleSearch"
+                    circle
+                    type="info"
+                    icon="el-icon-search"
+                ></el-button>
+            </div>
+        </el-autocomplete>
+        <LED prepend="刷新状态" class="py4 left pr3" :boot="current.cycling" />
+        <div class="py4 text-grey text-12 left">
+            当前房间号：{{room_id}}
+        </div>
         <el-table :data="history" 
-                  style="width :100%;margin-top:15px"
-                  max-height="440px"
+                  class="w100 mt5"
+                  max-height="420px"
                   stripe
         >
             <el-table-column width="70" label="短号" prop="short_id"></el-table-column>
@@ -37,23 +65,45 @@
 
 <script>
 import { room_id_controller } from '../data/settings';
+import { IntervalTimer } from '../class/Timer';
 import api from '../settings/api';
 import axios from 'axios';
 import Info from '../class/Info';
 import Utils from '../class/Utils';
+import qs from 'querystring';
+import LiveRoomShortcut from '../components/items/LiveRoomShortcut';
+import LED from '../components/items/LED';
 
 export default {
     name : 'RoomSettings',
+    components : { LiveRoomShortcut, LED },
     data : () => ({
         id_ctrl : room_id_controller,
         history : room_id_controller.history,
         room_id : room_id_controller.getCurrent(),
         room_id_lock : false,
-        cyc_timer : null
+        cyc_timer : null,
+        search : {
+            options : [{
+                value : 1,
+                label : '房间号或关键词'
+            }],
+            value : 1,
+            kw : '',
+            timer : null,
+            cb : null
+        },
+        current : {
+            cycling : false,
+        }
     }),
     methods: {
         setRoomID(){
             this.id_ctrl.setCurrent(this.room_id);
+        },
+        select(e){
+            this.room_id = e.room_id;
+            this.setRoomID();
         },
         removeHistory(room_id){
             this.id_ctrl.remove(room_id);
@@ -68,6 +118,7 @@ export default {
         async cycleLiveInfo(){
             const tot_len = this.history.length;
             let cur_len = 0;
+            this.current.cycling = true;
             const checkRoom = async ( index ) => {
                 try{
                     const r = await axios.get(`${api.bili_get_live_info}?room_id=${this.history[index].room_id}`);
@@ -85,6 +136,7 @@ export default {
                         this.history[index].up_name = data['data']['anchor_info']['base_info']['uname'];
                         Info.log('GET_LIVE_INFO',`获取房间信息成功，房间号：${this.history[index].room_id}`);
                         if(index === tot_len - 1){
+                            this.current.cycling = false;
                             this.save();
                         }
                     }
@@ -106,6 +158,45 @@ export default {
         },
         clearCycle(){
             clearInterval(this.cyc_timer);
+        },
+        emitSearcher(qs,cb){
+            this.search.timer.$continue('search');
+            this.search.cb = cb;
+        },
+        async handleSearch(){
+            const kw = this.search.kw || 'Yeuoly';
+            try{
+                const r = await axios.get(api.bili_get_live_search, {
+                    params : {
+                        context : '',
+                        search_type : 'live',
+                        cover_type : 'user_cover',
+                        page : 1,
+                        keyword : kw,
+                        category_id : '',
+                        __refresh__ : true,
+                        _extra : '',
+                        highlight : '',
+                        singe_column : 0,
+                    }
+                });
+                const data = r.data;
+                if(data['code'] !== 0){
+                    Info.error('GET_LIVE_SEARCH_LIST','获取直播间列表失败');
+                }
+                const list = data['data']['result']['live_user'];
+                this.search.cb( list.map( v => {
+                    return {
+                        uname : v.uname,
+                        uid : v.uid,
+                        room_id : v.roomid,
+                        live_status : v.is_live,
+                        face : v.uface
+                    }
+                }));
+            }catch(e){
+                Info.error('GET_LIVE_SEARCH_LIST','获取直播列表发生意外');
+            }
         }
     },
     watch : {
@@ -115,13 +206,19 @@ export default {
             },
             immediate : true
         }
-    }
-    
+    },
+    mounted() {
+        this.search.timer = new IntervalTimer();
+        this.search.timer.$on('search', this.handleSearch, 1);
+    },
 }
 </script>
 
 <style>
-#room-settings > *{
-    text-align: center;
-}
+  .input-with-select .el-input-group__prepend {
+    background-color: #fff;
+  }
+  .el-select .el-input {
+    width: 130px;
+  }
 </style>

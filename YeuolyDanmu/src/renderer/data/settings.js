@@ -2,6 +2,7 @@ import Store from 'electron-store';
 import api from '../settings/api';
 import axios from 'axios';
 import INFO from '../class/Info';
+import Utils from '../class/Utils';
 
 const store = new Store();
 let data = store.get('room_ids',{
@@ -49,8 +50,8 @@ export const room_id_controller = {
         this.save();
     },
     addToHistory(id,fn_suc){
-        for(let i in this.history){
-            if(this.history[i].room_id === id)return; 
+        if(this.history.map( v => v.room_id ).includes(id)){
+            return;
         }
        this.getRoomInfo(id,fn_suc);
     },
@@ -66,7 +67,7 @@ export const room_id_controller = {
                     short_id : 0,
                     uid : 0,
                     room_id : id,
-                    date : new Date().format('MM-dd hh:mm:ss'),
+                    date : Utils.formatDate(new Date(),'MM-dd hh:mm:ss'),
                     up_name : '加载失败',
                     title : '加载失败',
                     live_status : 0
@@ -77,7 +78,7 @@ export const room_id_controller = {
                     room_id : data['data']['room_info']['room_id'],
                     uid : data['data']['room_info']['uid'],
                     title : data['data']['room_info']['title'],
-                    date : new Date().format('MM-dd hh:mm:ss'),
+                    date : Utils.formatDate(new Date(),'MM-dd hh:mm:ss'),
                     up_name : data['data']['anchor_info']['base_info']['uname'],
                     live_status : data['data']['room_info']['live_status']
                 });
@@ -89,7 +90,7 @@ export const room_id_controller = {
 export const filter_danmu_controller = {
     black_list : [
         '哔哩哔哩 (゜-゜)つロ 干杯~',
-        '来拥抱勇气和爱呀（*/ω＼*）',
+        '来拥抱勇气和爱呀（*/ω＼*）'
     ],
     in(msg){
         return this.black_list.includes(msg);
