@@ -221,4 +221,7 @@ export default {
   .el-select .el-input {
     width: 130px;
   }
+  #room-settings *.cell{
+      text-align: center;
+  }
 </style>

@@ -8,7 +8,7 @@ export default new Router({
     {
       path: '/',
       name: 'index',
-      component: require('@/views/Index.vue').default,
+      component: () => import('@/views/Index.vue'),
       meta : {
         title : '默认目录'
       },
@@ -16,7 +16,7 @@ export default new Router({
         {
           name : 'log',
           path : '/index/log',
-          component: require('@/components/items/Logger.vue').default,
+          component: () => import('@/components/items/Logger.vue'),
           meta : {
             title : '日志'
           }
@@ -24,7 +24,7 @@ export default new Router({
         {
           name : 'task',
           path : '/index/task',
-          component: require('@/views/Task.vue').default,
+          component: () => import('@/views/Task.vue'),
           meta : {
             title : '任务'
           }
@@ -32,21 +32,21 @@ export default new Router({
         {
           name : 'room-settings',
           path : '/index/room-settings',
-          component: require('@/views/RoomSettings.vue').default,
+          component: () => import('@/views/RoomSettings.vue'),
           meta : {
             title : '房间设置'
           }
         },{
           name : 'color-settings',
           path : '/index/color-settings',
-          component: require('@/views/ColorSettings.vue').default,
+          component: () => import('@/views/ColorSettings.vue'),
           meta : {
             title : '选择弹幕颜色'
           }
         },{
           name : 'advance-settings',
           path : '/index/advance-settings',
-          component: require('@/views/AdvanceSettings.vue').default,
+          component: () => import('@/views/AdvanceSettings.vue'),
           meta : {
             title : '高级设置，请根据教程更改，部分设置重启生效'
           }
@@ -93,13 +93,6 @@ export default new Router({
           component: () => import('@/views/PluginsList.vue'),
           meta : {
             title : '插件列表'
-          }
-        },{
-          name : 'qiafan',
-          path : '/index/qiafan',
-          component: () => import('@/views/QiaFan.vue'),
-          meta : {
-            title : '恰饭'
           }
         },{
           name : 'feedback',

@@ -192,3 +192,5 @@
 
 .left{ float: left; }
 .right{ float: right; }
+
+@import "../assets/icon/iconfont.css";

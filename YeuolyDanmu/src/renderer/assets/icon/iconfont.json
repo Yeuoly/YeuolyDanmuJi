@@ -1,0 +1,23 @@
+{
+  "id": "1729648",
+  "name": "YeuolyDanmu",
+  "font_family": "",
+  "css_prefix_text": "yeuoly-icon",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "13023103",
+      "name": "command",
+      "font_class": "command",
+      "unicode": "e643",
+      "unicode_decimal": 58947
+    },
+    {
+      "icon_id": "10554144",
+      "name": "command-line",
+      "font_class": "command-line",
+      "unicode": "e67c",
+      "unicode_decimal": 59004
+    }
+  ]
+}

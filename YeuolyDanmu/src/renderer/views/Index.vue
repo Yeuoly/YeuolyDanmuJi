@@ -75,8 +75,8 @@ import INFO from '../class/Info';
 import Account from '../data/user';
 
 const drag = require('electron-drag');
-const { ipcRenderer : ipc } = require('electron');
 const logo = require('../assets/logo.png');
+const { ipcRenderer : ipc } = require('electron');
 
 export default {
     name : 'Index',
@@ -88,7 +88,7 @@ export default {
             url : '/'
         },{
             name : '日志',
-            icon : 'el-icon-monitor',
+            icon : 'yeuoly-icon-command',
             url : '/index/log'
         },{
             name : '任务',
@@ -152,13 +152,10 @@ export default {
         },{
             name : '更多',
             icon : 'el-icon-more',
-            subtitle : '一些杂七杂八的功能',
+            subtitle : '一些杂七杂八的',
             children : [{
                 name : '反馈',
                 url : '/index/feedback'
-            },{
-                name : '恰饭',
-                url : '/index/qiafan'
             }]
         }],
         user : {
