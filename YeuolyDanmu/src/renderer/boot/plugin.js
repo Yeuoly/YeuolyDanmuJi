@@ -18,7 +18,7 @@ window.createPlugin = obj => {
     plugins.push(obj);
 }
 //获取事件
-import { setListenner, removeListenner } from '../data/logs';
+import { setListenner, removeListenner } from '../data/records_ipc';
 
 const plugins_controller = {
     setListenner,

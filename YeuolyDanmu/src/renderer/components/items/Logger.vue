@@ -14,7 +14,7 @@
 
 <script>
 
-import { getDailyLogRecordsPointer } from '../../data/logs';
+import { getDailyLogRecordsPointer } from '../../data/records_ipc';
 
 export default {
     name : 'Logger',

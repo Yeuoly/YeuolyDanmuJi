@@ -8,7 +8,7 @@
 
 <script>
   import DanmuLoader from './class/DanmuLoader';
-  import { writeRecords } from './data/logs';
+  import { writeRecords } from './data/records_ipc';
 
   export default {
     name: 'yeuoly_danmu',

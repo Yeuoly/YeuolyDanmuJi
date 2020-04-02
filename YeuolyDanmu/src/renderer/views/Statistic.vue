@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { getStatisticPointer } from '../data/logs';
+import { getStatisticPointer } from '../data/records_ipc';
 import { cny_exchangerate_controller } from '../data/settings';
 
 import PieCharts from '../components/charts/PieCharts';

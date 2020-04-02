@@ -1,5 +1,5 @@
 import Utils from './Utils';
-import { addLog } from '../data/logs';
+import { addLog } from '../data/records_ipc';
 const log = require('electron-log');
 
 function getDate(){

@@ -155,13 +155,13 @@ import { global_settings } from '../settings/global_settings';
 import Danmu from '../class/Danmu';
 import { SuperChat , Gift , Guard } from '../class/Danmu';
 
-import { addGift, addLog, addSC, writeRecords, addDanmus, addGuard, clearStatistic } from '../data/logs';
+import { addGift, addLog, addSC, writeRecords, addDanmus, addGuard, clearStatistic } from '../data/records_ipc';
 import { User } from '../class/User';
 import Axios from 'axios';
 import api from '../settings/api';
 import Info from '../class/Info';
-// const addSC = require('../data/logs').addSC;
-// const addGift = require('../data/logs').addGift;
+// const addSC = require('../data/records_ipc').addSC;
+// const addGift = require('../data/records_ipc').addGift;
 
 const ipc = require('electron').ipcRenderer;
 

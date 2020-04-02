@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { getDailyLogRecordsPointer, getDailyGiftRecordsPointer, getDailySCRecordsPointer } from '../data/logs';
+import { getDailyLogRecordsPointer, getDailyGiftRecordsPointer, getDailySCRecordsPointer } from '../data/records_ipc';
 import SuperChat from '../components/items/SuperChat';
 import Gift from '../components/items/Gift';
 

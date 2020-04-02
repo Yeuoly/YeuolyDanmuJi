@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { getInteractionalDDs, getPaiedDDs } from '../data/logs';
+import { getInteractionalDDs, getPaiedDDs } from '../data/records_ipc';
 import { room_id_controller } from '../data/settings';
 import Axios from 'axios';
 import api from '../settings/api';

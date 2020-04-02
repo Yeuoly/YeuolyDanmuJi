@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { getDailyGuardRecordsPointer, getDailyGuardRecords } from '../data/logs';
+import { getDailyGuardRecordsPointer, getDailyGuardRecords } from '../data/records_ipc';
 import Guard from '../components/items/Guard';
 
 export default {
