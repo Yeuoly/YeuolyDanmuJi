@@ -9,7 +9,6 @@ axios.defaults.withCredentials = true;
 
 import App from './App'
 import router from './router'
-import store from './store'
 
 //安装颜色选择器
 import vcolorpicker from 'vcolorpicker';
@@ -43,6 +42,5 @@ Vue.config.productionTip = false
 new Vue({
   components: { App },
   router,
-  store,
   template: '<App/>'
 }).$mount('#app')

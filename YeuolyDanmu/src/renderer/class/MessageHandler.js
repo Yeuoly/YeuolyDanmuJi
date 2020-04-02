@@ -1,32 +1,18 @@
-import Danmu from './Danmu';
-import { SuperChat , Gift , Guard } from './Danmu';
-import store from '../store';
 import Utils from '../class/Utils';
-
-import { getAvatar } from '../class/Avatar';
-
-//引入礼物处理
+import Danmu from './Danmu';
 import GiftStation from './GiftStation';
-
-//传输速度
+import { SuperChat , Gift , Guard } from './Danmu';
+import { getAvatar } from '../class/Avatar';
 import { OrdinaryEventBus } from '../events/evnetBus';
-
-//获取全局设置
 import { global_settings } from '../settings/global_settings';
 import { User } from './User';
 
 const temp_max_count = Utils.varToPointer( () => global_settings['loading_module']['danmu_temp_max_count'] );
-const store_temp_max_count = 2000;
 
 //礼物自动过滤开关
 let auto_filt_low_price = Utils.varToPointer( () => global_settings['loading_module']['auto_filt_low_gift'] );
 //最低的直接显示礼物价值，如果一个礼物的价值高于$direct_gift_trans_min_price，就可以直接显示，否则要丢到礼物处理站处理一下
 let direct_gift_trans_min_price = Utils.varToPointer( () => global_settings['loading_module']['direct_trans_gift_min_line'] );
-
-/**
- * 这里说一下，不论是SuperChat还是礼物信息我这里都定义为弹幕
- * 只是给了弹幕多种类型，一种是normal普通类型，一种是superchat，一种是gift
- */
 
 /**
  * 这里再说一下，经过弹幕爆破测试，非常有必要根据弹幕速度设置缓存量
@@ -382,10 +368,6 @@ export default class MessageHandler{
         if(this.temp_danmus.length === temp_max_count){
             this.transDanmu();
         }
-        //当弹幕储量达到max_count的时候将弹幕入库
-        if(this.temp_store.length === store_temp_max_count){
-            //this.dispatchDanmu();
-        }
     }
 
     //传输弹幕
@@ -418,14 +400,5 @@ export default class MessageHandler{
     //实时直播信息
     transLiveInfo(info){
         typeof this.onLiveInfo === 'function' && this.onLiveInfo(info);
-    }
-
-    //弹幕入库
-    dispatchDanmu(){
-        if(this.temp_store.length > 0){
-            store.dispatch('ADD_DANMUS',this.temp_store);
-            delete this.temp_store;
-            this.temp_store = [];
-        }
     }
 }

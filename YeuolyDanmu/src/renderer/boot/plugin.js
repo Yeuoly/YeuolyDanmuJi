@@ -88,8 +88,8 @@ function bootPlugins(){
 function getPlugins(){
     fs.readdir(plugins_path, (err , files) => {
         if(err){
-            fs.mkdir(plugins_path,() => {
-                console.log(1);
+            fs.mkdir(plugins_path, () => {
+                Info.log('LOAD_PLUGINS','创建插件文件夹');
             });
         }else{
             let total_count = 0;
