@@ -175,6 +175,7 @@
 .text-white{ color: white; }
 .text-green{ color: green; }
 .text-black{ color: black; }
+.text-primary{ color: #00a1d6; }
 
 .text-10{ font-size: 10px; }
 .text-11{ font-size: 11px; }
@@ -189,6 +190,9 @@
 .text-20{ font-size: 20px; }
 .text-21{ font-size: 21px; }
 .text-22{ font-size: 22px; }
+.text-23{ font-size: 23px; }
+.text-24{ font-size: 24px; }
+.text-25{ font-size: 25px; }
 
 .left{ float: left; }
 .right{ float: right; }

@@ -29,9 +29,13 @@ export const getDailyLogRecords = () => actions.getters.clonner.log();
 
 export const getDailySCRecords = () => actions.getters.clonner.sc();
 
+export const getDailyDanmuRecords = () => actions.getters.clonner.danmu();
+
 export const getInteractionalDDs = () => actions.getters.clonner.idd();
 
 export const getPaiedDDs = () => actions.getters.clonner.pdd();
+
+export const getDailyDanmuPointer = () => actions.getters.pointer.danmu();
 
 export const getDailyLogRecordsPointer = () => actions.getters.pointer.log();
 

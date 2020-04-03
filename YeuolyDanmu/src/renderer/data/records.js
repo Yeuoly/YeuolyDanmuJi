@@ -59,14 +59,16 @@ const actions = {
             sc(){ return records.daily_sc_records.slice(0); },
             guard(){ return records.daily_guard_records.slice(0); },
             idd(){ return records.interactional_dd_hash.opter.clone().result; },
-            pdd(){ return records.paied_dd_hash.opter.clone().result; }
+            pdd(){ return records.paied_dd_hash.opter.clone().result; },
+            danmu(){ return records.daily_danmu_records.slice(0); }
         },
         pointer : {
             gift(){ return records.daily_gift_records; },
             log(){ return records.daily_log_records; },
             sc(){ return records.daily_sc_records; },
             guard(){ return records.daily_guard_records; },
-            statistics(){ return statistics; }
+            statistics(){ return statistics; },
+            danmu(){ return records.daily_danmu_records; }
         }
     },
     setters : {
@@ -156,7 +158,12 @@ const actions = {
             if(logger.last_index_gift !== records.daily_gift_records.length)
                 log.log(
                     JSON.stringify(
-                        records.daily_gift_records.slice(last_index_gift)
+                        records.daily_gift_records.slice(last_index_gift).map( v => ({
+                            gift_name : v.gift_name,
+                            gift_price : v.gift_price,
+                            gift_num : v.gift_num,
+                            user : v.user
+                        }))
                     )
                 );
             if(logger.last_index_danmu !== records.daily_danmu_records.length)

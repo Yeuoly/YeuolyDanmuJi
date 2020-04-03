@@ -156,6 +156,9 @@ export default {
             children : [{
                 name : '反馈',
                 url : '/index/feedback'
+            },{
+                name : '缓存管理',
+                url : '/index/cache-manager'
             }]
         }],
         user : {

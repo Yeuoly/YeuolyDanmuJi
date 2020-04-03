@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import { OrdinaryEventBus } from '../events/evnetBus';
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -108,6 +109,13 @@ export default new Router({
           meta : {
             title : '登录YS账号'
           }
+        },{
+          name : 'cache-manager',
+          path : '/index/cache-manager',
+          component: () => import('@/views/CacheManager.vue'),
+          meta : {
+            title : '缓存管理'
+          }
         }
       ]
     },
@@ -121,4 +129,11 @@ export default new Router({
       redirect: '/index/log'
     }
   ]
-})
+});
+
+router.afterEach((to, from) => {
+  OrdinaryEventBus.$emit(`router-to-${to.name}`);
+  OrdinaryEventBus.$emit(`router-lv-${from.name}`);
+});
+
+export default router;

@@ -150,6 +150,62 @@ class BaseHashList{
             this.setByOffsetRecursion(parent[dict[hash[offset - 1]]],hash,value,offset + 1);
         }
     }
+
+    /**
+     * @param {*} array 原始值， 
+     * @param {*} offset offset需要用户自己定义，因为我想了想不论怎么样都可能出现多判的情况
+     */
+    cover(array, offset){
+        this.list = array;
+        this.offset = offset;
+    }
+
+    /**
+     * @returns 返回一个数组，数组内为HashList的原始值
+     */
+    getOriginArray(){
+        return this.list.slice(0);
+    }
+
+    /**
+     * @returns 返回原始数据长度
+     */
+    getOriginLength(){
+        let len = 0;
+        const self = this;
+        const iter = ( parent, offset ) => {
+            if(offset === self.offset){
+                len += parent.length;
+            }else{
+                for(let i = 0; i < 16 ; i++){
+                    iter(parent[i],offset + 1);
+                }
+            }
+        }
+        iter(this.list,0);
+        return len;
+    }
+
+    /**
+     * @param {function} condition 这是一个回调函数，它的参数将会是每一个保存的元素，参考Array.map()，请返回true或false，true表示需要删除该元素，false表示保留该元素
+     */
+    delete(condition){
+        const iter = (parent, offset) => {
+            if(offset === this.offset){
+                const len = parent.length;
+                for(let i = len - 1; i >= 0; i--){
+                    if(condition(parent[i][1])){
+                        parent.splice(i,1);
+                    }
+                }
+            }else{
+                for(let i = 0; i < 16; i++){
+                    iter(parent[i], offset + 1);
+                }
+            }
+        }
+        iter(this.list, this.offset + 1);
+    }
 }
 
 /**
@@ -164,6 +220,10 @@ export default class HashList{
         this.current_md5 = '';
         const self = this;
         this.opter = {
+            /**
+             * @param {*} item 传入数据
+             * @returns 插入是否成功与HashList操作对象
+             */
             insert(item){
                 let result = false;
                 const res = self.base.find(self.current_md5);
@@ -176,27 +236,53 @@ export default class HashList{
                 return {
                     result : result,
                     handle : self.opter
-                };
+                }
             },
+            /**
+             * @param {*} 相比起insert这个方法更加暴力，它不会检测当前标识是否存在，直接插入值 
+             */
+            set(item){
+                self.base.set(self.current_md5,item);
+                return {
+                    result : true,
+                    handle : self.opter
+                }
+            },
+            /**
+             * @returns 返回当前标识下的数据
+             */
             get(){
                 return{
                     result : self.base.find(self.current_md5),
                     handle : self.opter
                 }
             },
+            /**
+             * 修改当前标识下的数据，filed为一个回调函数，如果数据类型为@param {boolean|number|string}则会赋予数据filed的返回值
+             * 若数据类型为不为上述三种，则会传入当前数据，由用户修改
+             * @param {*} field 
+             */
             change(field){
                 self.base.modify(self.current_md5,field);
                 return{
                     handle : self.opter
                 }
             },
+            /**
+             * 获取数据线性排列而成的数组
+             */
             clone(){
                 return{
                     result : self.base.clone(),
                     handle : self.opter
                 }
             },
+            /**
+             * 清除所有数据
+             * @returns 返回对象为result与HashList操作对象
+             */
             clear(){
+                self.base.clear();
                 return{
                     result : true,
                     handle : self.opter
@@ -205,8 +291,48 @@ export default class HashList{
         }
     }
 
+    /**
+     * @param {string|number|undefined} item_sign 数据唯一标识
+     * @returns 返回一个可操控HashList的对象 
+     */
     operate(item_sign){
-        this.current_md5 = md5(item_sign);
+        item_sign && ( this.current_md5 = md5(item_sign));
         return this.opter;
+    }
+
+    /**
+     * @param {*} array 数据原始值，原始值由HashList::getOrigin()获取
+     * @param {*} offset offset需要用户自行定义
+     */
+    cover(array,offset){
+        this.base.cover(array,offset);
+    }
+
+    /**
+     * @returns 返回数据原始值
+     */
+    getOrigin(){
+        return this.base.getOriginArray();
+    }
+
+    /**
+     * @returns 返回数据原始长度
+     */
+    getOriginLength(){
+        return this.base.getOriginLength();
+    }
+
+    /**
+     * @param {function} condition 这是一个回调函数，它的参数将会是每一个保存的元素，参考Array.map()，请返回true或false，true表示需要删除该元素，false表示保留该元素
+     */
+    deleteByCondition(condition){
+        this.base.delete(condition);
+    }
+
+    /**
+     * 删除所有元素
+     */
+    deleteAll(){
+        this.base.delete(() => true);
     }
 }

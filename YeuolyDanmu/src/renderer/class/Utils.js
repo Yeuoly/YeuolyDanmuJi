@@ -81,6 +81,15 @@ class Utils{
         }
         return sourceCopy;
     }
+
+    getVisualMemorySize(B){
+        let l = ['B','KB','MB','GB','TB','PB'];
+        for(let i = 0; i < 6; i++){
+            if(B < Math.pow(1024, i + 1)){
+                return ( B / Math.pow(1024, i)).toFixed(3) + l[i];
+            }
+        }
+    }
 }
 
 export default new Utils();
