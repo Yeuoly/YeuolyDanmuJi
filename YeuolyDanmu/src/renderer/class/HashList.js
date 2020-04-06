@@ -35,10 +35,10 @@ class BaseHashList{
     }
 
     /**
-     * @param {any} item 对象
-     * @param {any} item_sign 这个对象的唯一标识
+     * @param {object|array|number|string} item 对象
+     * @param {number|string} item_sign 这个对象的唯一标识
      * @param {function} hash 返回这个item_sign的md5
-     * @returns {any} true是插入成功 !=true是之前已经存在
+     * @returns {true|any} true是插入成功 !=true是之前已经存在
      */
     insert(item,item_sign,hash_cb){
         const hash = md5(item_sign);
@@ -152,8 +152,8 @@ class BaseHashList{
     }
 
     /**
-     * @param {*} array 原始值， 
-     * @param {*} offset offset需要用户自己定义，因为我想了想不论怎么样都可能出现多判的情况
+     * @param {array} array 原始值， 
+     * @param {number <= 16} offset offset需要用户自己定义，因为我想了想不论怎么样都可能出现多判的情况
      */
     cover(array, offset){
         this.list = array;
@@ -209,7 +209,7 @@ class BaseHashList{
 }
 
 /**
- * 这个是给外边用的，使用方法大概是promise
+ * 这是你从未见过的HashList类，功能齐全，操作方便，性能够顶，如果有想加的还可以随便加，如此nb的类为何不试一试呢？
  */
 export default class HashList{
     /**
@@ -260,7 +260,7 @@ export default class HashList{
             /**
              * 修改当前标识下的数据，filed为一个回调函数，如果数据类型为@param {boolean|number|string}则会赋予数据filed的返回值
              * 若数据类型为不为上述三种，则会传入当前数据，由用户修改
-             * @param {*} field 
+             * @param {function} field 
              */
             change(field){
                 self.base.modify(self.current_md5,field);

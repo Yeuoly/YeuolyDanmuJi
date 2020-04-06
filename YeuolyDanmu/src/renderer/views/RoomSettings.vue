@@ -66,6 +66,7 @@
 <script>
 import { room_id_controller } from '../data/settings';
 import { IntervalTimer } from '../class/Timer';
+import { OrdinaryEventBus } from '../events/evnetBus';
 import api from '../settings/api';
 import axios from 'axios';
 import Info from '../class/Info';
@@ -90,7 +91,7 @@ export default {
             }],
             value : 1,
             kw : '',
-            timer : null,
+            timer : new IntervalTimer(),
             cb : null
         },
         current : {
@@ -199,17 +200,11 @@ export default {
             }
         }
     },
-    watch : {
-        '$route.name' : {
-            handler(v){
-                v === 'room-settings' ? this.setupCycle() : this.clearCycle();
-            },
-            immediate : true
-        }
-    },
     mounted() {
-        this.search.timer = new IntervalTimer();
         this.search.timer.$on('search', this.handleSearch, 1);
+        OrdinaryEventBus.$on('router-to-room-settings', this.setupCycle);
+        OrdinaryEventBus.$on('router-lv-room-settings', this.clearCycle);
+        this.setupCycle();
     },
 }
 </script>
@@ -219,7 +214,7 @@ export default {
     background-color: #fff;
   }
   .el-select .el-input {
-    width: 130px;
+    width: 150px;
   }
   #room-settings *.cell{
       text-align: center;

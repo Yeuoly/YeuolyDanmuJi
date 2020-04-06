@@ -1,5 +1,4 @@
-import log from 'electron-log';
-import './records_init';
+import log from './records_init';
 
 import statistics from './states/statistic';
 import records from './states/records';
@@ -148,17 +147,22 @@ const actions = {
             records.daily_guard_records = [];
         },
         saveRecords(){
-            //只要知道是在写日志就行了
+            //写日志
             if(logger.last_index_sc !== records.daily_sc_records.length)
                 log.log(
                     JSON.stringify(
-                        records.daily_sc_records.slice(logger.last_index_sc)
+                        records.daily_sc_records.slice(logger.last_index_sc).map( v => ({
+                            date : v.start_time,
+                            price : v.price,
+                            message : v.message,
+                            user : v.user
+                        }))
                     )
                 );
             if(logger.last_index_gift !== records.daily_gift_records.length)
                 log.log(
                     JSON.stringify(
-                        records.daily_gift_records.slice(last_index_gift).map( v => ({
+                        records.daily_gift_records.slice(logger.last_index_gift).map( v => ({
                             gift_name : v.gift_name,
                             gift_price : v.gift_price,
                             gift_num : v.gift_num,
@@ -169,9 +173,19 @@ const actions = {
             if(logger.last_index_danmu !== records.daily_danmu_records.length)
                 log.log(
                     JSON.stringify(
-                        records.daily_danmu_records.slice(last_index_danmu)
+                        records.daily_danmu_records.slice(logger.last_index_danmu)
                     )
                 );
+            if(logger.last_index_guard !== records.daily_guard_records.length)
+                log.log(
+                    JSON.stringify(
+                        records.daily_guard_records.slice(logger.last_index_guard).map( v => ({
+                            guard_type : v.guard_type,
+                            price : v.price,
+                            user : v.user
+                        }))
+                    )
+                )
             logger.last_index_gift = records.daily_gift_records.length;
             logger.last_index_sc = records.daily_sc_records.length;
             logger.last_index_danmu = records.daily_danmu_records.length;
