@@ -141,6 +141,45 @@
                 </el-button></div>
             </el-col>
         </el-row>
+        <p></p>
+        <el-row>
+            <el-col :span="24">
+                <el-switch 
+                    v-model="speaker.on"
+                    active-text="启动语音助手"
+                ></el-switch>
+            </el-col>
+            <el-col :span="24">
+                <div class="text-grey text-12 left py4 px5">
+                    音量
+                </div>
+                <el-slider v-model.lazy="speaker.volume" class="w90 p0 left"></el-slider>
+            </el-col>
+            <el-col :span="24">
+                <div class="text-grey text-12 left py4 px5">
+                    音调
+                </div>
+                <el-slider v-model.lazy="speaker.pitch" class="w90 p0 left"></el-slider>
+            </el-col>
+            <el-col :span="24">
+                <div class="text-grey text-12 left py4 px5">
+                    语速
+                </div>
+                <el-slider v-model.lazy="speaker.speed" class="w90 p0 left"></el-slider>
+            </el-col>
+            <!-- <el-col :span="24">
+                <div class="text-grey text-12 left py4 px5">
+                    音色
+                </div>
+                <el-select v-model="speaker.voice">
+                    <el-option 
+                        v-for="(i, key) in speaker.voices"
+                        :key="key"
+                        :value="i.name"
+                    >{{i.name}}</el-option>
+                </el-select>
+            </el-col> -->
+        </el-row>
     </div>
 </template>
 
@@ -160,6 +199,7 @@ import { User } from '../class/User';
 import Axios from 'axios';
 import api from '../settings/api';
 import Info from '../class/Info';
+import { speaker_controller } from '../modules/speaker';
 // const addSC = require('../data/records_ipc').addSC;
 // const addGift = require('../data/records_ipc').addGift;
 
@@ -176,8 +216,35 @@ export default {
         danmu_dialog_flag : false,
         danmu_dialog_id : 0,
         gift_dialog_id : 0,
-        wirte_records_timer : null
+        wirte_records_timer : null,
+        speaker : {
+            on : false,
+            allow : true,
+            volume : 100,
+            pitch : 50,
+            speed : 10,
+            // voices : speaker_controller.getVoices(),
+            // voice : speaker_controller.getVoices()[0]
+        }
     }),
+    watch: {
+        'speaker.volume' : {
+            handler(v){ speaker_controller.setVolume(v / 100); },
+            immediate : true
+        },
+        'speaker.pitch' : {
+            handler(v){ speaker_controller.setPitch(v / 50); },
+            immediate : true
+        },
+        'speaker.speed' : {
+            handler(v){ speaker_controller.setSpeed(v / 10); },
+            immediate : true
+        },
+        'speaker.voice' : {
+            handler(v){ speaker_controller.setVoice(v); },
+            immediate : true
+        }
+    },
     methods: {
         refreshDanmuWindow(){
             ipc.send('to-danmu','refresh-danmuwindow');
@@ -185,10 +252,15 @@ export default {
         //传输普通弹幕
         transDanmus(danmus){
             //向弹幕窗口发送新弹幕
-            ipc.send('to-danmu','trans-danmu',this.danmusFilter(danmus));
+            const filted_danmus = this.danmusFilter(danmus);
+            ipc.send('to-danmu','trans-danmu',filted_danmus);
             //入库保存
-            //但是叭。。这个弹幕量太大的时候我还没想好怎么处理数据。。所以弹幕先不入库了。。
             addDanmus(danmus);
+            //语音
+            if(this.speaker.on && this.speaker.allow){
+                this.speaker.allow = false;
+                speaker_controller.speakDanmu(danmus[0]);
+            }
         },
         //传输sc
         transSuperChat(sc){
@@ -359,6 +431,10 @@ export default {
             clearStatistic();
         }
     },
+    mounted() {
+        //初始化语音助手
+        speaker_controller.onEnd(() => { this.speaker.allow = true; });
+    },
     beforeDestroy() {
         ipc.send('window-close-danmu');
         this.danmu_dialog_flag = false;
@@ -375,4 +451,5 @@ export default {
         padding-bottom: 5px;
         padding-right: 5px;
     }
+
 </style>

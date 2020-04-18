@@ -18,7 +18,7 @@
                         class="superchats"
                         :style="{ transform : `translateY( -${ sc_replacing ? '160' : '0' }px )` }"
                 ></SuperChat>
-                <DanmuGroup v-for="i in danmu_groups"
+                <DanmuGroup v-for="i in danmu_groups_virtual"
                             :text-color="screen_settings.text_used ? text_color(i.id) : '#fff'"
                             :uname-color="screen_settings.uanme_used ? text_color(i.id) : '#fff'"
                             :key="i.id"
@@ -26,6 +26,7 @@
                             :Danmus="i.value"
                             :font="screen_settings.font_family"
                             :type="i.type"
+                            @end="revVirualListStart"
                 ></DanmuGroup>
             </div>
         </div>
@@ -114,9 +115,7 @@ const win = require('electron').remote.getCurrentWindow();
 const win_id = win.id;
 require('electron').remote.getCurrentWindow().setAlwaysOnTop(true);
 
-//十万的时候清理一下，100000个在沙月的直播间大概要5 * 1000分钟，完全够了
-//就算弹幕速度快5倍也能用1000分钟，一天就24 * 60分钟
-const danmu_max_len = 50;
+document.title = '弹幕窗口';
 
 //初始化颜色信息
 import Store from 'electron-store';
@@ -162,6 +161,7 @@ export default {
     components : { DanmuGroup , SuperChat : SuperChatComponent },
     data: () => ({
         danmu_groups : [],
+        list_start : 0,
         color_group : color_group,
         current_danmu_count : 0,
         super_chats : [ new SuperChat(
@@ -208,6 +208,9 @@ export default {
                 transform : this.master_transform,
                 color : '#fff'
             }
+        },
+        danmu_groups_virtual(){
+            return this.danmu_groups.slice(this.list_start, this.danmu_groups.length);
         }
     },
     methods: {
@@ -297,6 +300,10 @@ export default {
             ipc.send('to-main','trans-info',
                 { block : '[DanmuDialog]', info : '弹幕窗口连接成功', color : 'green'} );
         },
+        //获取虚拟列表表头id
+        revVirualListStart(id){
+            this.list_start = id;
+        },
         replaceCurrentSuperChat(){
             if(this.current_super_chat === this.super_chats.length - 1){
                 this.sc_cycling = false;
@@ -335,12 +342,12 @@ export default {
             }else{
                 getAvatar(gift.user.uid, src => {
                     gift.user.face = src;
-                    this.appendDanmu({
+                    this.danmu_groups.push({
                         id : this.current_danmu_count++,
                         value : [gift],
                         type :'gift'
                     });
-                })
+                });
             }
         },
         loadSuperChat(sc){
@@ -351,14 +358,8 @@ export default {
                 this.replaceCurrentSuperChat();
             }
         },
-        appendDanmu(group){
-            this.danmu_groups.push(group);
-            if(this.danmu_groups.length > danmu_max_len){
-                this.clear(20);
-            }
-        },
         loadGuard(guard){
-            this.appendDanmu({
+            this.danmu_groups.push({
                 value : [guard],
                 id : this.current_danmu_count++,
                 type : 'guard'
@@ -389,7 +390,12 @@ export default {
                         norepeat_danmus[index].users.faces.push({ guard : e.guard_type , src : src });
                         norepeat_danmus[index].user.id = '一般路过群众';
                     }else{
-                        e.users = { faces : [ { guard : e.guard_type , src : src } ]};
+                        e.users = { 
+                            faces : [ { 
+                                guard : e.guard_type , 
+                                src : src 
+                            }]
+                        };
                         norepeat_danmus.push(e);
                         msg.push(e.message);
                     }
@@ -397,7 +403,7 @@ export default {
                     avatar.src = src;
                     avatar.onload = () => {
                         if(++len === full_len){
-                            this.appendDanmu({
+                            this.danmu_groups.push({
                                 id : this.current_danmu_count++,
                                 value : norepeat_danmus,
                                 type : 'normal'

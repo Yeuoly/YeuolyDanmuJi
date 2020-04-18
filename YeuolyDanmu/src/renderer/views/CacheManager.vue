@@ -1,5 +1,15 @@
 <template>
     <div id="cache-manager">
+        <el-dialog :title="`刷新头像缓存中…… ${refresh.cur} / ${refresh.tot}`"
+                   :visible.sync="refresh.show"
+                   :before-close="stopRefreshAvatars"
+                   :status="refresh_status"
+        >
+            <el-progress :text-inside="true" 
+                         :stroke-width="18" 
+                         :percentage="refresh.progress"
+            ></el-progress>
+        </el-dialog>
         <el-row>
             <el-col :span="22">
                 <el-col v-for="(i, key) in data" :span="11" :key="key">
@@ -25,11 +35,16 @@
 </template>
 
 <script>
-import Store from 'electron-store';
-import HashList from '../class/HashList';
+import Info from '../class/Info';
 import Utils from '../class/Utils';
+import api from '../settings/api';
+import Store from 'electron-store';
+import axios from 'axios';
+import HashList from '../class/HashList';
+import { MessageBox } from 'element-ui';
 import { getDailyGiftRecords, getDailyDanmuRecords } from '../data/records_ipc';
 import { OrdinaryEventBus } from '../events/evnetBus';
+import { getAvatarOrigin, getAvatarCount, setAvatar, getAvatarsList, saveAvatars } from '../class/Avatar';
 
 const store = new Store();
 
@@ -49,7 +64,7 @@ export default {
             label : '礼物缓存所占内存',
             value : 0
         }],
-        ctrl : [{
+        ctrl : [/*{
             label : '清理全部头像链接缓存',
             icon : 'el-icon-delete',
             value : 'delete-all',
@@ -64,13 +79,31 @@ export default {
             icon : 'el-icon-folder-delete',
             value : 'delete-high-pro',
             color : 'primary'
-        }]
+        },*/{
+            label : '刷新头像缓存，需要较长时间',
+            icon : 'el-icon-refresh-right',
+            value : 'refresh-avatars',
+            color : 'primary'
+        }],
+        refresh : {
+            show : false,
+            timer : null,
+            progress : 0,
+            over : false,
+            cur : 0,
+            tot : 0,
+        },
     }),
+    computed: {
+        refresh_status(){
+            return this.refresh.over ? 'success' : 'text';
+        }
+    },
     methods: {
         loadData(){
-            const store_avatars = store.get('store-avatars', null);
+            const store_avatars = store.get('avatars-cache', null);
             if(!store){
-                this.avatars_count = 0;
+                this.data[0].value = 0;
             }else{
                 const avatrs = new HashList(2);
                 const sizeof = require('object-sizeof');
@@ -89,8 +122,69 @@ export default {
                     break;
                 case 'delete-high-pro':
                     break;
+                case 'refresh-avatars':
+                    this.refreshAvatars();
+                    break;
+            }
+        },
+        stopRefreshAvatars(done){
+            if(!this.refresh.over){
+                MessageBox.confirm('您确定要取消吗？').then(() => {
+                    clearTimeout(this.refresh.timer);
+                    done();
+                    this.refresh.progress = 0;
+                    this.refresh.over = false;
+                    saveAvatars();
+                }).catch(() => {
+
+                });
+            }else{
+                done();
+                this.refresh.progress = 0;
+                this.refresh.over = false;
+                saveAvatars();
             }
             
+        },
+        refreshAvatars(){
+            this.refresh.show = true;
+            const store_avatars = store.get('avatars-cache', null);
+            const avatrs = new HashList(2);
+            if(store_avatars){
+                avatrs.cover(store_avatars, 2);
+            }
+            const origin = avatrs.operate().clone().result;
+            const len = origin.length;
+            this.refresh.cur = 0;
+            this.refresh.tot = len;
+            const refresher = async index => {
+                if(len === index){
+                    this.refresh.progress = 0;
+                    this.refresh.show = false;
+                    this.refresh.over = true;
+                    clearInterval(this.refresh.timer);
+                    saveAvatars();
+                    return;
+                }
+                const now = origin[index];
+                try{
+                    const r = await axios.get(`${api.bili_get_space_info}?mid=${now[2]}`);
+                    const data = r.data;
+                    if(data['code'] === 0){
+                        setAvatar(now[2],data['data']['face']);
+                    }else{
+                        Info.warning('REFRESH_AVATARS',`刷新头像错误{ uid:${now[2]}, error:${data['code']}`);
+                    }
+                }catch(e){
+                    Info.warning('REFRESH_AVATARS',`刷新头像错误{ uid:${now[2]}, error:${e}`);
+                }
+                this.refresh.cur++;
+                this.refresh.progress = parseFloat((( index + 1 ) * 100 / len).toFixed(3));
+            }
+            let cur = 0;
+            this.refresh.timer = setInterval(() => {
+                refresher(cur++);
+            },150);
         }
     },
     mounted() {

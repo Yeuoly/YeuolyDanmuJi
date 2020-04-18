@@ -23,7 +23,7 @@
         </div>
     </div>
 </template>
-
+ 
 <script>
 
 import Danmu from './Danmu';
@@ -31,12 +31,12 @@ import Guard from './Guard';
 import GiftDanmu from './GiftDanmu';
 import { DanmuGroupEventBus } from '../../events/evnetBus';
 
-const max_offset = require('electron').screen.getPrimaryDisplay().workAreaSize.height;
+const max_offset = window.innerHeight;
 
 export default {
     name : 'DanmuGroup',
     components : { Danmu, Guard, GiftDanmu },
-    props : ['Danmus','textColor','unameColor','font','type'],
+    props : ['Danmus','textColor','unameColor','font','type','index'],
     data : () => ({
         isShow : false,
         offset : 0,
@@ -50,6 +50,7 @@ export default {
         move(offset){
             if(this.offset > max_offset){
                 DanmuGroupEventBus.$off('move',this.move);
+                this.$emit('end',this.index);
                 return;
             }
             this.offset += offset;
@@ -59,7 +60,6 @@ export default {
             if(this.isShow)return;
             this.isShow = true;
             this.$refs.controller.style.opacity = 1;
-            // DanmuGroupEventBus.$off(`show-${this.key}`,this.show)
         }
     },
     mounted() {
@@ -70,9 +70,6 @@ export default {
         //不止于加载这么慢叭，
         setTimeout(() => { this.show(); },300);
         //this.show();
-    },
-    beforeDestroy() {
-        DanmuGroupEventBus.$off('move',this.move);
     },
 }
 </script>

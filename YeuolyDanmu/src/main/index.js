@@ -81,7 +81,8 @@ function createWindow () {
     transparent : true,
     titleBarStyle: false,
     show: false,
-    maximizable: false
+    maximizable: false,
+    title: '主窗口',
   });
 
   //mainWindow.setIcon(require('path').join(__dirname,'./../assets/logo.ico'));

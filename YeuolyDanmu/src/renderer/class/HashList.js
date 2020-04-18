@@ -301,6 +301,22 @@ export default class HashList{
     }
 
     /**
+     * 通过随机分布的一个整数作为唯一标识
+     * @param {integer} num
+     * @returns 返回一个可操控的HashList对象 
+     */
+    operateByNumber(num_sign){
+        const offset = this.base.offset;
+        const residue = ( num_sign || 0 ) % Math.pow(16,offset);
+        let sign = residue.toString(16);
+        if(sign.length === 1){
+            sign = '0' + sign;
+        }
+        this.current_md5 = sign + num_sign;
+        return this.opter;
+    }
+
+    /**
      * @param {*} array 数据原始值，原始值由HashList::getOrigin()获取
      * @param {*} offset offset需要用户自行定义
      */

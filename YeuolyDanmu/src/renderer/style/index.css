@@ -1,3 +1,7 @@
+.p0{
+  padding: 0;
+}
+
 .py1{
   padding-top: 3px;
   padding-bottom: 3px;
@@ -76,6 +80,10 @@
 .pb3{ padding-bottom: 8px; }
 .pb4{ padding-bottom: 11px; }
 .pb5{ padding-bottom: 15px; }
+
+.m0{
+  padding: 0;
+}
 
 .my1{
   margin-top: 3px;

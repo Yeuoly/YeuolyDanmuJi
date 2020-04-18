@@ -10,15 +10,20 @@ const recd_path = `${base_path}daily\\`;
 const logs_path = `${base_path}logs\\`;
 const filename = `${recd_path}${Utils.formatDate(new Date(),'yyyy-MM-dd-hh')}.yson`;
 
-//创建基础文件夹
-fs.mkdir(base_path,{ recursive: true });
-fs.mkdir(recd_path);
-fs.mkdir(logs_path);
+if(require('electron').remote.getCurrentWindow().getTitle() === '主窗口'){
+    try{
+        //创建基础文件夹
+        fs.mkdir(base_path,{ recursive: true });
+        fs.mkdir(recd_path);
+        fs.mkdir(logs_path);
+    }catch(e){}
 
-//electron-log配置
-log.transports.console.level = false;
-log.transports.file.file =  `${base_path}logs\\${Utils.formatDate(new Date(),'yyyy-MM-dd-hh')}.log`;
-log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
+    //electron-log配置
+    log.transports.console.level = false;
+    log.transports.file.file =  `${base_path}logs\\${Utils.formatDate(new Date(),'yyyy-MM-dd-hh')}.log`;
+    log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
+}
+
 
 export default {
     /**

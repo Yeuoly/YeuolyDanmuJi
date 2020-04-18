@@ -14,7 +14,7 @@ const temp_max_count = 20;
 let append_count = 0;
 
 //别数了，一共256个数组，是原始数据
-const store_avatar = store.get('store-avatars') || [
+const store_avatar = store.get('avatars-cache') || [
     [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]],
     [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]],
     [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]],
@@ -40,21 +40,18 @@ avatars.cover(store_avatar, 2);
 const defualt_avatar = 'http://i0.hdslb.com/bfs/album/6389ef2f437a4b00d0dc863b44f4084bf6b4165a.jpg';
 
 export const saveAvatars = () => {
-    store.set('store-avatars',avatars.getOrigin());
+    store.set('avatars-cache',avatars.getOrigin());
 }
 
 //采用回调的形式
 export const getAvatar = async ( uid, fn ) => {
-    const _a = avatars.operate(uid).get().result;
+    const _a = avatars.operateByNumber(uid).get().result;
     if(!_a){
         try{
             const r = await axios.get(`${api.bili_get_space_info}?mid=${uid}`);
             const data = r.data;
             if(data['code'] === 0){
-                avatars.operate().set({
-                    times : 1,
-                    src : data['data']['face']
-                });
+                avatars.operateByNumber(uid).set([1, data['data']['face'], uid]);
                 fn(data['data']['face']);
                 append_count++;
                 if(append_count === temp_max_count){
@@ -69,8 +66,20 @@ export const getAvatar = async ( uid, fn ) => {
         }
     }else{
         avatars.operate().change( item => {
-            item['times']++;
+            item[0]++;
         });
-        fn(_a['src']);
+        fn(_a[1]);
     }
 }
+
+export const getAvatarOrigin = () => avatars.getOrigin();
+
+export const getAvatarCount = () => avatars.getOriginLength();
+
+export const setAvatar = ( uid, src ) => {
+    avatars.operateByNumber(uid).change( item => {
+        item[1] = src;
+    });
+}
+
+export const getAvatarsList = () => avatars.operate().clone().result;
