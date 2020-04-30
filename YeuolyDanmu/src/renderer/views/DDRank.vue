@@ -47,6 +47,7 @@
 <script>
 import { getInteractionalDDs, getPaiedDDs } from '../data/records_ipc';
 import { room_id_controller } from '../data/settings';
+import { OrdinaryEventBus } from '../events/evnetBus';
 import Axios from 'axios';
 import api from '../settings/api';
 import Info from '../class/Info';
@@ -129,13 +130,9 @@ export default {
             }
         }
     },
-    watch : {
-        '$route.name' : {
-            handler(v){
-                v === 'dd-rank' && this.computeRank();
-            },
-            immediate : true
-        }
-    }
+    mounted() {
+        this.computeRank();
+        OrdinaryEventBus.$on('router-to-dd-rank',this.computeRank);
+    },
 }
 </script>

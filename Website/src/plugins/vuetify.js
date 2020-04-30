@@ -1,7 +1,33 @@
 import Vue from 'vue';
-import Vuetify from 'vuetify/lib';
+import Vuetify , {
+    VApp,
+    VContainer,
+    VCard,
+    VCardText,
+    VCardTitle,
+    VBtn,
+    VSlideYTransition,
+    VTimelineItem,
+    VTimeline
+} from 'vuetify/lib';
 
-Vue.use(Vuetify);
+import { Ripple } from 'vuetify/lib/directives';
 
-export default new Vuetify({
+Vue.use(Vuetify,{
+    components : {
+        VApp,
+        VContainer,
+        VCard,
+        VCardText,
+        VCardTitle,
+        VBtn,
+        VSlideYTransition,
+        VTimelineItem,
+        VTimeline
+    },
+    directives : {
+        Ripple
+    }
 });
+
+export default new Vuetify();

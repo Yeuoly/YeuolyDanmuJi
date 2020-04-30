@@ -101,18 +101,20 @@ export default {
     },
     methods: {
         loadData(){
-            const store_avatars = store.get('avatars-cache', null);
-            if(!store){
-                this.data[0].value = 0;
-            }else{
-                const avatrs = new HashList(2);
-                const sizeof = require('object-sizeof');
-                avatrs.cover(store_avatars, 2);
-                this.data[0].value = avatrs.getOriginLength();
-                this.data[1].value = Utils.getVisualMemorySize(sizeof(store_avatars));
-                this.data[2].value = Utils.getVisualMemorySize(sizeof(getDailyDanmuRecords()));
-                this.data[3].value = Utils.getVisualMemorySize(sizeof(getDailyGiftRecords()));
-            }
+            setTimeout(() => {
+                const store_avatars = store.get('avatars-cache', null);
+                if(!store){
+                    this.data[0].value = 0;
+                }else{
+                    const avatrs = new HashList(2);
+                    const sizeof = require('object-sizeof');
+                    avatrs.cover(store_avatars, 2);
+                    this.data[0].value = avatrs.getOriginLength();
+                    this.data[1].value = Utils.getVisualMemorySize(sizeof(store_avatars));
+                    this.data[2].value = Utils.getVisualMemorySize(sizeof(getDailyDanmuRecords()));
+                    this.data[3].value = Utils.getVisualMemorySize(sizeof(getDailyGiftRecords()));
+                }
+            });
         },
         controller(v){
             switch(v){
