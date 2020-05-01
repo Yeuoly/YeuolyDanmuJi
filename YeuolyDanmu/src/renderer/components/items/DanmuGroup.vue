@@ -36,20 +36,15 @@ const max_offset = window.innerHeight;
 export default {
     name : 'DanmuGroup',
     components : { Danmu, Guard, GiftDanmu },
-    props : ['Danmus','textColor','unameColor','font','type','index'],
+    props : ['Danmus','textColor','unameColor','font','type','index','event'],
     data : () => ({
-        isShow : false,
         offset : 0,
-        finished_children_count : 0
+        load_off : null
     }),
     methods: {
-        teleParent(){
-            const height = this.$refs.controller.offsetHeight;
-            DanmuGroupEventBus.$emit('move',height);
-        },
         move(offset){
             if(this.offset > max_offset){
-                DanmuGroupEventBus.$off('move',this.move);
+                this.load_off();
                 this.$emit('end',this.index);
                 return;
             }
@@ -57,19 +52,16 @@ export default {
             this.$refs.controller.style['transform'] = `translateY(-${this.offset}px)`;
         },
         show(){
-            if(this.isShow)return;
-            this.isShow = true;
             this.$refs.controller.style.opacity = 1;
         }
     },
     mounted() {
-        this.teleParent();
-        // DanmuGroupEventBus.$on(`show-${this.key}`,this.show);
-        //这里teleParent和$on顺序不能反
-        DanmuGroupEventBus.$on('move',this.move);
-        //不止于加载这么慢叭，
-        setTimeout(() => { this.show(); },300);
-        //this.show();
+        this.event.setDomMoveEvent( this.move, loadOff => {
+            this.load_off = loadOff;
+        });
+        const height = this.$refs.controller.offsetHeight;
+        this.event.front.event && this.event.front.event.front && this.event.front.event.onMove(height);
+        setTimeout(this.show, 300);
     },
 }
 </script>

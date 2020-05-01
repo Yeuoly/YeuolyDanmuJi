@@ -14,7 +14,7 @@
                 ></i>
             </div>
             <div id="cover" ref="cover" :style="{ backgroundColor: backgroundColor }">
-                <SuperChat :Danmu="super_chats[current_super_chat]" 
+                <SuperChat v-if="super_chats[current_super_chat]" :Danmu="super_chats[current_super_chat]" 
                         class="superchats"
                         :style="{ transform : `translateY( -${ sc_replacing ? '160' : '0' }px )` }"
                 ></SuperChat>
@@ -26,6 +26,7 @@
                             :Danmus="i.value"
                             :font="screen_settings.font_family"
                             :type="i.type"
+                            :event="i.event"
                             @end="revVirualListStart"
                 ></DanmuGroup>
             </div>
@@ -156,35 +157,41 @@ import { support_font } from '../class/FontController';
 export default {
     name : 'DanmuDialog',
     components : { DanmuGroup , SuperChat : SuperChatComponent },
-    data: () => ({
-        danmu_groups : [],
-        list_start : 0,
-        color_group : color_group,
-        current_danmu_count : 0,
-        super_chats : [ new SuperChat(
-             '碧诗',2,'这是一条测试SC','','','','',30,0,0,'#EDF5FF','#2A60B2','#7497CD',
-            'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
-            'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
-        ) ],
-        current_super_chat : 0,
-        sc_cycling : false,
-        dialog_open : false,
-        screen_settings : screen_settings,
-        danmu_size : 16,
-        sc_replacing : true,
-        hidding_dialog : false,
-        sleep_timer : null,
-        font_families : [{
-            id : '114514',
-            label : '默认字体',
-            value : 'DanmuFont'
-        },...support_font],
-        click_locked : false,
-        live : {
-            fans : 0,
-            popular : 0
-        }
-    }),
+    data(){
+        SuperChat(
+                '碧诗',2,'这是一条测试SC','','','','',30,0,0,'#EDF5FF','#2A60B2','#7497CD',
+                'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
+                'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
+        ).then( r => {
+            data.super_chats.push(r);
+        })
+        const data = {
+            danmu_groups : [{ text : '什么？你问我是干嘛的，我就是个填充物，减少判断用的', event : {} }],
+            list_start : 1,
+            color_group : color_group,
+            current_danmu_count : 1,
+            super_chats : [],
+            current_super_chat : 0,
+            sc_cycling : false,
+            dialog_open : false,
+            screen_settings : screen_settings,
+            danmu_size : 16,
+            sc_replacing : true,
+            hidding_dialog : false,
+            sleep_timer : null,
+            font_families : [{
+                id : '114514',
+                label : '默认字体',
+                value : 'DanmuFont'
+            },...support_font],
+            click_locked : false,
+            live : {
+                fans : 0,
+                popular : 0
+            }
+        };
+        return data; 
+    },
     computed : {
         text_color(index){
             if(this.color_group.length > 0)
@@ -333,15 +340,43 @@ export default {
             this.super_chats.push(src);
             this.screen_settings.sleeper && this.sleep_timer.$continue('screen-sleep');
         },
+        appendDanmu(source,type){
+            const self = this;
+            const index = self.current_danmu_count++;
+            const dom = {
+                type : type,
+                value : source,
+                event : {
+                    front : self.danmu_groups[index - 1],
+                    back : null,
+                    dom_move_event : null,
+                    dom_move_checker : null,
+                    setDomMoveEvent(callDomMove,setupLoadOff){
+                        //绑定移动事件
+                        this.dom_move_event = callDomMove;
+                        //绑定超出边界事件，当dom超出边界以后，告诉后边的元素移除front，并自己移除back
+                        setupLoadOff(() => {
+                            delete this.front.event;
+                            this.back = null;
+                        });
+                    },
+                    onMove(movement){
+                        //自身移动
+                        this.dom_move_event && this.dom_move_event(movement);
+                        //前级移动
+                        this.front.event && this.front.event.front && this.front.event.onMove(movement);
+                    }
+                },
+                id : index,
+            };
+            self.danmu_groups[index - 1].event.back = dom;
+            self.danmu_groups.push(dom);
+        },
         loadGift(gift){
             if(gift.is_super){
 
             }else{
-                this.danmu_groups.push({
-                    id : this.current_danmu_count++,
-                    value : [gift],
-                    type :'gift'
-                });
+                this.appendDanmu([gift],'gift');
             }
         },
         loadSuperChat(sc){
@@ -353,11 +388,7 @@ export default {
             }
         },
         loadGuard(guard){
-            this.danmu_groups.push({
-                value : [guard],
-                id : this.current_danmu_count++,
-                type : 'guard'
-            });
+            this.appendDanmu([guard],'guard');
         },
         loadDanmu(danmus){
             //要考虑处理一下重复弹幕，肝，它痛了起来
@@ -395,11 +426,7 @@ export default {
                 avatar.src = e.user.face;
                 avatar.onload = () => {
                     if(++len === full_len){
-                        this.danmu_groups.push({
-                            id : this.current_danmu_count++,
-                            value : norepeat_danmus,
-                            type : 'normal'
-                        });
+                        this.appendDanmu(norepeat_danmus,'normal')
                     }
                 }
             });

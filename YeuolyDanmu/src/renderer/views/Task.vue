@@ -408,7 +408,7 @@ export default {
             this.transGift(test);
         },
         async testGuard(){
-            const test = await Guard('Yeuoly',40691233,199,3);
+            const test = await Guard('Yeuoly',40691233,199000,3);
             this.transGuard(test);
         },
         saveRecords(){
