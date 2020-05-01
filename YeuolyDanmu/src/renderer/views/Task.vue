@@ -167,18 +167,6 @@
                 </div>
                 <el-slider v-model.lazy="speaker.speed" class="w90 p0 left"></el-slider>
             </el-col>
-            <!-- <el-col :span="24">
-                <div class="text-grey text-12 left py4 px5">
-                    音色
-                </div>
-                <el-select v-model="speaker.voice">
-                    <el-option 
-                        v-for="(i, key) in speaker.voices"
-                        :key="key"
-                        :value="i.name"
-                    >{{i.name}}</el-option>
-                </el-select>
-            </el-col> -->
         </el-row>
     </div>
 </template>
@@ -191,8 +179,7 @@ import { room_id_controller } from '../data/settings';
 import { filter_danmu_controller } from '../data/settings';
 import { global_settings } from '../settings/global_settings';
 
-import Danmu from '../class/Danmu';
-import { SuperChat , Gift , Guard } from '../class/Danmu';
+import { SuperChat, Gift, Guard, Danmu } from '../class/Danmu';
 
 import { addGift, addLog, addSC, writeRecords, addDanmus, addGuard, clearStatistic } from '../data/records_ipc';
 import { User } from '../class/User';
@@ -361,8 +348,8 @@ export default {
             });
         },
         //伪造一个虚假的30块SC
-        testSC30(){
-            const test = new SuperChat(
+        async testSC30(){
+            const test = await SuperChat(
                 '碧诗',2,'这是一条测试SC','','','','',30,0,0,'#EDF5FF','#2A60B2','#7497CD',
                 'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
                 'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
@@ -370,58 +357,58 @@ export default {
             this.transSuperChat(test);
         },
         //伪造一个虚假的50块SC
-        testSC50(){
-            const test = new SuperChat(
+        async testSC50(){
+            const test = await SuperChat(
                 '碧诗',2,'这是一条测试SC','','','','',50,0,0,'#DBFFFD','#427D9E','#7DA4BD',
                 'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
                 'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
             );
             this.transSuperChat(test);
         },
-        testSC100(){
-            const test = new SuperChat(
+        async testSC100(){
+            const test = await SuperChat(
                 '碧诗',2,'这是一条测试SC','','','','',100,0,0,'#FFF1C5','#E2B52B','#ECCF75',
                 'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
                 'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
             );
             this.transSuperChat(test);
         },
-        testSC500(){
-            const test = new SuperChat(
+        async testSC500(){
+            const test = await SuperChat(
                 '碧诗',2,'这是一条测试SC','','','','',500,0,0,'#FFEAD2','#E09443','#E8AF79',
                 'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
                 'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
             );
             this.transSuperChat(test);
         },
-        testSC1000(){
-            const test = new SuperChat(
+        async testSC1000(){
+            const test = await SuperChat(
                 '碧诗',2,'这是一条测试SC','','','','',1000,0,0,'#FFE7E4','#E54D4D','#EE8B8B',
                 'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
                 'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
             );
             this.transSuperChat(test);
         },
-        testSC2000(){
-            const test = new SuperChat(
+        async testSC2000(){
+            const test = await SuperChat(
                 '碧诗',2,'这是一条测试SC','','','','',2000,0,0,'#FFD8D8','#AB1A32','#C86A7A',
                 'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
                 'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
             );
             this.transSuperChat(test);
         },
-        testDanmu(){
-            const test = new Danmu('Yeuoly',40691233,'测试弹幕','','','','','');
+        async testDanmu(){
+            const test = await Danmu('Yeuoly',40691233,null,'测试弹幕',0,'','',0,'',0);
             this.transDanmus([test]);    
         },
-        testGift(){
-            const test = new Gift('Yeuoly',40691233,'http://i2.hdslb.com/bfs/face/dc664955fedaa4527d794abad384019a0c63f488.jpg',
+        async testGift(){
+            const test = await Gift('Yeuoly',40691233,null,
                 1,'辣条',23300,233,false
             );
             this.transGift(test);
         },
-        testGuard(){
-            const test = new Guard(new User('Yeuoly',40691233,'https://i2.hdslb.com/bfs/face/dc664955fedaa4527d794abad384019a0c63f488.jpg',0,0,0),3,198000);
+        async testGuard(){
+            const test = await Guard('Yeuoly',40691233,199,3);
             this.transGuard(test);
         },
         saveRecords(){

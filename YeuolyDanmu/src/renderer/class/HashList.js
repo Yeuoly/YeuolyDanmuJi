@@ -233,29 +233,20 @@ export default class HashList{
                 }else{
                     result = false;
                 }
-                return {
-                    result : result,
-                    handle : self.opter
-                }
+                return result;
             },
             /**
              * @param {*} 相比起insert这个方法更加暴力，它不会检测当前标识是否存在，直接插入值 
              */
             set(item){
                 self.base.set(self.current_md5,item);
-                return {
-                    result : true,
-                    handle : self.opter
-                }
+                return self.opter;
             },
             /**
              * @returns 返回当前标识下的数据
              */
             get(){
-                return{
-                    result : self.base.find(self.current_md5),
-                    handle : self.opter
-                }
+                return self.base.find(self.current_md5);
             },
             /**
              * 修改当前标识下的数据，filed为一个回调函数，如果数据类型为@param {boolean|number|string}则会赋予数据filed的返回值
@@ -264,18 +255,7 @@ export default class HashList{
              */
             change(field){
                 self.base.modify(self.current_md5,field);
-                return{
-                    handle : self.opter
-                }
-            },
-            /**
-             * 获取数据线性排列而成的数组
-             */
-            clone(){
-                return{
-                    result : self.base.clone(),
-                    handle : self.opter
-                }
+                return self.opter;
             },
             /**
              * 清除所有数据
@@ -283,10 +263,7 @@ export default class HashList{
              */
             clear(){
                 self.base.clear();
-                return{
-                    result : true,
-                    handle : self.opter
-                }
+                return self.opter;
             }
         }
     }
@@ -309,7 +286,8 @@ export default class HashList{
         const offset = this.base.offset;
         const residue = ( num_sign || 0 ) % Math.pow(16,offset);
         let sign = residue.toString(16);
-        if(sign.length === 1){
+        const extr = this.base.offset - sign.length;
+        for(let i = 0; i < extr; i++){
             sign = '0' + sign;
         }
         this.current_md5 = sign + num_sign;
@@ -336,6 +314,13 @@ export default class HashList{
      */
     getOriginLength(){
         return this.base.getOriginLength();
+    }
+    
+    /**
+     * 获取数据线性排列而成的数组
+     */
+    clone(){
+        return this.base.clone();
     }
 
     /**

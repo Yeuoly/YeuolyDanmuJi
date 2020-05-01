@@ -1,4 +1,6 @@
-export class User{
+import { getAvatar } from './Avatar';
+
+class UserClass{
     constructor(id,uid,face,lv,live_lv,live_rank){
         this.id = id;
         this.uid = uid;
@@ -12,6 +14,15 @@ export class User{
     getUid(){ return this.uid; }
     getFaceUrl(){ return this.face; }
 }
+
+export const User = (id,uid,face,lv,live_lv,live_rank) => new Promise( async reslove => {
+    if(face){
+        reslove(new UserClass(id,uid,face,lv,live_lv,live_rank));
+    }else{
+        const avatars = await getAvatar(uid);
+        reslove(new UserClass(id,uid,avatars,lv,live_lv,live_rank));
+    }
+});
 
 export class Medal{
     constructor(lv,medal_name,up_name,up_uid){

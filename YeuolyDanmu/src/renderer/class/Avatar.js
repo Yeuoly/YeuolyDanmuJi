@@ -43,34 +43,30 @@ export const saveAvatars = () => {
     store.set('avatars-cache',avatars.getOrigin());
 }
 
-//采用回调的形式
-export const getAvatar = async ( uid, fn ) => {
-    const _a = avatars.operateByNumber(uid).get().result;
-    if(!_a){
-        try{
-            const r = await axios.get(`${api.bili_get_space_info}?mid=${uid}`);
-            const data = r.data;
-            if(data['code'] === 0){
-                avatars.operateByNumber(uid).set([1, data['data']['face'], uid]);
-                fn(data['data']['face']);
-                append_count++;
-                if(append_count === temp_max_count){
-                    saveAvatars();
-                    append_count = 0;
-                }
-            }else{
-                fn(defualt_avatar);
-            }
-        }catch(e){
-            fn(defualt_avatar);
-        }
+//整活整活，Promise还挺好用
+export const getAvatar = uid => new Promise( async resolve => {
+    const handle = avatars.operateByNumber(uid).get();
+    if(handle){
+        handle[0]++;
+        resolve(handle[1]);
     }else{
-        avatars.operate().change( item => {
-            item[0]++;
-        });
-        fn(_a[1]);
+        try{
+            const { data } = await axios.get(`${api.bili_get_space_info}?mid=${uid}`);
+            if(data['code'] !== 0){
+                resolve(defualt_avatar);
+                return;
+            }
+            avatars.operateByNumber(uid).set([1, data['data']['face'], uid]);
+            if(++append_count === temp_max_count){
+                saveAvatars();
+                append_count = 0;
+            }
+            resolve(data['data']['face']);
+        }catch(e){
+            resolve(defualt_avatar);
+        }
     }
-}
+}); 
 
 export const getAvatarOrigin = () => avatars.getOrigin();
 
@@ -82,4 +78,4 @@ export const setAvatar = ( uid, src ) => {
     });
 }
 
-export const getAvatarsList = () => avatars.operate().clone().result;
+export const getAvatarsList = () => avatars.clone();

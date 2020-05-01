@@ -11,10 +11,10 @@ const updateInteractionalDD = ( id, uid ) => {
         uid : uid,
         id : id,
         times : 1
-    }).result){
+    })){
         statistics.interactional_dd_count++;
     }else{
-        records.interactional_dd_hash.opter.change( item => {
+        records.interactional_dd_hash.operate().change( item => {
             item['times']++;
         });
     }
@@ -22,14 +22,14 @@ const updateInteractionalDD = ( id, uid ) => {
 
 //更新打钱DD
 const updatePaiedDD = ( id, uid, price ) => {
-    if(records.paied_dd_hash.operate(uid).insert({
+    if(records.paied_dd_hash.operateByNumber(uid).insert({
         uid : uid,
         id : id,
         price : price
-    }).result){
+    })){
         statistics.paied_dd_count++;
     }else{
-        records.paied_dd_hash.opter.change( item => {
+        records.paied_dd_hash.operate().change( item => {
             item['price'] += price;
         });
     }
@@ -57,8 +57,8 @@ const actions = {
             log(){ return records.daily_log_records.slice(0); },
             sc(){ return records.daily_sc_records.slice(0); },
             guard(){ return records.daily_guard_records.slice(0); },
-            idd(){ return records.interactional_dd_hash.opter.clone().result; },
-            pdd(){ return records.paied_dd_hash.opter.clone().result; },
+            idd(){ return records.interactional_dd_hash.clone(); },
+            pdd(){ return records.paied_dd_hash.clone(); },
             danmu(){ return records.daily_danmu_records.slice(0); }
         },
         pointer : {

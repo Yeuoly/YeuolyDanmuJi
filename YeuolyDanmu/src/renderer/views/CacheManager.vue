@@ -1,10 +1,18 @@
 <template>
     <div id="cache-manager">
-        <el-dialog :title="`刷新头像缓存中…… ${refresh.cur} / ${refresh.tot}`"
+        <el-dialog :title="`刷新头像缓存中…… `"
                    :visible.sync="refresh.show"
                    :before-close="stopRefreshAvatars"
                    :status="refresh_status"
         >
+            <VOdometer theme="minimal"
+                       format=""
+                       :value="refresh.cur"
+            ></VOdometer> / 
+            <VOdometer theme="minimal"
+                       format=""
+                       :value="refresh.tot"
+            ></VOdometer>
             <el-progress :text-inside="true" 
                          :stroke-width="18" 
                          :percentage="refresh.progress"
@@ -41,6 +49,8 @@ import api from '../settings/api';
 import Store from 'electron-store';
 import axios from 'axios';
 import HashList from '../class/HashList';
+import sizeof from 'object-sizeof';
+import VOdometer from '../components/items/VOdometer';
 import { MessageBox } from 'element-ui';
 import { getDailyGiftRecords, getDailyDanmuRecords } from '../data/records_ipc';
 import { OrdinaryEventBus } from '../events/evnetBus';
@@ -50,6 +60,7 @@ const store = new Store();
 
 export default {
     name : 'cache-manager',
+    components : { VOdometer },
     data : () => ({
         data : [{
             label : '已缓存头像数量（加载延迟∝数量，但基本在0.01ms以下',
@@ -102,18 +113,10 @@ export default {
     methods: {
         loadData(){
             setTimeout(() => {
-                const store_avatars = store.get('avatars-cache', null);
-                if(!store){
-                    this.data[0].value = 0;
-                }else{
-                    const avatrs = new HashList(2);
-                    const sizeof = require('object-sizeof');
-                    avatrs.cover(store_avatars, 2);
-                    this.data[0].value = avatrs.getOriginLength();
-                    this.data[1].value = Utils.getVisualMemorySize(sizeof(store_avatars));
-                    this.data[2].value = Utils.getVisualMemorySize(sizeof(getDailyDanmuRecords()));
-                    this.data[3].value = Utils.getVisualMemorySize(sizeof(getDailyGiftRecords()));
-                }
+                this.data[0].value = getAvatarCount();
+                this.data[1].value = Utils.getVisualMemorySize(sizeof(getAvatarsList()));
+                this.data[2].value = Utils.getVisualMemorySize(sizeof(getDailyDanmuRecords()));
+                this.data[3].value = Utils.getVisualMemorySize(sizeof(getDailyGiftRecords()));
             });
         },
         controller(v){
@@ -150,12 +153,7 @@ export default {
         },
         refreshAvatars(){
             this.refresh.show = true;
-            const store_avatars = store.get('avatars-cache', null);
-            const avatrs = new HashList(2);
-            if(store_avatars){
-                avatrs.cover(store_avatars, 2);
-            }
-            const origin = avatrs.operate().clone().result;
+            const origin = getAvatarsList();
             const len = origin.length;
             this.refresh.cur = 0;
             this.refresh.tot = len;

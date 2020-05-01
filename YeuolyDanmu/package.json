@@ -63,6 +63,7 @@
     "element-ui": "^2.13.0",
     "md5": "^2.2.1",
     "object-sizeof": "^1.6.0",
+    "odometer": "^0.4.8",
     "vcolorpicker": "^0.1.8",
     "vue": "^2.5.16",
     "vue-echarts": "^5.0.0-beta.0",

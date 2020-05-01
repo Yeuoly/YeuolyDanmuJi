@@ -150,9 +150,6 @@ const screen_settings =  store.get('danmu-dialog|screen_settings', {
 //休眠器
 import { IntervalTimer } from '../class/Timer';
 
-//获取头像
-import { getAvatar } from '../class/Avatar';
-
 //获取可用字体
 import { support_font } from '../class/FontController';
 
@@ -340,13 +337,10 @@ export default {
             if(gift.is_super){
 
             }else{
-                getAvatar(gift.user.uid, src => {
-                    gift.user.face = src;
-                    this.danmu_groups.push({
-                        id : this.current_danmu_count++,
-                        value : [gift],
-                        type :'gift'
-                    });
+                this.danmu_groups.push({
+                    id : this.current_danmu_count++,
+                    value : [gift],
+                    type :'gift'
                 });
             }
         },
@@ -384,33 +378,30 @@ export default {
                  * 这里要等待头像全部加载完毕再向目标数组中push元素，而且如你所见，加载是异步的
                  */
                 const avatar = new Image();
-                getAvatar(e.user.uid, src => {
-                    //得要是找到了而且开了折叠弹幕才折叠
-                    if(index !== -1 && global_settings['display_module']['auto_fold_repeat_danmu']){
-                        norepeat_danmus[index].users.faces.push({ guard : e.guard_type , src : src });
-                        norepeat_danmus[index].user.id = '一般路过群众';
-                    }else{
-                        e.users = { 
-                            faces : [ { 
-                                guard : e.guard_type , 
-                                src : src 
-                            }]
-                        };
-                        norepeat_danmus.push(e);
-                        msg.push(e.message);
+                if(index !== -1 && global_settings['display_module']['auto_fold_repeat_danmu']){
+                    norepeat_danmus[index].users.faces.push({ guard : e.guard_type , src : e.user.face });
+                    norepeat_danmus[index].user.id = '一般路过群众';
+                }else{
+                    e.users = { 
+                        faces : [ { 
+                            guard : e.guard_type , 
+                            src : e.user.face
+                        }]
+                    };
+                    norepeat_danmus.push(e);
+                    msg.push(e.message);
+                }
+                //先初始化完弹幕对象，再加载头像，感觉要回调地狱了
+                avatar.src = e.user.face;
+                avatar.onload = () => {
+                    if(++len === full_len){
+                        this.danmu_groups.push({
+                            id : this.current_danmu_count++,
+                            value : norepeat_danmus,
+                            type : 'normal'
+                        });
                     }
-                    //先初始化完弹幕对象，再加载头像，感觉要回调地狱了
-                    avatar.src = src;
-                    avatar.onload = () => {
-                        if(++len === full_len){
-                            this.danmu_groups.push({
-                                id : this.current_danmu_count++,
-                                value : norepeat_danmus,
-                                type : 'normal'
-                            });
-                        }
-                    }
-                });
+                }
             });
         },
         //更新实时信息

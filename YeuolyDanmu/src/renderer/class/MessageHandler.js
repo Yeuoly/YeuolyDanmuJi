@@ -1,11 +1,8 @@
 import Utils from '../class/Utils';
-import Danmu from './Danmu';
 import GiftStation from './GiftStation';
-import { SuperChat , Gift , Guard } from './Danmu';
-import { getAvatar } from '../class/Avatar';
+import { SuperChat , Gift , Guard, Danmu } from './Danmu';
 import { OrdinaryEventBus } from '../events/evnetBus';
 import { global_settings } from '../settings/global_settings';
-import { User } from './User';
 
 const temp_max_count = Utils.varToPointer( () => global_settings['loading_module']['danmu_temp_max_count'] );
 
@@ -97,7 +94,7 @@ export default class MessageHandler{
     }
 
     //装载弹幕进入类内
-    handleMessage(msg){
+    async handleMessage(msg){
         let danmu;
         switch(msg['cmd']){
             case 'DANMU_MSG':
@@ -111,11 +108,20 @@ export default class MessageHandler{
                 * 9为弹幕设置 ?-?
                 */
                 const info = msg['info'];
-                danmu = new Danmu(
-                    info[2][1],info[2][0],info[1],
+                danmu = await Danmu(
+                    info[2][1],info[2][0],null,info[1],
                     info[3][0],info[3][1],info[3][2],
                     info[4][0],info[4][3],info[7]
                 );
+                //增加弹幕数量
+                this.danmu_count.now++;
+
+                //加入临时缓存
+                this.temp_danmus.push(danmu);
+                //当弹幕储量达到max_count时传输弹幕
+                if(this.temp_danmus.length === temp_max_count){
+                    this.transDanmu();
+                }
                 break;
             case 'SEND_GIFT':
                 //送礼物的 $data
@@ -141,7 +147,7 @@ export default class MessageHandler{
                 if(gf['price'] === 0){
                     return;
                 }
-                danmu = new Gift(
+                danmu = await Gift(
                     gf['uname'],gf['uid'],gf['face'],gf['giftId'],gf['giftName'],
                     gf['price'],gf['num'],false
                 );
@@ -150,6 +156,7 @@ export default class MessageHandler{
                     GiftStation.insertGift(gf['uid'],gf['num'],gf['giftId'],danmu);
                     return;
                 }
+                this.transGift(danmu);
                 break;
             case 'NOTICE_MSG':
                 break;
@@ -173,7 +180,16 @@ export default class MessageHandler{
                  */
                 const wg = msg['data'];
                 const gi = GiftStation.getGuardInfo(wg['guard_level']);
-                danmu = new Danmu(wg['username'],wg['uid'],`${gi['name']}进入了直播间`,0,0,0,0,0,wg['guard_level']);
+                danmu = await Danmu(wg['username'],wg['uid'],`${gi['name']}进入了直播间`,0,0,0,0,0,wg['guard_level']);
+                //增加弹幕数量
+                this.danmu_count.now++;
+
+                //加入临时缓存
+                this.temp_danmus.push(danmu);
+                //当弹幕储量达到max_count时传输弹幕
+                if(this.temp_danmus.length === temp_max_count){
+                    this.transDanmu();
+                }
                 break;
             case 'ROOM_REAL_TIME_MESSAGE_UPDATE':
                 //这个是更新直播间信息的 $data
@@ -237,7 +253,7 @@ export default class MessageHandler{
                  * }
                  */
                 const data = msg['data'];
-                danmu = new SuperChat(
+                danmu = await SuperChat(
                     data['user_info']['uname'],data['uid'],data['message'],
                     data['medal_info'] ? data['medal_info']['medal_level'] : 0,
                     data['medal_info'] ? data['medal_info']['medal_name'] : '',
@@ -246,6 +262,7 @@ export default class MessageHandler{
                     data['background_color'],data['background_bottom_color'],data['background_price_color'],
                     data['background_image'],data['user_info']['face']
                 );
+                this.transSuperChat(danmu);
                 break;
             case 'SUPER_CHAT_MESSAGE_JPN':
                 //说出来你们可能不信，sc还有专门的日文包的，参数和上面基本一致 $data
@@ -317,12 +334,9 @@ export default class MessageHandler{
                 //装载一下头像
                 //设置一下基础信息
                 const gb = msg['data'];
-                getAvatar(gb['uid'], src => {
-                    //本来我是不想这里这样弄的，但是两个窗口传输数据全都不是引用类数据，所以只能在这里异步处理一下了
-                    danmu = new Guard(new User(gb['username'],gb['uid'],src,0,0,0),gb['guard_level'],gb['price']);
-                    this.transGuard(danmu);
-                });
-                return;
+                danmu = await Guard(gb['username'],gb['uid'],gb['price'],gb['guard_level']);
+                this.transGuard(danmu);
+                break;
             case 'GUARD_MSG':
                 /**
                  * msg : 可能要用正则提取一下 ?${uname}:?在本房间开通了舰长
@@ -336,37 +350,6 @@ export default class MessageHandler{
             default:
                 console.log(msg);
                 break;
-        }
-        //弹幕入库
-        /**
-         * 由于大量弹幕同时入库会造成大量不必要的性能消耗，这里加上一个弹幕传输限制
-         * 每 #waiting_time 传输一次或者缓存弹幕量超过 #temp_max_count时才传输弹幕
-         * 同时取消单个弹幕传输的做法，一次性传输一个数组
-         */
-
-        //可能存在还没有登记过的消息类型
-        if(!danmu)return;
-
-        //如果是sc就直接传，不搞花里胡哨的东西了
-        if(danmu.type === 'super_chat'){
-            this.transSuperChat(danmu);
-            return;
-        }else if(danmu.type === 'gift'){
-            this.transGift(danmu);
-            return;
-        }else if(danmu.type === 'guard'){
-            this.transGuard(danmu);
-            return;
-        }
-
-        //增加弹幕数量
-        this.danmu_count.now++;
-
-        //加入临时缓存
-        this.temp_danmus.push(danmu);
-        //当弹幕储量达到max_count时传输弹幕
-        if(this.temp_danmus.length === temp_max_count){
-            this.transDanmu();
         }
     }
 
