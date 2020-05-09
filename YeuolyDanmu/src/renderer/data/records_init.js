@@ -11,12 +11,10 @@ const logs_path = `${base_path}logs\\`;
 const filename = `${recd_path}${Utils.formatDate(new Date(),'yyyy-MM-dd-hh')}.yson`;
 
 if(require('electron').remote.getCurrentWindow().getTitle() === '主窗口'){
-    try{
-        //创建基础文件夹
-        fs.mkdir(base_path,{ recursive: true });
-        fs.mkdir(recd_path);
-        fs.mkdir(logs_path);
-    }catch(e){}
+    //创建基础文件夹
+    fs.mkdir(base_path,{ recursive: true },() => {});
+    fs.mkdir(recd_path,() => {});
+    fs.mkdir(logs_path,() => {});
 
     //electron-log配置
     log.transports.console.level = false;

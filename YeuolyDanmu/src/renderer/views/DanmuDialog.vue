@@ -1,5 +1,5 @@
 <template>
-    <div @click="initSleeper" style="height:100%">
+    <div style="height:100%">
         <div id="handle" class="danmu-dialog"  :style="{ transform : master_transform }">
             <div id="ctrl-area">
                 <i class="el-icon-setting" 
@@ -27,6 +27,8 @@
                             :font="screen_settings.font_family"
                             :type="i.type"
                             :event="i.event"
+                            :hidder="screen_settings.danmu_hidder.on"
+                            :hidder-time="screen_settings.danmu_hidder.interval"
                             @end="revVirualListStart"
                 ></DanmuGroup>
             </div>
@@ -67,15 +69,17 @@
                 active-text="显示直播状态"
                 style="padding-bottom:5px"
             ></el-switch>
-            <p></p>
-            <el-switch
-                v-model="screen_settings.sleeper"
-                active-text="启动自动休眠"
+            <el-switch 
+                v-model="screen_settings.danmu_hidder.on"
+                active-text="开启弹幕淡出"
                 style="padding-bottom:5px"
             ></el-switch>
-            <el-input v-model.number="screen_settings.dormancy_interval" style="padding-bottom:5px">
-                <template slot="prepend">休眠时间(s)</template>
+            <el-input v-model.number="screen_settings.danmu_hidder.interval">
+                <template slot="prepend">
+                    弹幕淡出时间
+                </template>
             </el-input>
+            <p></p>
             <p class="demonstration">
                 选择字体
             </p>
@@ -132,21 +136,26 @@ import SCTimer from '../settings/super_chat_staying_time';
 //SC类
 import { SuperChat } from '../class/Danmu';
 
-//获取礼物欢迎语
-import Utils from '../class/Utils';
-const gift_pre_saying = Utils.varToPointer( () => global_settings['display_module']['gift_greet'] );
-
 //屏幕设置
-const screen_settings =  store.get('danmu-dialog|screen_settings', {
+import Utils from '../class/Utils';
+
+const screen_settings_default = {
     uanme_used : true,
     text_used : false,
     opacity : 50,
     backgound_color : 1,
-    dormancy_interval : 60,
     sleeper : true,
     font_family : 'DanmuFont',
-    show_live_info : true
-});
+    show_live_info : true,
+    danmu_hidder : {
+        on : true,
+        interval : 30
+    },
+};
+
+const screen_settings = store.get('danmu-dialog|screen_settings',{});
+//检查屏幕设置更新
+Utils.updateOptions(screen_settings, screen_settings_default);
 
 //休眠器
 import { IntervalTimer } from '../class/Timer';
@@ -164,7 +173,7 @@ export default {
                 'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
         ).then( r => {
             data.super_chats.push(r);
-        })
+        });
         const data = {
             danmu_groups : [{ text : '什么？你问我是干嘛的，我就是个填充物，减少判断用的', event : {} }],
             list_start : 1,
@@ -174,7 +183,7 @@ export default {
             current_super_chat : 0,
             sc_cycling : false,
             dialog_open : false,
-            screen_settings : screen_settings,
+            screen_settings,
             danmu_size : 16,
             sc_replacing : true,
             hidding_dialog : false,
@@ -218,11 +227,6 @@ export default {
         }
     },
     methods: {
-        initSleeper(){
-            if(!this.screen_settings.sleeper)return;
-            this.hidding_dialog = false;
-            this.sleep_timer.$continue('screen-sleep');
-        },
         saveColorSettings(){
             store.set('danmu-dialog|screen_settings',this.screen_settings);
         },
@@ -267,9 +271,6 @@ export default {
             ipc.send('danmu-mounted',win_id);
             //用于接收所有传输到弹幕窗口的信息
             ipc.on('to-danmu', ( sender, channel, msg ) => {
-                //重置休眠器
-                this.screen_settings.sleeper && this.sleep_timer.$continue('screen-sleep');
-                this.hidding_dialog = false;
                 switch(channel){
                     case 'trans-danmu':
                         this.loadDanmu(msg);
@@ -338,7 +339,6 @@ export default {
         spendSC(src){
             src.last_tims--;
             this.super_chats.push(src);
-            this.screen_settings.sleeper && this.sleep_timer.$continue('screen-sleep');
         },
         appendDanmu(source,type){
             const self = this;
@@ -444,28 +444,6 @@ export default {
                 this.danmu_groups = [];
             }
         },
-        setupSleep(){
-            this.sleep_timer = new IntervalTimer();
-            this.sleep_timer.$on('screen-sleep',() => {
-                this.hidding_dialog = true;
-            },this.screen_settings.dormancy_interval);
-            this.screen_settings.sleeper && this.sleep_timer.$continue('screen-sleep');
-        },
-        // onFast(flag){
-        //     if(this.fast_flag !== flag){
-        //         this.fast_flag = flag;
-        //         this.$refs.cover.style['scroll-behavior'] =  flag ? 'initial' : 'smooth';
-        //     }s
-        // },
-        // moveScroll(){
-        //     //如果弹幕太多了就动快点，弹幕少就慢慢动，救命啊这里卡爆了
-        //     if(this.$refs.cover.scrollTop + 100 < this.$refs.cover.scrollHeight){
-        //         this.$refs.cover.scrollTop = this.$refs.cover.scrollHeight;
-        //     }
-        //     else{
-        //         this.$refs.cover.scrollTop += 30;
-        //     }
-        // }
     },
     mounted() {
         //linux等平台的窗口拖动
@@ -475,14 +453,8 @@ export default {
             document.querySelector('#handle').style['-webkit-app-region'] = 'drag';
         }
         this.setupRevMsg();
-        //设置睡眠事件
-        this.setupSleep();
         //重置一下窗口穿透，开发者模式下不重置会很蛋疼
         win.setIgnoreMouseEvents(false);
-        //获取初始信息
-        const data = this.$Win.getParameter();
-        this.live.fans = data.fans;
-        this.live.popular = data.popular;
     },
 }
 </script>

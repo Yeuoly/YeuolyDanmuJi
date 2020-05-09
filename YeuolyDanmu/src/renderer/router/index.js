@@ -116,6 +116,13 @@ const router = new Router({
           meta : {
             title : '缓存管理'
           }
+        },{
+          name : 'records-reader',
+          path : '/index/records-reader',
+          component: () => import('@/views/RecordsReader.vue'),
+          meta : {
+            title : '历史'
+          }
         }
       ]
     },

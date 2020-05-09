@@ -22,8 +22,6 @@ function getExchangerate (){
     });
 }
 
-getExchangerate();
-
 export const room_id_controller = {
     ...data,
     getCurrent(){

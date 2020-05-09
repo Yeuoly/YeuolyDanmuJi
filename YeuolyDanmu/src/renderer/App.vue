@@ -9,10 +9,13 @@
 <script>
   import DanmuLoader from './class/DanmuLoader';
   import { writeRecords } from './data/records_ipc';
+  import { cny_exchangerate_controller } from './data/settings';
+  //初始化礼物
+  import GiftStation from './class/GiftStation';
 
   export default {
     name: 'yeuoly_danmu',
-    mounted() {
+    async mounted() {
       const electron = require('electron');
       //防止被403，重写消息头
       const session = electron.remote.session;
@@ -23,6 +26,25 @@
         let newVar = {requestHeaders: details.requestHeaders};
         callback(newVar);
       });
+      if(require('electron').remote.getCurrentWindow().getTitle() === '主窗口') {
+        GiftStation.getGiftConfig();
+        cny_exchangerate_controller.init();
+      };
+      const win = await this.$Win.openWin({
+        width: 300,
+        height: 730,
+        useContentSize: true,
+        webPreferences : {
+          webSecurity : false
+        },
+        resizable: true,
+        frame: false,
+          titleBarStyle: false,
+          windowConfig : {
+            router : '/danmu',
+            name : '弹幕窗口',
+          }
+        });
     },
     beforeDestroy() {
       writeRecords();

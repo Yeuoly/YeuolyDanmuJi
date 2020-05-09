@@ -47,10 +47,10 @@
                 <div id="drag_area"></div>
                 <i id="close" class="controller el-icon-close" @click="closeProgress"></i>
                 <i id="minimize" class="controller el-icon-minus" @click="minimizeProgress"></i>
-                <div id="index-user">
+                <!-- <div id="index-user">
                     <span id="index-name">{{user.name}}</span>
                     <div id="index-face" :style="{ backgroundImage : `url(${user.face})` }"></div>
-                </div>
+                </div> -->
             </el-header>
             <el-main>
                 <div class="px1 pb3" style="overflow:auto;height:500px">
@@ -72,7 +72,7 @@ import { DanmuTransBus, OrdinaryEventBus } from '../events/evnetBus';
 
 import Logger from '../components/items/Logger.vue';
 import INFO from '../class/Info';
-import Account from '../data/user';
+//import Account from '../data/user';
 
 const drag = require('electron-drag');
 const logo = require('../assets/logo.png');
@@ -108,7 +108,7 @@ export default {
                 name : '高级设置',
                 url : '/index/advance-settings'
             }]
-        },{
+        },/*{
             name : '账户',
             icon : 'el-icon-user',
             subtitle : '账号管理',
@@ -116,7 +116,7 @@ export default {
                 name : '登录YS账号',
                 url : '/index/ys-login'
             }]
-        },{
+        },*/{
             name : '记录',
             icon : 'el-icon-reading',
             subtitle : '舰长、SC、礼物等记录',
@@ -129,6 +129,9 @@ export default {
             },{
                 name : '舰长记录',
                 url : '/index/records-guard-window'
+            },{
+                name : '历史',
+                url : '/index/records-reader'
             }]
         },{
             name : '统计',
@@ -198,10 +201,10 @@ export default {
                 this.user.face = face;
             });
         },
-        initAccount(){
-            OrdinaryEventBus.$on('master-login-succeed',this.setUserInfo);
-            Account.init();
-        }
+        // initAccount(){
+        //     OrdinaryEventBus.$on('master-login-succeed',this.setUserInfo);
+        //     Account.init();
+        // }
     },
     mounted() {
         //linux等平台的窗口拖动
@@ -211,7 +214,7 @@ export default {
             document.querySelector('#drag_area').style['-webkit-app-region'] = 'drag';
         }
         //登录
-        this.initAccount();
+        //this.initAccount();
     },
 }
 </script>

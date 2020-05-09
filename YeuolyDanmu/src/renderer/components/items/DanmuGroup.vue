@@ -36,10 +36,11 @@ const max_offset = window.innerHeight;
 export default {
     name : 'DanmuGroup',
     components : { Danmu, Guard, GiftDanmu },
-    props : ['Danmus','textColor','unameColor','font','type','index','event'],
+    props : ['Danmus','textColor','unameColor','font','type','index','event','hidder','hidder-time'],
     data : () => ({
         offset : 0,
-        load_off : null
+        load_off : null,
+        hidder_timer : null
     }),
     methods: {
         move(offset){
@@ -62,6 +63,19 @@ export default {
         const height = this.$refs.controller.offsetHeight;
         this.event.front.event && this.event.front.event.front && this.event.front.event.onMove(height);
         setTimeout(this.show, 300);
+        if(this.hidder){
+            this.hidder_timer = setTimeout(() => {
+                this.$refs.controller.style.opacity = 0;
+                setTimeout(() => {
+                    this.$emit('end',this.index);
+                }, 500);
+            },this.hidderTime * 1000);
+        }
+    },
+    beforeDestroy() {
+        if(this.hidder_timer){
+            clearTimeout(this.hidder_timer);
+        }
     },
 }
 </script>

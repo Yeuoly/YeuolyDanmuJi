@@ -187,8 +187,6 @@ import Axios from 'axios';
 import api from '../settings/api';
 import Info from '../class/Info';
 import { speaker_controller } from '../modules/speaker';
-// const addSC = require('../data/records_ipc').addSC;
-// const addGift = require('../data/records_ipc').addGift;
 
 const ipc = require('electron').ipcRenderer;
 
@@ -200,9 +198,6 @@ export default {
         starting : false,
         closing :false,
         socket_sender : null,
-        danmu_dialog_flag : false,
-        danmu_dialog_id : 0,
-        gift_dialog_id : 0,
         wirte_records_timer : null,
         speaker : {
             on : false,
@@ -310,7 +305,6 @@ export default {
                 //打开弹幕窗口，初始化窗口信息，避免重复打开
                 if(!this.danmu_dialog_flag){
                     this.danmu_dialog_flag = true;
-                    this.openDanmuDialog(live_status);
                 }
                 //然后发一下，这个是避免二次启动的时候初始化信息传不过去
                 ipc.send('to-danmu','trans-live-info',live_status);
@@ -327,25 +321,6 @@ export default {
         },
         clearDanmu(){
             ipc.send('to-danmu','clear');
-        },
-        async openDanmuDialog(live_status){
-            const win = await this.$Win.openWin({
-                width: 300,
-                height: 730,
-                useContentSize: true,
-                webPreferences : {
-                    webSecurity : false
-                },
-                resizable: true,
-                frame: false,
-                titleBarStyle: false,
-
-                windowConfig : {
-                    router : '/danmu',
-                    name : '弹幕窗口',
-                    data : live_status
-                }
-            });
         },
         //伪造一个虚假的30块SC
         async testSC30(){

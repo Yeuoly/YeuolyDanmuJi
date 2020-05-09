@@ -90,6 +90,26 @@ class Utils{
             }
         }
     }
+
+    /**
+     * @param {object} src 
+     * @param {object} dist 
+     * 检测更新设置的key有没有更新
+     * src为源数据
+     * dist为标准key
+     */
+    updateOptions(src, dist){
+        for(let i in dist){
+            const type = typeof src[i];
+            if(['array','object'].includes(type)){
+                this.updateOptions(src[i], dist[i]);
+            }else if(['number','string','symbol','boolean'].includes(type)){
+                
+            }else if(type === 'undefined'){
+                src[i] = dist[i];
+            }
+        }
+    }
 }
 
 export default new Utils();
