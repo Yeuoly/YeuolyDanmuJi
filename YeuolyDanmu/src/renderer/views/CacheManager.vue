@@ -168,8 +168,7 @@ export default {
                 }
                 const now = origin[index];
                 try{
-                    const r = await axios.get(`${api.bili_get_space_info}?mid=${now[2]}`);
-                    const data = r.data;
+                    const { data } = await axios.get(`${api.bili_get_space_info}?mid=${now[2]}`);
                     if(data['code'] === 0){
                         setAvatar(now[2],data['data']['face']);
                     }else{

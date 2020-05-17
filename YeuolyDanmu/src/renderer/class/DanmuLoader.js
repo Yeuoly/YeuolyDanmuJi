@@ -72,8 +72,7 @@ export default class DanmuLoader{
             popular : 0
         }
         try{
-            const response = await axios.get(`${api.bili_get_live_info}?room_id=${this.room_id}`);
-            const data = response.data;
+            const { data } = await axios.get(`${api.bili_get_live_info}?room_id=${this.room_id}`);
             if(data['code'] === 0){
                 INFO.log('INIT_ROOM_STATUS','获取初始信息成功','green');
                 live_status.fans = data['data']['anchor_info']['relation_info']['attention'];
@@ -121,12 +120,12 @@ export default class DanmuLoader{
     }
 
     //获取服务器信息与token
-    getConf(successHook){
-        axios.get(api.bili_get_room_conf,{
-            room_id : this.room_id,
-            platform : platform
-        }).then( response => {
-            const data = response.data;
+    async getConf(successHook){
+        try {
+            const { data } = await axios.get(api.bili_get_room_conf,{
+                room_id : this.room_id,
+                platform : platform
+            });
             if(data['code'] === 0){
                 this.server_list = data['data']['host_server_list'];
                 this.token = data['data']['token'];
@@ -134,9 +133,9 @@ export default class DanmuLoader{
             }else{
                 INFO.error('DanmuLoader','获取房间信息失败');
             }
-        }).catch(() => {
+        }catch(e){
             INFO.error('DanmuLoader','获取房间信息失败');
-        });
+        }
     }
 
     //处理消息
@@ -158,16 +157,12 @@ export default class DanmuLoader{
                         this.heart_beat_times++;
                         const popular = self.getBodyView().getUint32(0);
                         INFO.log('HeartBeat',`心跳成功！心跳-总次数:${this.heart_beat_times}，当前人气值：${popular}`);
-                        //这要保证数据到的时候要合适，最初启动的时候会有点尴尬，数据不会立即过去
-                        //所以加一个5s延迟，弹幕窗口启动应该5s是够了
-                        setTimeout(() => {
-                            this.message_handler.handleMessage({
-                                cmd : 'YEUOLY_CUREENT_POPULAR',
-                                data : {
-                                    popular : popular
-                                }
-                            });
-                        },5000);
+                        this.message_handler.handleMessage({
+                            cmd : 'YEUOLY_CUREENT_POPULAR',
+                            data : {
+                                popular
+                            }
+                        });
                         break;
                     case 5:
                         //处理数据主体

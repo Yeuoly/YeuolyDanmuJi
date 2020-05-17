@@ -72,9 +72,7 @@ export default {
                 }
             }
             try{
-                const response = await Axios.get(
-                    `${api.bili_get_seven_rank}?roomid=${target_info.room_id}&ruid=${target_info.uid}`
-                );
+                const { data } = await Axios.get(`${api.bili_get_seven_rank}?roomid=${target_info.room_id}&ruid=${target_info.uid}`);
                 this.seven_rank = response.data['data']['list'];
                 Info.log('GET_SEVEN_RANK','获取七日榜成功','green');
             }catch(e){

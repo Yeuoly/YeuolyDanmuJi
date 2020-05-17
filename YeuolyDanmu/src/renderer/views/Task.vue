@@ -23,121 +23,13 @@
                     关闭弹幕姬
                 </el-button></div>
             </el-col>
-            <el-col :span="4">
+            <el-col :span="4" v-for="(i, key) in btns" :key="key">
                 <div class="task-item"><el-button round 
                     type="info" 
                     plain   
-                    @click="clearDanmu" 
+                    @click="emitEvent(i.event)" 
                 >
-                    清空弹幕姬
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="clearStatistic" 
-                >
-                    清空统计
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="refreshDanmuWindow" 
-                >
-                    唤醒弹幕窗口
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="testSC30" 
-                >
-                    测试30块SC
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="testSC50" 
-                >
-                    测试50块SC
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="testSC100" 
-                >
-                    测试100块SC
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="testSC500" 
-                >
-                    测试500块SC
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="testSC1000" 
-                >
-                    测试1k块SC
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="testSC2000" 
-                >
-                    测试2k块SC
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain
-                    @click="testDanmu" 
-                >
-                    测试弹幕
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="testGift" 
-                >
-                    测试辣条
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="testGuard" 
-                >
-                    测试舰长
-                </el-button></div>
-            </el-col>
-            <el-col :span="4">
-                <div class="task-item"><el-button round 
-                    type="info" 
-                    plain   
-                    @click="saveRecords" 
-                >
-                    保存日志
+                    {{i.text}}
                 </el-button></div>
             </el-col>
         </el-row>
@@ -207,7 +99,44 @@ export default {
             speed : 10,
             // voices : speaker_controller.getVoices(),
             // voice : speaker_controller.getVoices()[0]
-        }
+        },
+        btns : [{
+            event : 'clear-danmu',
+            text : '清空弹幕'
+        },{
+            event : 'clear-statistics',
+            text : '清空统计'
+        },{
+            event : 'sc-30',
+            text : '测试30SC'
+        },{
+            event : 'sc-50',
+            text : '测试50SC'
+        },{
+            event : 'sc-100',
+            text : '测试100SC'
+        },{
+            event : 'sc-500',
+            text : '测试500SC'
+        },{
+            event : 'sc-1000',
+            text : '测试1kSC'
+        },{
+            event : 'sc-2000',
+            text : '测试2kSC'
+        },{
+            event : 'danmu',
+            text : '测试弹幕'
+        },{
+            event : 'guard',
+            text : '测试舰长'
+        },{
+            event : 'gift',
+            text : '测试辣条'
+        },{
+            event : 'save-records',
+            text : '保存日志'
+        }]
     }),
     watch: {
         'speaker.volume' : {
@@ -228,8 +157,71 @@ export default {
         }
     },
     methods: {
-        refreshDanmuWindow(){
-            ipc.send('to-danmu','refresh-danmuwindow');
+        async emitEvent(e){
+            switch(e){
+                case 'clear-danmu':
+                    ipc.send('to-danmu','clear');
+                    break;
+                case 'sc-30':
+                    this.transSuperChat(await SuperChat(
+                        '碧诗',2,'这是一条测试SC','','','','',30,0,0,'#EDF5FF','#2A60B2','#7497CD',
+                        'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
+                        'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
+                    ));
+                    break;
+                case 'sc-50':
+                    this.transSuperChat(await SuperChat(
+                        '碧诗',2,'这是一条测试SC','','','','',50,0,0,'#DBFFFD','#427D9E','#7DA4BD',
+                        'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
+                        'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
+                    ));
+                    break;
+                case 'sc-100':
+                    this.transSuperChat(await SuperChat(
+                        '碧诗',2,'这是一条测试SC','','','','',100,0,0,'#FFF1C5','#E2B52B','#ECCF75',
+                        'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
+                        'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
+                    ));
+                    break;
+                case 'sc-500':
+                    this.transSuperChat(await SuperChat(
+                        '碧诗',2,'这是一条测试SC','','','','',500,0,0,'#FFEAD2','#E09443','#E8AF79',
+                        'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
+                        'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
+                    ));
+                    break;
+                case 'sc-1000':
+                    this.transSuperChat(await SuperChat(
+                        '碧诗',2,'这是一条测试SC','','','','',1000,0,0,'#FFE7E4','#E54D4D','#EE8B8B',
+                        'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
+                        'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
+                    ));
+                    break;
+                case 'sc-2000':
+                    this.transSuperChat(await SuperChat(
+                        '碧诗',2,'这是一条测试SC','','','','',2000,0,0,'#FFD8D8','#AB1A32','#C86A7A',
+                        'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
+                        'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
+                    ));
+                    break;
+                case 'danmu':
+                    this.transDanmus([await Danmu('Yeuoly',40691233,null,'测试弹幕',0,'','',0,'',0)]);
+                    break;
+                case 'gift':
+                    this.transGift(await Gift('Yeuoly',40691233,null,1,'辣条',23300,233,false));
+                    break;
+                case 'guard':
+                    this.transGuard(await Guard('Yeuoly',40691233,199000,3));
+                    break;
+                case 'save-records':
+                    writeRecords();
+                    break;
+                case 'clear-statistics':
+                    clearStatistic();
+                    break;
+                default:
+                    console.log('w');
+            }
         },
         //传输普通弹幕
         transDanmus(danmus){
@@ -319,79 +311,7 @@ export default {
                 clearInterval(this.wirte_records_timer);
             });
         },
-        clearDanmu(){
-            ipc.send('to-danmu','clear');
-        },
-        //伪造一个虚假的30块SC
-        async testSC30(){
-            const test = await SuperChat(
-                '碧诗',2,'这是一条测试SC','','','','',30,0,0,'#EDF5FF','#2A60B2','#7497CD',
-                'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
-                'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
-            );
-            this.transSuperChat(test);
-        },
-        //伪造一个虚假的50块SC
-        async testSC50(){
-            const test = await SuperChat(
-                '碧诗',2,'这是一条测试SC','','','','',50,0,0,'#DBFFFD','#427D9E','#7DA4BD',
-                'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
-                'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
-            );
-            this.transSuperChat(test);
-        },
-        async testSC100(){
-            const test = await SuperChat(
-                '碧诗',2,'这是一条测试SC','','','','',100,0,0,'#FFF1C5','#E2B52B','#ECCF75',
-                'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
-                'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
-            );
-            this.transSuperChat(test);
-        },
-        async testSC500(){
-            const test = await SuperChat(
-                '碧诗',2,'这是一条测试SC','','','','',500,0,0,'#FFEAD2','#E09443','#E8AF79',
-                'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
-                'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
-            );
-            this.transSuperChat(test);
-        },
-        async testSC1000(){
-            const test = await SuperChat(
-                '碧诗',2,'这是一条测试SC','','','','',1000,0,0,'#FFE7E4','#E54D4D','#EE8B8B',
-                'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
-                'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
-            );
-            this.transSuperChat(test);
-        },
-        async testSC2000(){
-            const test = await SuperChat(
-                '碧诗',2,'这是一条测试SC','','','','',2000,0,0,'#FFD8D8','#AB1A32','#C86A7A',
-                'https://i0.hdslb.com/bfs/live/1aee2d5e9e8f03eed462a7b4bbfd0a7128bbc8b1.png',
-                'https://i1.hdslb.com/bfs/face/3e60b20604b6fdc7d081eb6a1ec72aa47c5a3964.jpg'
-            );
-            this.transSuperChat(test);
-        },
-        async testDanmu(){
-            const test = await Danmu('Yeuoly',40691233,null,'测试弹幕',0,'','',0,'',0);
-            this.transDanmus([test]);    
-        },
-        async testGift(){
-            const test = await Gift('Yeuoly',40691233,null,
-                1,'辣条',23300,233,false
-            );
-            this.transGift(test);
-        },
-        async testGuard(){
-            const test = await Guard('Yeuoly',40691233,199000,3);
-            this.transGuard(test);
-        },
-        saveRecords(){
-            writeRecords();
-        },
-        clearStatistic(){
-            clearStatistic();
-        }
+        
     },
     mounted() {
         //初始化语音助手

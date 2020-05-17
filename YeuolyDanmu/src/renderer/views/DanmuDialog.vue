@@ -26,6 +26,7 @@
                             :Danmus="i.value"
                             :font="screen_settings.font_family"
                             :type="i.type"
+                            :clear="i.clear"
                             :event="i.event"
                             :hidder="screen_settings.danmu_hidder.on"
                             :hidder-time="screen_settings.danmu_hidder.interval"
@@ -306,7 +307,9 @@ export default {
                 { block : '[DanmuDialog]', info : '弹幕窗口连接成功', color : 'green'} );
         },
         //获取虚拟列表表头id
+        //并清理内存，我也不知道我怎么写着写着就写成这鬼样子的
         revVirualListStart(id){
+            delete this.danmu_groups[id - 1];
             this.list_start = id;
         },
         replaceCurrentSuperChat(){
@@ -368,6 +371,7 @@ export default {
                     }
                 },
                 id : index,
+                clear : false
             };
             self.danmu_groups[index - 1].event.back = dom;
             self.danmu_groups.push(dom);
@@ -436,12 +440,14 @@ export default {
             fans && ( this.live.fans = fans );
             popular && ( this.live.popular = popular );
         },
-        //当弹幕太多了的时候清除顶部的几个
-        clear(end){
-            if(end){
-                this.danmu_groups.splice(0,this.danmu_groups.length - end);
-            }else{
-                this.danmu_groups = [];
+        //因为一些很蛋疼的事情不能直接清
+        clear(){
+            const len = this.danmu_groups.length;
+            for(let i = len - 1; i > 0; i--){
+                if(this.danmu_groups[i] === undefined){
+                    return;
+                }
+                this.danmu_groups[i].clear = true;
             }
         },
     },

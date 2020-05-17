@@ -22,8 +22,7 @@ export default {
     master : new Account(),
     async init(){
         try{
-            const r = await axios.post(api.yeuoly_account_ordinary_action,qs.stringify({ act : 0 }));
-            const data = r.data;
+            const { data } = await axios.post(api.yeuoly_account_ordinary_action,qs.stringify({ act : 0 }));
             if(data['data']['res'] === 666){
                 const res = data['data']['data'];
                 this.master.setAcoountName(res['user_id']);

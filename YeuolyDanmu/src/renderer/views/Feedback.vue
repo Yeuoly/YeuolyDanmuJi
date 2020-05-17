@@ -41,12 +41,11 @@ export default {
         async submit(){
             try{
                 this.submitting = true;
-                const response = await Axios.post(api.yeuoly_feedback,qs.stringify({
+                const { data } = await Axios.post(api.yeuoly_feedback,qs.stringify({
                     email : this.email,
                     project : 1,
                     message : this.message,
                 }));
-                const data = response.data;
                 if(data['data']['res'] === -250){
                     MessageBox.alert(data['data']['error']).finally( () => {
                         this.submitting = false;

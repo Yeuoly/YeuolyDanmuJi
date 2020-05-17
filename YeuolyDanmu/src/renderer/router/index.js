@@ -139,8 +139,8 @@ const router = new Router({
 });
 
 router.afterEach((to, from) => {
-  OrdinaryEventBus.$emit(`router-to-${to.name}`);
   OrdinaryEventBus.$emit(`router-lv-${from.name}`);
+  OrdinaryEventBus.$emit(`router-to-${to.name}`);
 });
 
 export default router;

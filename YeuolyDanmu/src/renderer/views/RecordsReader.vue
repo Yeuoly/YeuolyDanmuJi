@@ -4,21 +4,38 @@
             <el-col :span="20">
                 <el-tabs tab-position="left">
                     <el-tab-pane label="弹幕">
-                        <virtual-list :data="records.danmu" :height="450" :item-height="20" style="width:95%">
+                        <el-input v-model="searcher.danmu_key" class="pb2 pr2" style="width:98%">
+                            <template slot="prepend">
+                                查找
+                            </template>
+                        </el-input>
+                        <virtual-list :data="filted_danmu" :height="450" :item-height="20" style="width:98%">
                             <template slot="inner" scope="channel">
                                 {{channel.data.id}}:{{channel.data.message}}
                             </template>
                         </virtual-list>
                     </el-tab-pane>
                     <el-tab-pane label="礼物">
-                        <el-input v-model="searcher.gift_key" class="pb2">
+                        <el-input v-model="searcher.gift_key" class="pb2" style="width:98%">
                             <template slot="prepend">
                                 查找
                             </template>
                         </el-input>
-                        <virtual-list :data="filted_gift" :height="450" :item-height="20" style="width:95%">
+                        <virtual-list :data="filted_gift" :height="450" :item-height="20" style="width:98%">
                             <template slot="inner" scope="channel">
                                 {{channel.data.user.id}}[{{channel.data.user.uid}}]:赠送了{{channel.data.gift_num}}个{{channel.data.gift_name}}
+                            </template>
+                        </virtual-list>
+                    </el-tab-pane>
+                    <el-tab-pane label="日志">
+                        <el-input v-model="searcher.log_key" class="pb2" style="width:98%">
+                            <template slot="prepend">
+                                查找
+                            </template>
+                        </el-input>
+                        <virtual-list :data="filted_log" :height="450" :item-height="40" style="width:98%">
+                            <template slot="inner" scope="channel">
+                                {{channel}}
                             </template>
                         </virtual-list>
                     </el-tab-pane>
@@ -69,12 +86,19 @@ export default {
         },
         searcher : {
             gift_key : '',
-            danmu_key : ''
+            danmu_key : '',
+            log_key : ''
         },
     }),
     computed: {
         filted_gift(){
-            return this.records.gift.filter( e => this.searcher.gift_key === '' || e.toString().indexOf(this.searcher.gift_key) !== -1);
+            return this.records.gift.filter( e => this.searcher.gift_key === '' || new RegExp(this.searcher.gift_key).test(JSON.stringify(e)));
+        },
+        filted_danmu(){
+            return this.records.danmu.filter( e => this.searcher.danmu_key === '' || new RegExp(this.searcher.danmu_key).test(JSON.stringify(e)));
+        },
+        filted_log(){
+            return this.records.logs.filter( e => this.searcher.log_key === '' || new RegExp(this.searcher.log_key).test(JSON.stringify(e)));
         }
     },
     methods : {
@@ -110,10 +134,13 @@ export default {
                         if(err){
                             Info.error('RecordsReader','读取日志失败' + err);
                         }else{
-                            const res = data.toString('utf8').split(/^[\n\r]$/g);
-                            res.forEach( e => {
-                                const json = JSON.parse(e);
-                            });
+                            try{
+                                data.toString('utf8').split(/[\n\r]/).forEach( e => e && this.records.logs.push(e));
+                                const f = this.files.logs;
+                                f.splice(f.indexOf(filename), 1);
+                            }catch(e){
+                                Info.error('RecordsReader','读取日志失败' + e);
+                            }
                         }
                     });
                     break;
@@ -141,17 +168,13 @@ export default {
 
                                 }
                             });
+                            const f = this.files.daily;
+                            f.splice(f.indexOf(filename), 1);
                         }
                     });
                     break;
             }
         },
-        searchAll(type,keyword){
-
-        },
-        search(type,file,keyword){
-
-        }
     },
     mounted() {
         this.getFiles();

@@ -42,6 +42,7 @@
 
 <script>
 import { getDailyLogRecordsPointer, getDailyGiftRecordsPointer, getDailySCRecordsPointer } from '../data/records_ipc';
+import { OrdinaryEventBus } from '../events/evnetBus';
 import SuperChat from '../components/items/SuperChat';
 import Gift from '../components/items/Gift';
 
@@ -115,6 +116,7 @@ export default {
             ];
         }
     },
+    //最后发现还是用watch省事，不弄了x
     watch: {
         '$route.meta' : {
             handler(newVal){

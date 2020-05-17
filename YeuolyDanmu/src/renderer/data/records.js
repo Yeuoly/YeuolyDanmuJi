@@ -137,8 +137,8 @@ const actions = {
                     statistics[i] = 0;
                 }
             }
-            records.paied_dd_hash.clear();
-            records.interactional_dd_hash.clear();
+            records.paied_dd_hash.operate().clear();
+            records.interactional_dd_hash.operate().clear();
             statistics.danmu_speeds = { value : [], date: [] };
             records.daily_danmu_records = [];
             records.daily_gift_records = [];

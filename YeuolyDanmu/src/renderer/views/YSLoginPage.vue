@@ -51,14 +51,14 @@ export default {
         loading : false,
     }),
     methods: {
-        login(){
+        async login(){
             this.loading = true;
-            axios.post(api.yeuoly_account_ordinary_action,qs.stringify({
-                email : this.model.email,
-                password : this.model.password,
-                act : 2
-            })).then( r => {
-                const data = r.data;
+            try{
+                const { data } = axios.post(api.yeuoly_account_ordinary_action,qs.stringify({
+                    email : this.model.email,
+                    password : this.model.password,
+                    act : 2
+                }));
                 if(data['data']['res'] === 666){
                     MessageBox.confirm('登录成功','登录').then(() => {
                         Account.init();
@@ -66,11 +66,10 @@ export default {
                 }else{
                     MessageBox.alert(data['data']['error'],'登录');
                 }
-            }).catch(() => {
+            }catch(e){
                 MessageBox.alert('与服务器连接出错','YeuolySystem');
-            }).finally(() => {
-                this.loading = false;
-            });
+            }
+            this.loading = false;
         },
         retrievePassword(){
             

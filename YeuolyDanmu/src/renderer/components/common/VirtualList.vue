@@ -27,6 +27,7 @@ export default {
         data(v){
             const len = v.length;
             this.all_height = len * this.itemHeight;
+            this.padding_top > this.all_height && ( this.padding_top = this.all_height - this.height );
             this.padding_bottom = this.all_height - this.virtual_list.length * this.itemHeight;
         }
     },
@@ -36,23 +37,23 @@ export default {
         },
         style(){
             return { paddingTop : this.padding_top + 'px', paddingBottom : this.padding_bottom + 'px' };
+        },
+        max_item(){
+            return parseInt(this.height / this.itemHeight) + 1;
         }
     },
     methods: {
         scroll(){
+            const top = this.$refs.master.scrollTop;
+            this.start_index = Math.floor(top / this.itemHeight);
+            this.end_index = this.start_index + this.max_item;
             if (this.end_index >= this.data.length - 1) {
                 this.padding_bottom = 0;
                 return;
             }
-            const top = this.$refs.master.scrollTop;
-            this.start_index = Math.floor(top / this.itemHeight);
-            this.end_index = this.start_index + 60;
             this.padding_top = top;
             this.padding_bottom = this.all_height - this.height - top;
         }
-    },
-    mounted() {
-        
     },
 }
 </script>

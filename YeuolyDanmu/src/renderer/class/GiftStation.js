@@ -168,8 +168,7 @@ const GiftStation = {
     async getGiftConfig(){
         const room_id = room_id_controller.current;
         try{
-            const response = await axios.get(`${api.bili_get_gift_config}?platform=pc&roomid=${room_id}`);
-            const data = response.data;
+            const { data } = await axios.get(`${api.bili_get_gift_config}?platform=pc&roomid=${room_id}`);
             if(data['code'] === 0){
                 gift_list = data['data']['list'];
                 guard_list = data['data']['guard_resources'];

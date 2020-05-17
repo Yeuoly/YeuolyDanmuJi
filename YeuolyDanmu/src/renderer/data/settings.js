@@ -41,37 +41,36 @@ export const room_id_controller = {
     },
     setCurrent(id){
         this.current = id;
-        this.addToHistory(id, info => {
-            this.history.push(info);
-            this.save();
-        });
-        this.save();
+        this.addToHistory(id);    
     },
-    addToHistory(id,fn_suc){
-        if(this.history.map( v => v.room_id ).includes(id)){
-            return;
-        }
-       this.getRoomInfo(id,fn_suc);
+    addToHistory(id){
+        return new Promise( async reslove => {
+            if(!this.history.map( v => v.room_id ).includes(id)){
+                const data = await this.getRoomInfo(id);
+                this.history.push(data);
+                this.save();
+                reslove(data);
+            }
+        });
     },
     getHistory(){
         return this.history;
     },
-    getRoomInfo(id,fn_suc){
-        axios.get(`${api.bili_get_live_info}?room_id=${id}`).then( r => {
-            const data = r.data;
+    getRoomInfo(id){
+        return new Promise( async reslove => {
+            const { data } = await axios.get(`${api.bili_get_live_info}?room_id=${id}`);
             if(data['code'] !== 0){
                 INFO.error('GET_LIVE_INFO',`代号:${data['code']}`);
-                fn_suc({
-                    short_id : 0,
-                    uid : 0,
+                reslove({
+                    short_id : 0,uid : 0,
                     room_id : id,
                     date : Utils.formatDate(new Date(),'MM-dd hh:mm:ss'),
                     up_name : '加载失败',
                     title : '加载失败',
                     live_status : 0
-                });      
+                });
             }else{
-                fn_suc({
+                reslove({
                     short_id : data['data']['room_info']['short_id'],
                     room_id : data['data']['room_info']['room_id'],
                     uid : data['data']['room_info']['uid'],
@@ -81,7 +80,7 @@ export const room_id_controller = {
                     live_status : data['data']['room_info']['live_status']
                 });
             }
-        });
+        })
     }
 }
 

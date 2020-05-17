@@ -122,8 +122,7 @@ export default {
             this.current.cycling = true;
             const checkRoom = async ( index ) => {
                 try{
-                    const r = await axios.get(`${api.bili_get_live_info}?room_id=${this.history[index].room_id}`);
-                    const data = r.data;
+                    const { data } = await axios.get(`${api.bili_get_live_info}?room_id=${this.history[index].room_id}`);
                     if(data['code'] !== 0){
                         cur_len++;
                         Info.error('GET_LIVE_INFO',`代号:${data['code']}`);
@@ -167,7 +166,7 @@ export default {
         async handleSearch(){
             const kw = this.search.kw || 'Yeuoly';
             try{
-                const r = await axios.get(api.bili_get_live_search, {
+                const { data } = await axios.get(api.bili_get_live_search, {
                     params : {
                         context : '',
                         search_type : 'live',
@@ -181,7 +180,6 @@ export default {
                         singe_column : 0,
                     }
                 });
-                const data = r.data;
                 if(data['code'] !== 0){
                     Info.error('GET_LIVE_SEARCH_LIST','获取直播间列表失败');
                 }
