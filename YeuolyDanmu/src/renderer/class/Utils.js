@@ -41,37 +41,51 @@ class Utils{
     transFormatFromBufferToJson(msg){
         const ary = new Uint8Array(msg);
         const str = this.byteToString(ary);
-        try{
-            return JSON.parse(str);
-        }catch(e){
-            return JSON.parse(decodeURIComponent(str));
-        }
+        return JSON.parse(str);
     }
 
     //网上抄的
     //https://blog.csdn.net/kangear/article/details/82497104
-    byteToString(arr) {
-        if(typeof arr === 'string') {
-            return arr;
-        }
-        let str = '',
-        _arr = arr;
-        for(let i = 0; i < _arr.length; i++) {
-            let one = _arr[i].toString(2),
-            v = one.match(/^1+?(?=0)/);
-            if(v && one.length == 8) {
-                let bytesLength = v[0].length;
-                let store = _arr[i].toString(2).slice(7 - bytesLength);
-                for(let st = 1; st < bytesLength; st++) {
-                    store += _arr[st + i].toString(2).slice(2);
-                }
-                str += String.fromCharCode(parseInt(store, 2));
-                i += bytesLength - 1;
-            } else {
-                str += String.fromCharCode(_arr[i]);
+    byteToString(array) {
+        const bytes = array.slice(0)
+        const filterArray = [
+            [0x7f],
+            [0x1f, 0x3f],
+            [0x0f, 0x3f, 0x3f],
+            [0x07, 0x3f, 0x3f, 0x3f]
+        ]
+        let j
+        let str = ''
+        for (let i = 0; i < bytes.length; i = i + j) {
+            const item = bytes[i]
+            let number = ''
+            if (item >= 240) {
+            j = 4
+            } else if (item >= 224) {
+            j = 3
+            } else if (item >= 192) {
+            j = 2
+            } else if (item < 128) {
+            j = 1
             }
+            const filter = filterArray[j - 1]
+            for (let k = 0; k < j; k++) {
+            let r = (bytes[i + k] & filter[k]).toString(2)
+            const l = r.length
+            if (l > 6) {
+                number = r
+                break
+            }
+            for (let n = 0; n < 6 - l; n++) {
+                r = '0' + r
+            }
+            number = number + r
+            }
+            str = str + String.fromCharCode(parseInt(number, 2))
         }
-        return str;
+        console.log(array);
+        console.log(str);
+        return str
     }
 
     objDeepCopy(source) {

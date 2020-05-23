@@ -10,6 +10,7 @@
   import DanmuLoader from './class/DanmuLoader';
   import { writeRecords } from './data/records_ipc';
   import { cny_exchangerate_controller } from './data/settings';
+  import { DialogSocket } from './modules/channel';
   //初始化礼物
   import GiftStation from './class/GiftStation';
 

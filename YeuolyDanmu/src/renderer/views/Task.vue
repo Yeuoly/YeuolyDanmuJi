@@ -66,6 +66,7 @@
 <script>
 import Loader from '../class/DanmuLoader';
 import { OrdinaryEventBus } from '../events/evnetBus';
+import { DialogSocket } from '../modules/channel';
 
 import { room_id_controller } from '../data/settings';
 import { filter_danmu_controller } from '../data/settings';
@@ -80,7 +81,8 @@ import api from '../settings/api';
 import Info from '../class/Info';
 import { speaker_controller } from '../modules/speaker';
 
-const ipc = require('electron').ipcRenderer;
+//获取窗口通讯
+import { sender } from './Index';
 
 export default {
     name : 'Task',
@@ -160,7 +162,7 @@ export default {
         async emitEvent(e){
             switch(e){
                 case 'clear-danmu':
-                    ipc.send('to-danmu','clear');
+                    sender('clear');
                     break;
                 case 'sc-30':
                     this.transSuperChat(await SuperChat(
@@ -227,7 +229,7 @@ export default {
         transDanmus(danmus){
             //向弹幕窗口发送新弹幕
             const filted_danmus = this.danmusFilter(danmus);
-            ipc.send('to-danmu','trans-danmu',filted_danmus);
+            sender('trans-danmu',filted_danmus);
             //入库保存
             addDanmus(danmus);
             //语音
@@ -238,22 +240,22 @@ export default {
         },
         //传输sc
         transSuperChat(sc){
-            ipc.send('to-danmu','trans-sc',sc);
+            sender('trans-sc',sc);
             addSC(sc);
         },
         //传输gift
         transGift(gift){
             //这里最后需要做一点调整，把礼物全部传输到一个单独显示礼物的地方
-            ipc.send('to-danmu','trans-gift',gift);
+            sender('trans-gift',gift);
             addGift(gift);
         },
         //传输舰队信息
         transGuard(guard){
-            ipc.send('to-danmu','trans-guard',guard);
+            sender('trans-guard',guard);
             addGuard(guard);
         },
         transLiveInfo(info){
-            ipc.send('to-danmu','trans-live-info',info);
+            sender('trans-live-info',info);
         },
         //过滤弹幕
         danmusFilter(danmus){
@@ -299,7 +301,7 @@ export default {
                     this.danmu_dialog_flag = true;
                 }
                 //然后发一下，这个是避免二次启动的时候初始化信息传不过去
-                ipc.send('to-danmu','trans-live-info',live_status);
+                sender('trans-live-info',live_status);
             });
         },
         closeDanmuLoader(){
@@ -318,7 +320,7 @@ export default {
         speaker_controller.onEnd(() => { this.speaker.allow = true; });
     },
     beforeDestroy() {
-        ipc.send('window-close-danmu');
+        sender('window-close-danmu');
         this.danmu_dialog_flag = false;
     },
 }

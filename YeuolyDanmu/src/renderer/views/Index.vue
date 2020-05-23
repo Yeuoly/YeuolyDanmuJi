@@ -69,9 +69,29 @@
 
 <script>
 import { DanmuTransBus, OrdinaryEventBus } from '../events/evnetBus';
-
+import { DialogSocket } from '../modules/channel';
 import Logger from '../components/items/Logger.vue';
 import INFO from '../class/Info';
+
+const socket = new DialogSocket(32862);
+socket.startServer('main', () => {
+    INFO.log('Index','主窗口通讯连接成功','green');
+});
+export const sender = (channel, data) => {
+    socket.send(JSON.stringify({channel, data}));
+};
+export const addListener = handler => {
+    socket.addListener(handler);
+}
+addListener( ev => {
+    const data = JSON.parse(ev.data);
+    switch(data['channel']){
+        case 'trans-info':
+            INFO.log(data['data']['block'],data['data']['info'],data['data']['color']);
+            break;
+    }
+});
+
 //import Account from '../data/user';
 
 const drag = require('electron-drag');
@@ -178,18 +198,6 @@ export default {
         },
         minimizeProgress(){
             ipc.send('window-min');
-        },
-        mountChannel(){
-            ipc.on('to-main', ( _sender, channel, info ) => {
-                switch(channel){
-                    case 'trans-info':
-                        this.transInfo(info.block,info.info,info.color);
-                        break;
-                }
-            });
-        },
-        transInfo(block,info,color){
-            INFO.log(block,info,color);
         },
         router(url){
             if(url === this.$route.path)return;

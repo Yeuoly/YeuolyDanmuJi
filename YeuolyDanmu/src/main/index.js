@@ -20,7 +20,6 @@ const winURL = process.env.NODE_ENV === 'development'
 //定义最大化最小化事件
 const electron = require('electron');
 
-// const fs = require('fs');
 
 const ipc = electron.ipcMain;
 //登录窗口最小化
@@ -111,6 +110,14 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+
+/**
+ * 为窗口通讯开启socket，为什么不用ipc呢？因为占资源太高了
+ */
+import { DialogSocket } from './utils/channel';
+const channel = new DialogSocket(32862);
+channel.startServer();
 
 /**
  * Auto Updater

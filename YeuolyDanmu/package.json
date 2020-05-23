@@ -61,6 +61,7 @@
     "electron-store": "^5.1.0",
     "electron-vue-windows": "^1.0.41",
     "element-ui": "^2.13.0",
+    "install": "^0.13.0",
     "md5": "^2.2.1",
     "object-sizeof": "^1.6.0",
     "odometer": "^0.4.8",
@@ -70,7 +71,8 @@
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
-    "vuex-electron": "^1.0.0"
+    "vuex-electron": "^1.0.0",
+    "ws": "^7.3.0"
   },
   "devDependencies": {
     "ajv": "^6.5.0",

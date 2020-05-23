@@ -116,7 +116,6 @@ import DanmuGroup from '../components/items/DanmuGroup';
 import SuperChatComponent from '../components/items/SuperChat';
 
 const drag = require('electron-drag');
-const ipc = require('electron').ipcRenderer;
 const win = require('electron').remote.getCurrentWindow();
 const win_id = win.id;
 require('electron').remote.getCurrentWindow().setAlwaysOnTop(true);
@@ -130,6 +129,9 @@ const color_group = store.get('color-group-using',[]);
 
 //获取全局设置
 import { global_settings , refreshSettings } from '../settings/global_settings';
+
+//获取通讯类
+import { DialogSocket } from '../modules/channel';
 
 //sc停留时间判定
 import SCTimer from '../settings/super_chat_staying_time';
@@ -268,31 +270,38 @@ export default {
         },
         //装载弹幕接收钩子
         setupRevMsg(){
-            //由于这个窗口是在渲染进程中进行的，主进程不能直接获取窗口ID，所以在窗口挂载时向主进程发送窗口ID
-            ipc.send('danmu-mounted',win_id);
             //用于接收所有传输到弹幕窗口的信息
-            ipc.on('to-danmu', ( sender, channel, msg ) => {
-                switch(channel){
+            const socket = new DialogSocket(32862);
+            socket.startServer('danmu', () => {
+                //向主窗口发送成功消息
+                socket.send(JSON.stringify({ 
+                    channel : 'trans-info',
+                    data : { block : 'DanmuDialog', info : '弹幕窗口通讯连接成功', color : 'green'}
+                }));
+            });
+            socket.addListener( ev => {
+                const data = JSON.parse(ev.data);
+                switch(data['channel']){
                     case 'trans-danmu':
-                        this.loadDanmu(msg);
+                        this.loadDanmu(data['data']);
                         break;
                     case 'trans-sc':
-                        this.loadSuperChat(msg);
+                        this.loadSuperChat(data['data']);
                         break;
                     case 'trans-gift':
-                        this.loadGift(msg);
+                        this.loadGift(data['data']);
                         break;
                     case 'trans-guard':
-                        this.loadGuard(msg);
+                        this.loadGuard(data['data']);
                         break;
                     case 'trans-live-info':
-                        this.refreshLiveInfo(msg);
+                        this.refreshLiveInfo(data['data']);
                         break;
                     case 'clear':
                         this.clear();
                         break;
                     case 'setting-color':
-                        this.color_group = msg;
+                        this.color_group = data['data'];
                         break;
                     case 'refresh-settings':
                         this.refreshGlobalSettings();
@@ -301,10 +310,7 @@ export default {
                         this.initSleeper();
                         break;
                 }
-            });
-            //向主窗口发送成功消息
-            ipc.send('to-main','trans-info',
-                { block : '[DanmuDialog]', info : '弹幕窗口连接成功', color : 'green'} );
+            })
         },
         //获取虚拟列表表头id
         //并清理内存，我也不知道我怎么写着写着就写成这鬼样子的
