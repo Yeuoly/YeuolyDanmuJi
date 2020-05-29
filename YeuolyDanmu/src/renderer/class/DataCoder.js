@@ -1,4 +1,4 @@
-import Utils from './Utils';
+import Utils from '../modules/Utils';
 
 //头部偏移、长度
 const raw_header_len = 16;
@@ -101,8 +101,4 @@ export class BiliDataDecoder extends BiliDataCoder{
             typeof fn === 'function' && fn(self);
         }
     }
-}
-
-export class BiliDataEncoder extends BiliDataCoder{
-    
 }

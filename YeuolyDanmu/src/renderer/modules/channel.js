@@ -12,18 +12,22 @@ export class DialogSocket{
         this.listeners.push(handler);
     }
 
-    startServer(path, succees_hook){
-        this.socket = new WebSocket('ws://localhost:' + this.port + '/' + path);
-        this.socket.onopen = e => {
-            succees_hook();
-        };
-        this.socket.onmessage = e => {
-            this.listeners.forEach( i => {
-                i(e);
-            });
-        };
-        this.socket.onerror = ev => {
-            
-        };
+    startServer(path, succees_hook, failure_hook, auto_restart){
+        auto_restart = auto_restart || true;
+        const connect = () => {
+            const socket = new WebSocket(`ws://localhost:${this.port}/${path}`);
+            socket.onmessage = e => this.listeners.forEach(i => i(e));
+            socket.onopen = () => succees_hook();
+            socket.onerror = () => {
+                typeof failure_hook === 'function' && failure_hook();
+                if(auto_restart){
+                    setTimeout(() => {
+                        this.socket = connect();
+                    }, 5000);
+                }
+            }
+            return socket;
+        }
+        this.socket = connect();
     }
 }

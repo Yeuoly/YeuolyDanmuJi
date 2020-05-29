@@ -69,10 +69,20 @@
 
 <script>
 import { DanmuTransBus, OrdinaryEventBus } from '../events/evnetBus';
-import { DialogSocket } from '../modules/channel';
+import { DialogSocket } from '../modules/Channel';
 import Logger from '../components/items/Logger.vue';
-import INFO from '../class/Info';
+import INFO from '../modules/Info';
 
+//初始化礼物汇率等
+import { cny_exchangerate_controller } from '../data/settings';
+import GiftStation from '../modules/GiftStation';
+GiftStation.getGiftConfig();
+cny_exchangerate_controller.init();
+
+//初始化插件
+import '../boot/plugin';
+
+//初始化窗口通讯
 const socket = new DialogSocket(32862);
 socket.startServer('main', () => {
     INFO.log('Index','主窗口通讯连接成功','green');
@@ -214,15 +224,29 @@ export default {
         //     Account.init();
         // }
     },
-    mounted() {
+    async mounted() {
         //linux等平台的窗口拖动
         const clear = drag('#drag_area');
         //windows和mac的窗口拖动
         if(!drag.supported){
             document.querySelector('#drag_area').style['-webkit-app-region'] = 'drag';
         }
-        //登录
-        //this.initAccount();
+        //启动弹幕窗口
+        const win = await this.$Win.openWin({
+            width: 300,
+            height: 730,
+            useContentSize: true,
+            webPreferences : {
+            webSecurity : false
+            },
+            resizable: true,
+            frame: false,
+            titleBarStyle: false,
+            windowConfig : {
+                router : '/danmu',
+                name : '弹幕窗口',
+            }
+        });
     },
 }
 </script>

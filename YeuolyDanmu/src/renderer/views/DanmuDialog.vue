@@ -27,7 +27,6 @@
                             :font="screen_settings.font_family"
                             :type="i.type"
                             :clear="i.clear"
-                            :event="i.event"
                             :hidder="screen_settings.danmu_hidder.on"
                             :hidder-time="screen_settings.danmu_hidder.interval"
                             @end="revVirualListStart"
@@ -119,7 +118,7 @@ const drag = require('electron-drag');
 const win = require('electron').remote.getCurrentWindow();
 const win_id = win.id;
 require('electron').remote.getCurrentWindow().setAlwaysOnTop(true);
-
+require('electron').ipcRenderer.send('danmu-mounted', win_id);
 document.title = '弹幕窗口';
 
 //初始化颜色信息
@@ -131,7 +130,7 @@ const color_group = store.get('color-group-using',[]);
 import { global_settings , refreshSettings } from '../settings/global_settings';
 
 //获取通讯类
-import { DialogSocket } from '../modules/channel';
+import { DialogSocket } from '../modules/Channel';
 
 //sc停留时间判定
 import SCTimer from '../settings/super_chat_staying_time';
@@ -140,7 +139,7 @@ import SCTimer from '../settings/super_chat_staying_time';
 import { SuperChat } from '../class/Danmu';
 
 //屏幕设置
-import Utils from '../class/Utils';
+import Utils from '../modules/Utils';
 
 const screen_settings_default = {
     uanme_used : true,
@@ -355,31 +354,9 @@ export default {
             const dom = {
                 type : type,
                 value : source,
-                event : {
-                    front : self.danmu_groups[index - 1],
-                    back : null,
-                    dom_move_event : null,
-                    dom_move_checker : null,
-                    setDomMoveEvent(callDomMove,setupLoadOff){
-                        //绑定移动事件
-                        this.dom_move_event = callDomMove;
-                        //绑定超出边界事件，当dom超出边界以后，告诉后边的元素移除front，并自己移除back
-                        setupLoadOff(() => {
-                            delete this.front.event;
-                            this.back = null;
-                        });
-                    },
-                    onMove(movement){
-                        //自身移动
-                        this.dom_move_event && this.dom_move_event(movement);
-                        //前级移动
-                        this.front.event && this.front.event.front && this.front.event.onMove(movement);
-                    }
-                },
                 id : index,
                 clear : false
             };
-            self.danmu_groups[index - 1].event.back = dom;
             self.danmu_groups.push(dom);
         },
         loadGift(gift){

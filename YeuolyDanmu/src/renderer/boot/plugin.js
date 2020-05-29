@@ -6,18 +6,15 @@ const fs = require('fs');
 const path = require('path');
 import Vue from 'vue';
 import Axios from 'axios';
-import Info from '../class/Info';
+import Info from '../modules/Info';
 import HashList from '../class/HashList';
 import { global_settings } from '../settings/global_settings';
-import { getAvatar } from '../class/Avatar';
+import { getAvatar } from '../modules/Avatar';
 import { setListenner, removeListenner } from '../data/records_ipc';
 export const plugins = [];
 export const plugin_ids = [];
 
 (function(){
-    if(require('electron').remote.getCurrentWindow().getTitle() !== '主窗口'){
-        return;
-    }
     //创建插件接口，开放Vue接口
     window.createPlugin = obj => {
         plugins.push(obj);
@@ -67,10 +64,10 @@ export const plugin_ids = [];
             errors.push('mount应该为一个函数');
         }
         if(errors.length === 0){
-            Info.log('LOAD_PLUGINS',`插件【${e.label}】验证通过`,'green');
+            Info.log('LoadPlugins',`插件【${e.label}】验证通过`,'green');
             return true;
         }else{
-            Info.error('LOAD_PLUGINS',errors.join(' | '));
+            Info.error('LoadPlugins',errors.join(' | '));
         }
     }
 
@@ -79,9 +76,9 @@ export const plugin_ids = [];
             if( checkPlugin(e) && e.default_boot){
                 try{
                     e.run(plugins_controller);
-                    Info.log('BOOT_PLUGINS',`插件【${e.label}】启动成功`,'green');
+                    Info.log('BootPlugins',`插件【${e.label}】启动成功`,'green');
                 }catch(e){
-                    Info.error('BOOT_PLUGINS', e.message + '<br />' + e.stack);
+                    Info.error('BootPlugins', e.message + '<br />' + e.stack);
                 }
             }
         });

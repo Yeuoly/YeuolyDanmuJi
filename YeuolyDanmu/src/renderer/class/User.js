@@ -1,4 +1,4 @@
-import { getAvatar } from './Avatar';
+import { getAvatar } from '../modules/Avatar';
 
 class UserClass{
     constructor(id,uid,face,lv,live_lv,live_rank){

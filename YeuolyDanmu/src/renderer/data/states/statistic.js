@@ -1,4 +1,4 @@
-import Utils from '../../class/Utils';
+import Utils from '../../modules/Utils';
 
 export default {
     total_price : 0,
@@ -11,8 +11,8 @@ export default {
     total_guard_price : 0,
     total_guard_count : 0,
     danmu_speeds : {  
-        value : [ 0 ],
-        date : [ Utils.formatDate(new Date(),'hh:mm:ss') ]
+        value : [  ],
+        date : [  ]
     },
     //这个是为后续统计做的，但考虑到现在的CPU已经挺蛋疼了，就暂时不做了
     gift_classfiy_count : []

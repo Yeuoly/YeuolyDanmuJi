@@ -1,27 +1,9 @@
 import { OrdinaryEventBus } from '../events/evnetBus';
 import actions from './records';
-import Utils from '../class/Utils';
-
-const danmu_speed_cache = {
-    accumulate_time : 0,
-    accumulate_count : 0
-};
-
-const speed_calc_interval = 30000;
+import Utils from '../modules/Utils';
 
 //挂载速度事件
-OrdinaryEventBus.$on('current-speed', v => {
-    //我知道这里代码可读性跟屎一样，反正只要知道这是个算平均速度的就行了
-    danmu_speed_cache.accumulate_time += v.time;
-    danmu_speed_cache.accumulate_count += v.count;
-    if(danmu_speed_cache.accumulate_time > speed_calc_interval){
-        const V = ( danmu_speed_cache.accumulate_count * 1000 ) / danmu_speed_cache.accumulate_time;
-        const D = Utils.formatDate(new Date(),'hh:mm:ss');
-        actions.setters.speed(V,D);
-        danmu_speed_cache.accumulate_count = 0;
-        danmu_speed_cache.accumulate_time = 0;
-    }
-});
+OrdinaryEventBus.$on('current-popular', v => actions.setters.speed(v,Utils.formatDate(new Date(),'hh:mm:ss')));
 
 export const getDailyGiftRecords = () => actions.getters.clonner.gift();
 

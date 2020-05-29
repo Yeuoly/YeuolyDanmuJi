@@ -69,8 +69,8 @@ import { IntervalTimer } from '../class/Timer';
 import { OrdinaryEventBus } from '../events/evnetBus';
 import api from '../settings/api';
 import axios from 'axios';
-import Info from '../class/Info';
-import Utils from '../class/Utils';
+import Info from '../modules/Info';
+import Utils from '../modules/Utils';
 import qs from 'querystring';
 import LiveRoomShortcut from '../components/items/LiveRoomShortcut';
 import LED from '../components/items/LED';
@@ -125,7 +125,7 @@ export default {
                     const { data } = await axios.get(`${api.bili_get_live_info}?room_id=${this.history[index].room_id}`);
                     if(data['code'] !== 0){
                         cur_len++;
-                        Info.error('GET_LIVE_INFO',`代号:${data['code']}`);
+                        Info.error('GetLiveInfo',`代号:${data['code']}`);
                     }else{
                         cur_len++;
                         this.history[index].title = data['data']['room_info']['title'];
@@ -134,14 +134,14 @@ export default {
                         this.history[index].uid = data['data']['room_info']['uid'];
                         this.history[index].short_id = data['data']['room_info']['short_id'];
                         this.history[index].up_name = data['data']['anchor_info']['base_info']['uname'];
-                        Info.log('GET_LIVE_INFO',`获取房间信息成功，房间号：${this.history[index].room_id}`);
+                        Info.log('GetLiveInfo',`获取房间信息成功，房间号：${this.history[index].room_id}`);
                         if(index === tot_len - 1){
                             this.current.cycling = false;
                             this.save();
                         }
                     }
                 }catch(error){
-                    Info.error('GET_LIVE_INFO','获取房间信息失败');
+                    Info.error('GetLiveInfo','获取房间信息失败');
                 }
                 //这里有必要设个300ms延迟，避免被B站banIP
                 setTimeout(() => {
@@ -181,7 +181,7 @@ export default {
                     }
                 });
                 if(data['code'] !== 0){
-                    Info.error('GET_LIVE_SEARCH_LIST','获取直播间列表失败');
+                    Info.error('SearchLiveList','获取直播间列表失败');
                 }
                 const list = data['data']['result']['live_user'];
                 this.search.cb( list.map( v => {
@@ -194,7 +194,7 @@ export default {
                     }
                 }));
             }catch(e){
-                Info.error('GET_LIVE_SEARCH_LIST','获取直播列表发生意外');
+                Info.error('SearchLiveList','获取直播列表发生意外');
             }
         }
     },

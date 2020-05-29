@@ -1,7 +1,7 @@
 import { User , Medal } from './User'
 import { global_settings } from '../settings/global_settings';
 
-import GiftStation from './GiftStation';
+import GiftStation from '../modules/GiftStation';
 
 export const Danmu = (
     user_id,user_uid,user_face,message,

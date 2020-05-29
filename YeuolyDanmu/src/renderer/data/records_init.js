@@ -1,5 +1,5 @@
-import Utils from '../class/Utils';
-import Info from '../class/Info';
+import Utils from '../modules/Utils';
+import Info from '../modules/Info';
 import { global_settings } from '../settings/global_settings';
 
 const fs = require('fs');

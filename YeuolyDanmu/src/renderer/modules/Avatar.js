@@ -1,7 +1,7 @@
 import axios from 'axios';
 import api from '../settings/api';
 import Store from 'electron-store';
-import HashList from './HashList';
+import HashList from '../class/HashList';
 
 /**
  * 3e8次计算平均585ms（计算能力一般的笔记本 N3450 1.10Ghz）

@@ -32,8 +32,8 @@
             <el-col :span="24">
                 <DateValueSmoothCharts
                     class="line" 
-                    title="弹幕速度统计" 
-                    subtext="不同时间段弹幕速度，其实就相当于人气"
+                    title="人气值" 
+                    subtext="不同时间段人气值总览"
                     :model="statistic.danmu_speeds"
                 />
             </el-col>
@@ -155,7 +155,7 @@ export default {
             const CNY = this.table_data.total_sc_price + this.table_data.total_guard_price / 1000
                 + this.table_data.au_price / 1000;
             return {
-                CNY : CNY,
+                CNY : CNY.toFixed(3),
                 USD : ( CNY * this.exchangerate.USD ).toFixed(3),
                 JPY : ( CNY * this.exchangerate.JPY ).toFixed(3),
                 EUR : ( CNY * this.exchangerate.EUR ).toFixed(3),

@@ -66,7 +66,6 @@
 <script>
 import Loader from '../class/DanmuLoader';
 import { OrdinaryEventBus } from '../events/evnetBus';
-import { DialogSocket } from '../modules/channel';
 
 import { room_id_controller } from '../data/settings';
 import { filter_danmu_controller } from '../data/settings';
@@ -78,8 +77,8 @@ import { addGift, addLog, addSC, writeRecords, addDanmus, addGuard, clearStatist
 import { User } from '../class/User';
 import Axios from 'axios';
 import api from '../settings/api';
-import Info from '../class/Info';
-import { speaker_controller } from '../modules/speaker';
+import Info from '../modules/Info';
+import { speaker_controller } from '../modules/Speaker';
 
 //获取窗口通讯
 import { sender } from './Index';

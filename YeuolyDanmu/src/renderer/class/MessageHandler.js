@@ -1,5 +1,5 @@
-import Utils from '../class/Utils';
-import GiftStation from './GiftStation';
+import Utils from '../modules/Utils';
+import GiftStation from '../modules/GiftStation';
 import { SuperChat , Gift , Guard, Danmu } from './Danmu';
 import { OrdinaryEventBus } from '../events/evnetBus';
 import { global_settings } from '../settings/global_settings';
@@ -60,16 +60,9 @@ export default class MessageHandler{
     speedCalc(){
         const dif = this.danmu_count.now - this.danmu_count.last;
         const speed = (dif / this.speed_info.waiting_time) * 1000;
-        //传出
-        /**
-         * 加上这个传输速度我的内心是很复杂的，一开始我是想核心模块耦合度要很低的，但是
-         * 这里就有个计算速度的，外边又有个需要速度的统计，那能怎么办，不止于再做一个叭？
-         * 再做一个又会造成性能损耗，那就用吧，耦合度我就不管了
-         */
-        OrdinaryEventBus.$emit('current-speed',{ count : dif , time : this.speed_info.waiting_time });
         for(let i in speed_list_time){
             if( speed >= speed_list_time[i].SPEED ){
-                this.speed_info = { 
+                this.speed_info = {
                     waiting_time : speed_list_time[i].INTERVAL,
                     latiao_min : speed_list_time[i].LATIAO_MIN,
                     price_min : speed_list_time[i].RPICE_MIN
@@ -200,7 +193,8 @@ export default class MessageHandler{
                 this.transLiveInfo({ fans : msg['data']['fans'] });
                 return;
             case 'YEUOLY_CUREENT_POPULAR':
-                this.transLiveInfo({ popular : msg['data']['popular'] });
+                this.transLiveInfo({ popular : msg['data']['popular']});
+                OrdinaryEventBus.$emit('current-popular', msg['data']['popular']);
                 return;
             case 'ENTRY_EFFECT':
                 //高贵用户的入场特性，我人傻了，特效还专门传的，不想做了，想做的就改这里叭（ $data

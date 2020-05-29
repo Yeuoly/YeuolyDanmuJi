@@ -9,10 +9,9 @@
 
 import axios from 'axios';
 import api from '../settings/api';
-import { room_id_controller } from '../data/settings';
 import INFO from './Info';
-import { OrdinaryEventBus } from '../events/evnetBus';
 import Utils from './Utils';
+import { room_id_controller } from '../data/settings';
 import { global_settings } from '../settings/global_settings';
 
 //辣条数量检测延迟
@@ -174,12 +173,12 @@ const GiftStation = {
                 guard_list = data['data']['guard_resources'];
                 //选出常用礼物
                 initOrdinaryList();
-                INFO.log('REFRESH_GIFT_CONFIG','刷新礼物列表成功','green');
+                INFO.log('RrefreshGiftConfig','刷新礼物列表成功','green');
             }else{
-                INFO.warning('REFRESH_GIFT_CONFIG','刷新礼物列表失败');
+                INFO.warning('RrefreshGiftConfig','刷新礼物列表失败');
             }
         }catch(e){
-            INFO.warning('REFRESH_GIFT_CONFIG','刷新礼物列表失败');
+            INFO.warning('RrefreshGiftConfig','刷新礼物列表失败');
         }
     },
     getGuardInfo(level){

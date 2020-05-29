@@ -1,8 +1,8 @@
 import Store from 'electron-store';
 import api from '../settings/api';
 import axios from 'axios';
-import INFO from '../class/Info';
-import Utils from '../class/Utils';
+import INFO from '../modules/Info';
+import Utils from '../modules/Utils';
 
 const store = new Store();
 let data = store.get('room_ids',{
@@ -16,9 +16,9 @@ function getExchangerate (){
         for(let i in response.data['rates']){
             cny_exchangerate_controller.rate[i] = response.data['rates'][i];
         }
-        INFO.log('GET_CNY_EXCHANGERATE','获取汇率成功','green');
+        INFO.log('GetCNYExchangerate','获取汇率成功','green');
     }).catch( () => {
-        INFO.warning('GET_CNY_EXCHANGERATE','获取汇率失败');
+        INFO.warning('GetCNYExchangerate','获取汇率失败');
     });
 }
 
@@ -39,16 +39,16 @@ export const room_id_controller = {
             }
         }
     },
-    setCurrent(id){
+    async setCurrent(id){
         this.current = id;
-        this.addToHistory(id);    
+        await this.addToHistory(id);
+        this.save();
     },
     addToHistory(id){
         return new Promise( async reslove => {
             if(!this.history.map( v => v.room_id ).includes(id)){
                 const data = await this.getRoomInfo(id);
                 this.history.push(data);
-                this.save();
                 reslove(data);
             }
         });

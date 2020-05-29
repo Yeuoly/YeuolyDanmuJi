@@ -36,17 +36,20 @@ const max_offset = window.innerHeight;
 export default {
     name : 'DanmuGroup',
     components : { Danmu, Guard, GiftDanmu },
-    props : ['Danmus','textColor','unameColor','font','type','index','event','hidder','hidder-time','clear'],
+    props : ['Danmus','textColor','unameColor','font','type','index','hidder','hidder-time','clear'],
     data : () => ({
         offset : 0,
-        load_off : null,
         hidder_timer : null
     }),
     methods: {
+        teleParent(){
+            const height = this.$refs.controller.offsetHeight;
+            DanmuGroupEventBus.$emit('move',height);
+        },
         move(offset){
             if(this.offset > max_offset){
-                this.load_off();
                 this.$emit('end',this.index);
+                DanmuGroupEventBus.$off('move',this.move);
                 return;
             }
             this.offset += offset;
@@ -62,11 +65,9 @@ export default {
         }
     },
     mounted() {
-        this.event.setDomMoveEvent( this.move, loadOff => {
-            this.load_off = loadOff;
-        });
         const height = this.$refs.controller.offsetHeight;
-        this.event.front.event && this.event.front.event.front && this.event.front.event.onMove(height);
+        this.teleParent();
+        DanmuGroupEventBus.$on('move',this.move);
         setTimeout(this.show, 300);
         if(this.hidder){
             this.hidder_timer = setTimeout(() => {
@@ -78,7 +79,7 @@ export default {
         }
     },
     beforeDestroy() {
-        this.move(9999999999999999);
+        DanmuGroupEventBus.$off('move',this.move);
         if(this.hidder_timer){
             clearTimeout(this.hidder_timer);
         }

@@ -65,7 +65,7 @@
 import { global_settings } from '../settings/global_settings';
 import pather from 'path';
 import fs from 'fs';
-import Info from '../class/Info';
+import Info from '../modules/Info';
 
 import VirtualList from '../components/common/VirtualList';
 

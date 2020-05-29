@@ -1,11 +1,10 @@
 import api from '../settings/api';
 import axios from 'axios';
-import INFO from './Info';
+import INFO from '../modules/Info';
 import MessageHandler from './MessageHandler';
 
 import { BiliDataCoder, BiliDataDecoder } from './DataCoder';
-
-import Utils from './Utils';
+import { inflate } from 'pako'
 
 const platform = 'web';
 const heart_beat_time = 30000;
@@ -74,13 +73,13 @@ export default class DanmuLoader{
         try{
             const { data } = await axios.get(`${api.bili_get_live_info}?room_id=${this.room_id}`);
             if(data['code'] === 0){
-                INFO.log('INIT_ROOM_STATUS','获取初始信息成功','green');
+                INFO.log('InitRoomStatus','获取初始信息成功','green');
                 live_status.fans = data['data']['anchor_info']['relation_info']['attention'];
             }else{
-                INFO.warning('INIT_ROOM_STATUS','获取初始信息失败');
+                INFO.warning('InitRoomStatus','获取初始信息失败');
             }
         }catch(e){
-            INFO.warning('INIT_ROOM_STATUS','获取初始信息失败');
+            INFO.warning('InitRoomStatus','获取初始信息失败');
         }
         INFO.log('WSConnection',`开始连接至直播间，当前房间号：${this.room_id}`);
         //获取服务器信息与token
@@ -140,7 +139,7 @@ export default class DanmuLoader{
 
     //处理消息
     onMessage(e){
-        const data = e.data;
+        const data = e.data || e;
         const bili_decoder = new BiliDataDecoder(data, self => {
             //睿站这里有个很蛋疼的地方，一次传输的消息可能有好几个封装，需要在这里分离开，你说你老老实实用JSON它不香吗
             let extrme_len = 1;
@@ -159,16 +158,18 @@ export default class DanmuLoader{
                         INFO.log('HeartBeat',`心跳成功！心跳-总次数:${this.heart_beat_times}，当前人气值：${popular}`);
                         this.message_handler.handleMessage({
                             cmd : 'YEUOLY_CUREENT_POPULAR',
-                            data : {
-                                popular
-                            }
+                            data : { popular }
                         });
                         break;
                     case 5:
-                        //处理数据主体
+                        //处理数据主体，这里可能存在压缩数据，所以需要解个压
                         const data_buf = self.getBodyBuffer();
-                        const data_json = Utils.transFormatFromBufferToJson(data_buf);
-                        this.message_handler.handleMessage(data_json);
+                        const protocol = self.getVer();
+                        if(protocol === 0){
+                            this.message_handler.handleMessage(JSON.parse(new TextDecoder().decode(new Uint8Array(data_buf))));
+                        }else if(protocol === 2){
+                            this.onMessage(new Blob([inflate(new Uint8Array(data_buf))]));
+                        }
                         break;
                 }
                 extrme_len = bili_decoder.getLastLen();
@@ -187,6 +188,10 @@ export default class DanmuLoader{
                 }
             }
         });
+    }
+
+    sloveMessage(arr){
+
     }
 
     //心跳
@@ -222,7 +227,7 @@ export default class DanmuLoader{
     }
 
     onError(e){
-        INFO.error('ERROR','与服务器连接出错，将在五秒内尝试重连');
+        INFO.error('WSConnection','与服务器连接出错，将在五秒内尝试重连');
         setTimeout(() => {
             this.socket.close(3001);
             this.startLoader();

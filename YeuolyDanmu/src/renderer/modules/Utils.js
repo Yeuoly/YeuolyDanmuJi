@@ -60,13 +60,13 @@ class Utils{
             const item = bytes[i]
             let number = ''
             if (item >= 240) {
-            j = 4
+                j = 4
             } else if (item >= 224) {
-            j = 3
+                j = 3
             } else if (item >= 192) {
-            j = 2
+                j = 2
             } else if (item < 128) {
-            j = 1
+                j = 1
             }
             const filter = filterArray[j - 1]
             for (let k = 0; k < j; k++) {
@@ -79,7 +79,7 @@ class Utils{
             for (let n = 0; n < 6 - l; n++) {
                 r = '0' + r
             }
-            number = number + r
+                number = number + r
             }
             str = str + String.fromCharCode(parseInt(number, 2))
         }

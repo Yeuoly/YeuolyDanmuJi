@@ -43,8 +43,8 @@
 </template>
 
 <script>
-import Info from '../class/Info';
-import Utils from '../class/Utils';
+import Info from '../modules/Info';
+import Utils from '../modules/Utils';
 import api from '../settings/api';
 import Store from 'electron-store';
 import axios from 'axios';
@@ -54,7 +54,7 @@ import VOdometer from '../components/items/VOdometer';
 import { MessageBox } from 'element-ui';
 import { getDailyGiftRecords, getDailyDanmuRecords } from '../data/records_ipc';
 import { OrdinaryEventBus } from '../events/evnetBus';
-import { getAvatarOrigin, getAvatarCount, setAvatar, getAvatarsList, saveAvatars } from '../class/Avatar';
+import { getAvatarOrigin, getAvatarCount, setAvatar, getAvatarsList, saveAvatars } from '../modules/Avatar';
 
 const store = new Store();
 

@@ -50,7 +50,7 @@ import { room_id_controller } from '../data/settings';
 import { OrdinaryEventBus } from '../events/evnetBus';
 import Axios from 'axios';
 import api from '../settings/api';
-import Info from '../class/Info';
+import Info from '../modules/Info';
 
 export default {
     name : "DDRank",
@@ -74,9 +74,9 @@ export default {
             try{
                 const { data } = await Axios.get(`${api.bili_get_seven_rank}?roomid=${target_info.room_id}&ruid=${target_info.uid}`);
                 this.seven_rank = response.data['data']['list'];
-                Info.log('GET_SEVEN_RANK','获取七日榜成功','green');
+                Info.log('GetSevenDayRank','获取七日榜成功','green');
             }catch(e){
-                Info.warning('GET_SEVEN_RANK','获取七日榜失败');
+                Info.warning('GetSevenDayRank','获取七日榜失败');
             }
             const rank_i = getInteractionalDDs();
             const rank_p = getPaiedDDs();
