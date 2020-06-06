@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron'
-
+import { DialogSocket } from './utils/channel';
+global.channel = new DialogSocket(32862);
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -17,52 +18,37 @@ const winURL = process.env.NODE_ENV === 'development'
   : `file://${__dirname}/index.html`
 
 
-//定义最大化最小化事件
+process.on('uncaughtException', err => {
+  console.log('求你了别退了');
+});
+
+//定义最小化事件
 const electron = require('electron');
-
-
 const ipc = electron.ipcMain;
 //登录窗口最小化
 ipc.on('window-min', function () {
   mainWindow.minimize();
 });
-//登录窗口最大化
-ipc.on('window-max', function () {
-  if (mainWindow.isMaximized()) {
-    mainWindow.restore();
-  } else {
-    mainWindow.maximize();
-  }
-});
-//关闭弹幕窗口
-ipc.on('window-close-danmu',function () {
-  if(danmu_win_id){
-    BrowserWindow.fromId(danmu_win_id).close();
-    danmu_win_id = 0;
-  }
-});
 //关闭窗口
+
+//这个是个大工程？大概，首先用ipc发出信号关掉两个客户端的websocket，再执行关闭服务器
 ipc.on('window-close', function () {
-  mainWindow.close();
-  if(danmu_win_id){
-    BrowserWindow.fromId(danmu_win_id).close();
-  }
+  mainWindow.webContents.send('close-websocket');
+  BrowserWindow.fromId(danmu_win_id).webContents.send('close-websocket');
 });
-//向弹幕窗口的通讯
-ipc.on('to-danmu',function(sender,channel,msg){
-  if( danmu_win_id && BrowserWindow.fromId(danmu_win_id)){
-    BrowserWindow.fromId(danmu_win_id).webContents.send('to-danmu',channel,msg);
+let closed_num = 0;
+ipc.on('closed-websocket', () => {
+  if(++closed_num === 2){
+    global.channel.stopServer(() => {
+      BrowserWindow.fromId(danmu_win_id).close();
+      mainWindow.close();
+    });
   }
-});
+})
 //获取弹幕窗口
 ipc.on('danmu-mounted',function(sender,id){
   danmu_win_id = id;
 });
-//向主窗口的通讯
-ipc.on('to-main',function(sender,channel,msg){
-  mainWindow.webContents.send('to-main',channel,msg);
-});
-
 function createWindow () {
   /**
    * Initial window options
@@ -115,8 +101,7 @@ app.on('activate', () => {
 /**
  * 为窗口通讯开启socket，为什么不用ipc呢？因为占资源太高了
  */
-import { DialogSocket } from './utils/channel';
-const channel = new DialogSocket(32862);
+
 channel.startServer();
 
 /**

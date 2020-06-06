@@ -118,7 +118,7 @@ const drag = require('electron-drag');
 const win = require('electron').remote.getCurrentWindow();
 const win_id = win.id;
 require('electron').remote.getCurrentWindow().setAlwaysOnTop(true);
-require('electron').ipcRenderer.send('danmu-mounted', win_id);
+const ipc = require('electron').ipcRenderer;
 document.title = '弹幕窗口';
 
 //初始化颜色信息
@@ -444,6 +444,8 @@ export default {
         this.setupRevMsg();
         //重置一下窗口穿透，开发者模式下不重置会很蛋疼
         win.setIgnoreMouseEvents(false);
+        //传输窗口id
+        ipc.send('danmu-mounted', win_id);
     },
 }
 </script>

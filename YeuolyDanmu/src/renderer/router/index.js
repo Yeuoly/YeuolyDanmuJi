@@ -123,6 +123,13 @@ const router = new Router({
           meta : {
             title : '历史'
           }
+        },{
+          name : 'custom-danmu',
+          path : '/index/custom-danmu',
+          component: () => import('@/views/CustomDanmu.vue'),
+          meta : {
+            title : '自定义弹幕风格'
+          }
         }
       ]
     },

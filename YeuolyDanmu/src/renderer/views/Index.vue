@@ -137,6 +137,9 @@ export default {
             },{
                 name : '高级设置',
                 url : '/index/advance-settings'
+            },{
+                name : '自定义弹幕',
+                url : '/index/custom-danmu'
             }]
         },/*{
             name : '账户',
@@ -352,7 +355,7 @@ export default {
         left: 0;
         top: 0;
         bottom: 0;
-        overflow-y: none;
+        overflow-x: hidden;
         /* background-color: rgb(37,37,38); */
         border-radius: 10px 0 0 10px;
     }

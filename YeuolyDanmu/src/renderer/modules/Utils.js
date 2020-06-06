@@ -38,56 +38,6 @@ class Utils{
         return res.buffer;
     }
 
-    transFormatFromBufferToJson(msg){
-        const ary = new Uint8Array(msg);
-        const str = this.byteToString(ary);
-        return JSON.parse(str);
-    }
-
-    //网上抄的
-    //https://blog.csdn.net/kangear/article/details/82497104
-    byteToString(array) {
-        const bytes = array.slice(0)
-        const filterArray = [
-            [0x7f],
-            [0x1f, 0x3f],
-            [0x0f, 0x3f, 0x3f],
-            [0x07, 0x3f, 0x3f, 0x3f]
-        ]
-        let j
-        let str = ''
-        for (let i = 0; i < bytes.length; i = i + j) {
-            const item = bytes[i]
-            let number = ''
-            if (item >= 240) {
-                j = 4
-            } else if (item >= 224) {
-                j = 3
-            } else if (item >= 192) {
-                j = 2
-            } else if (item < 128) {
-                j = 1
-            }
-            const filter = filterArray[j - 1]
-            for (let k = 0; k < j; k++) {
-            let r = (bytes[i + k] & filter[k]).toString(2)
-            const l = r.length
-            if (l > 6) {
-                number = r
-                break
-            }
-            for (let n = 0; n < 6 - l; n++) {
-                r = '0' + r
-            }
-                number = number + r
-            }
-            str = str + String.fromCharCode(parseInt(number, 2))
-        }
-        console.log(array);
-        console.log(str);
-        return str
-    }
-
     objDeepCopy(source) {
         const sourceCopy = source instanceof Array ? [] : {};
         for (var item in source) {
@@ -121,6 +71,44 @@ class Utils{
                 
             }else if(type === 'undefined'){
                 src[i] = dist[i];
+            }
+        }
+    }
+
+    fillDefaultOptions(src, dist){
+        for(let i in dist){
+            const type = typeof src[i];
+            if(['array','object'].includes(type)){
+                this.fillDefaultOptions(src[i], dist[i]);
+            }else{
+                src[i] = src[i] || dist[i];
+            }
+        }
+    }
+
+    dom = {
+        getElementPosition(dom){
+            return {
+                x : dom.offsetLeft,
+                y : dom.offsetTop
+            }
+        },
+        getEventPosition(ev){
+            return {
+                x : ev.clientX,
+                y : ev.clientY
+            }
+        },
+        getEventRelativePosition(ev){
+            return {
+                x : ev.offsetX,
+                y : ev.offsetY
+            }
+        },
+        getElementSize(dom){
+            return {
+                width : dom.offsetWidth,
+                height : dom.offsetHeight
             }
         }
     }

@@ -1,3 +1,5 @@
+const ipc = require('electron').ipcRenderer;
+
 export class DialogSocket{
     constructor(port){
         this.port = port;
@@ -29,5 +31,9 @@ export class DialogSocket{
             return socket;
         }
         this.socket = connect();
+        ipc.on('close-websocket', () => {
+            this.socket.close(3140);
+            ipc.send('closed-websocket');
+        });
     }
 }

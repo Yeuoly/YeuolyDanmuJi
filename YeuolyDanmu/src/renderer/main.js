@@ -4,6 +4,7 @@ import axios from 'axios'
 //初始化设置
 import './style/danmu.css';
 import './style/index.css';
+import './directive/index';
 
 axios.defaults.withCredentials = true;
 

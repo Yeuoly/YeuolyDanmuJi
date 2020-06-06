@@ -109,6 +109,17 @@ export default {
                     },
                 },
                 introduction : '更改缓存模块，添加头像刷新、读弹幕'
+            },{
+                version : 'v1.0.6',
+                date : '2020/5/30',
+                git_code : 'fca69552ef2ce6535578caf72777ba425ec095ce',
+                downloads : {
+                    windows : {
+                         x64 : 'http://downloads.srmxy.cn/YeuolyDanmu-1.0.6.rar',
+                        x86 : ''
+                    },
+                },
+                introduction : '更换通讯方式，修复无法加载弹幕，更改人气统计算法，优化代码结构'
             }]
         }
     },
