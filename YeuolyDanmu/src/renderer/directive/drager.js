@@ -55,7 +55,7 @@ Vue.directive('drag-move',{
             el.addEventListener('mousedown', ev => {
                 const { x, y } = Utils.dom.getEventRelativePosition(ev);
                 //以3px为界，没过界则算作resize，过了就算move
-                if(x > 3 && y > 3 && x < opts.options.size.width - 3 && y < opts.options.size.height - 3){
+                if(x < opts.options.size.width - 3 && y < opts.options.size.height - 3){
                     origin_dom_pos.x = parseInt(el.style.left.replace(/\px/g,''));
                     origin_dom_pos.y = parseInt(el.style.top.replace(/\px/g,''));
                     origin_pos = Utils.dom.getEventPosition(ev);
@@ -68,7 +68,7 @@ Vue.directive('drag-move',{
                 if(!vnode.drag.moving && !vnode.drag.resizing){
                     //如果没有正在移动，判断鼠标位置设置鼠标图标
                     const { x , y } = Utils.dom.getEventRelativePosition(ev);
-                    if(x > 3 && y > 3 && x < opts.options.size.width - 3 && y < opts.options.size.height - 3){
+                    if(x < opts.options.size.width - 3 && y < opts.options.size.height - 3){
                         parent.style.cursor = 'move';
                     }else{
                         parent.style.cursor = 'initial';
@@ -76,7 +76,7 @@ Vue.directive('drag-move',{
                 };
             });
             el.addEventListener('mouseleave', ev => {
-                if(!vnode.drag.moving){
+                if(!vnode.drag.moving && !vnode.drag.resizing){
                     parent.style.cursor = 'initial';
                 }
             });
@@ -94,6 +94,10 @@ Vue.directive('drag-move',{
     }
 });
 
+/**
+ * 这里先说明一下，因为第一个懒，第二个为了降低逻辑复杂度和提高性能
+ * 只提供左右和右下三个方向的resize
+ */
 Vue.directive('drag-resize',{
     bind(el, binding, vnode, oldVnode){
         binding.value = binding.value || {};
@@ -116,35 +120,76 @@ Vue.directive('drag-resize',{
             Utils.fillDefaultOptions(binding.value, default_binding);
             const opts = binding.value;
             vnode.drag.resizing = false;
-            //判定鼠标样式
-            const direction = ({ x, y }) => {
-                const res = { dirs : [], cursor : '' };
-                if(x < 3){
-                    res.dirs.push('left');
-                }else if(x > opts.options.size.width - 3){
-                    res.dirs.push('right')
+            let origin_mouse_pos = { x : 0, y :0 };
+            let origin_size = { width : 0, height :0 };
+            let direction = 0;
+            const resize = ev => {
+                const { x, y } = Utils.dom.getEventPosition(ev);
+                const movement_x = x - origin_mouse_pos.x;
+                const movement_y = y - origin_mouse_pos.y;
+                const target_width = origin_size.width + movement_x;
+                const target_height = origin_size.height + movement_y;
+                if(direction === 1 && target_width >= 6 && target_width <= opts.options.area.width - opts.position.x){
+                    el.style.width = target_width + 'px';
+                }else if(direction === 2 && target_height >= 6 && target_height <= opts.options.area.height - opts.position.y){
+                    el.style.height = target_height + 'px';
+                }else if(target_width >= 6 && target_width <= opts.options.area.width - opts.position.x &&
+                    target_height >= 6 && target_height <= opts.options.area.height - opts.position.y){
+                    el.style.width = target_width + 'px';
+                    el.style.height = target_height + 'px';
                 }
-                if(y < 3){
-                    res.dirs.push('top');
-                }else if(y > opts.options.size.height - 3){
-                    res.dirs.push('bottom');
-                }
-
-                return res;
             }
-
+            //x y为相对坐标
+            const direct = ({ x, y }) => {
+                if(x >= opts.options.size.width - 3){
+                    if(y >= opts.options.size.height - 3){
+                        return 3;
+                    }else{
+                        return 1;
+                    }
+                }else if(y >= opts.options.size.height - 3){
+                    return 2;
+                }
+            }
             el.addEventListener('mousemove', ev => {
                 if(!vnode.drag.resizing && !vnode.drag.moving){
-                    const dirs = direction(Utils.dom.getEventRelativePosition(ev));
-                    
+                    const { x, y } = Utils.dom.getEventRelativePosition(ev);
+                    direction = direct({x, y});
+                    let style;
+                    switch(direction){
+                        case 0: style = 'initial'; break;
+                        case 1: style = 'e-resize'; break;
+                        case 2: style = 'n-resize'; break;
+                        case 3: style = 'nw-resize'; break;
+                    }
+                    parent.style.cursor = style;
                 }
             });
             el.addEventListener('mousedown', ev => {
-
+                const { x, y } = Utils.dom.getEventRelativePosition(ev);
+                if(x >= opts.options.size.width - 3 || y >= opts.options.size.height - 3){
+                    vnode.drag.resizing = true;
+                    direction = direct({x, y});
+                    origin_size.width = parseInt(el.style.width.replace(/\px/g,''));
+                    origin_size.height = parseInt(el.style.height.replace(/\px/g,''));
+                    document.body.addEventListener('mousemove', resize);
+                }
             });
-            document.addEventListener('mouseup', ev => {
-
+            const remover = () => {
+                vnode.drag.resizing = false;
+                document.body.removeEventListener('mousemove', resize);
+                opts.options.size.width = parseInt(el.style.width.replace(/\px/g,''));
+                opts.options.size.height = parseInt(el.style.height.replace(/\px/g,''));
+            }
+            el.addEventListener('mouseleave', ev => {
+                if(!vnode.drag.moving && !vnode.drag.resizing){
+                    parent.style.cursor = 'initial';
+                }
             });
+            document.body.addEventListener('mousedown', ev => {
+                origin_mouse_pos = Utils.dom.getEventPosition(ev);
+            });
+            document.body.addEventListener('mouseup', remover);
         });
     }
 });

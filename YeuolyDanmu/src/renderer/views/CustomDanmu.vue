@@ -10,15 +10,45 @@
         <el-col :span="18">
             <div ref="drawer" id="drawer">
                 <div v-for="(i, key) in current_danmu_decoration" :key="key" style="width:100%;height:100%">
-                    <div v-if="i.type === 'message'" class="message" :style="i.css || ''" v-drag-move="i.options" v-focus>
+                    <div v-if="i.type === 'message'" 
+                         class="message" 
+                         :style="i.css || ''" 
+                         v-drag-move="i.options" 
+                         v-drag-resize="i.options" 
+                         v-focus
+                    >
                         {{ test_danmu.message }}
                     </div>
-                    <div v-else-if="i.type === 'face'" class="message" :style="i.css || ''" v-drag-move="i.options">
+                    <div v-else-if="i.type === 'face'" 
+                         class="message" 
+                         :style="i.css || ''" 
+                         v-drag-move="i.options" 
+                         v-drag-resize="i.options" 
+                         v-focus
+                    >
 
                     </div>
-                    <div v-else-if="i.type === 'medal'" class="message" :style="i.css || ''" v-drag-move="i.options"></div>
-                    <div v-else-if="i.type === 'ul'" class="message" :style="i.css || ''" v-drag-move="i.options"></div>
-                    <div v-else-if="i.type === 'guard'" class="message" :style="i.css || ''" v-drag-move="i.options"></div>
+                    <div v-else-if="i.type === 'medal'" 
+                         class="message" 
+                         :style="i.css || ''" 
+                         v-drag-move="i.options" 
+                         v-drag-resize="i.options" 
+                         v-focus
+                    ></div>
+                    <div v-else-if="i.type === 'ul'" 
+                         class="message" 
+                         :style="i.css || ''" 
+                         v-drag-move="i.options" 
+                         v-drag-resize="i.options" 
+                         v-focus
+                    ></div>
+                    <div v-else-if="i.type === 'guard'" 
+                         class="message" 
+                         :style="i.css || ''" 
+                         v-drag-move="i.options" 
+                         v-drag-resize="i.options" 
+                         v-focus
+                    ></div>
                 </div>
             </div>
         </el-col>
