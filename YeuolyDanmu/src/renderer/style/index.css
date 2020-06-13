@@ -176,7 +176,18 @@
 .w20{ width: 20%; }
 .w10{ width: 10%; }
 .w5 { width: 5%; }
+/*************************************/
 
+.h100{ height: 100%; }
+.h90{ height: 90%; }
+.h80{ height: 80%; }
+.h75{ height: 75%; }
+.h60{ height: 60%; }
+.h40{ height: 40%; }
+.h25{ height: 25%; }
+.h20{ height: 20%; }
+.h10{ height: 10%; }
+.h5 { height: 5%; }
 /*************************************/
 
 .text-grey{ color: grey; }
@@ -202,7 +213,14 @@
 .text-24{ font-size: 24px; }
 .text-25{ font-size: 25px; }
 
+.text-left{ text-align: left; }
+.text-right{ text-align: right; }
+
 .left{ float: left; }
 .right{ float: right; }
+
+.clickable {
+  cursor: pointer;
+}
 
 @import "../assets/icon/iconfont.css";

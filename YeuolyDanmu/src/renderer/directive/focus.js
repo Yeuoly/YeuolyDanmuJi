@@ -2,13 +2,13 @@ import Vue from 'vue';
 
 Vue.directive('focus',{
     bind(el, binding, vnode){
-        const focus = { on : false, left : false };
+        const focus = { on : false, left : true };
         const mouseFunc = [
             () => { if(focus.left) focus.on = false; else focus.on = true; },
             () => { focus.left = true; },
             () => { focus.left = false; }
-        ]
-        binding.func = mouseFunc;
+        ];
+        vnode.focus = { func : mouseFunc };
         document.body.addEventListener('mousedown', mouseFunc[0]);
         el.addEventListener('mouseleave', mouseFunc[1]);
         el.addEventListener('mouseenter', mouseFunc[2]);
@@ -23,19 +23,24 @@ Vue.directive('focus',{
         el.style.backgroundPosition = position;
         el.style.backgroundSize = size;
         el.style.backgroundRepeat = 'no-repeat';
-        console.log(require('../assets/blue-point.png'));
         Object.defineProperty(focus, 'on', {
             set(v){
                 if(v){
                     el.style.backgroundImage = line;
+                    if(binding.value && typeof binding.value.event === 'function'){
+                        binding.value.event('focus', binding.value.index || 0);
+                    }
                 }else{
                     el.style.backgroundImage = '';
+                    if(binding.value && typeof binding.value.event === 'function'){
+                        binding.value.event('unfocus', binding.value.index || 0);
+                    }
                 }
             }
         });
     },
-    unbind(el, binding){
-        const mouseFunc = binding.func;
+    unbind(el, binding, vnode){
+        const mouseFunc = vnode.focus.func;
         document.body.removeEventListener('mouseleave', mouseFunc[0]);
         el.removeEventListener('mouseleave', mouseFunc[1]);
         el.removeEventListener('mouseenter', mouseFunc[2]);

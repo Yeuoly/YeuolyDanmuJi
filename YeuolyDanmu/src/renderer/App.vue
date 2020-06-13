@@ -61,4 +61,8 @@
         -webkit-box-shadow: inset 0 0 6px rgba(193,193,193);
         background-color: rgb(193,193,193);
     }
+
+    .v-modal{
+      border-radius: 10px;
+    }
 </style>
