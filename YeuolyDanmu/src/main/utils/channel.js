@@ -1,7 +1,7 @@
 import express from 'express';
 import http from 'http';
 
-export class DialogSocket{
+export class DialogChannel{
     constructor(port){
         this.port = port;
         this.listeners = [];

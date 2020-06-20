@@ -1,6 +1,6 @@
 <template>
     <div style="height:100%">
-        <div id="handle" class="danmu-dialog"  :style="{ transform : master_transform }">
+        <div ref="handle" id="handle" class="danmu-dialog" :style="{ transform: master_transform }">
             <div id="ctrl-area">
                 <i class="el-icon-setting" 
                     @click="handleSettingDialog"
@@ -130,7 +130,7 @@ const color_group = store.get('color-group-using',[]);
 import { global_settings , refreshSettings } from '../settings/global_settings';
 
 //获取通讯类
-import { DialogSocket } from '../modules/Channel';
+import { DialogChannel } from '../modules/Channel';
 
 //sc停留时间判定
 import SCTimer from '../settings/super_chat_staying_time';
@@ -204,12 +204,6 @@ export default {
         return data; 
     },
     computed : {
-        text_color(index){
-            if(this.color_group.length > 0)
-                return index => this.color_group[index %  this.color_group.length];
-            else
-                return '#ffffff';
-        },
         backgroundColor(){
             return `rgba(${ this.screen_settings.backgound_color === 1 ? 
             '0,0,0' : '255,255,255' },${ this.screen_settings.opacity / 100 })`;
@@ -229,6 +223,12 @@ export default {
         }
     },
     methods: {
+        text_color(index){
+            if(this.color_group.length > 0)
+                return this.color_group[index %  this.color_group.length];
+            else
+                return '#ffffff';
+        },
         saveColorSettings(){
             store.set('danmu-dialog|screen_settings',this.screen_settings);
         },
@@ -270,16 +270,22 @@ export default {
         //装载弹幕接收钩子
         setupRevMsg(){
             //用于接收所有传输到弹幕窗口的信息
-            const socket = new DialogSocket(32862);
-            socket.startServer('danmu', () => {
+            const messager = new DialogChannel(1);
+            messager.startServer(() => {
                 //向主窗口发送成功消息
-                socket.send(JSON.stringify({ 
+                messager.send({ 
                     channel : 'trans-info',
                     data : { block : 'DanmuDialog', info : '弹幕窗口通讯连接成功', color : 'green'}
-                }));
+                });
             });
-            socket.addListener( ev => {
-                const data = JSON.parse(ev.data);
+            this.$refs.handle.addEventListener('mousedown', () => {
+                messager.setWindowMoveState(true);
+            });
+            this.$refs.handle.addEventListener('mouseup', () => {
+                messager.setWindowMoveState(false);
+            });
+            messager.addListener( ev => {
+                const data = ev;
                 switch(data['channel']){
                     case 'trans-danmu':
                         this.loadDanmu(data['data']);
@@ -435,12 +441,6 @@ export default {
         },
     },
     mounted() {
-        //linux等平台的窗口拖动
-        const clear = drag('#handle');
-        //windows和mac的窗口拖动
-        if(!drag.supported){
-            document.querySelector('#handle').style['-webkit-app-region'] = 'drag';
-        }
         this.setupRevMsg();
         //重置一下窗口穿透，开发者模式下不重置会很蛋疼
         win.setIgnoreMouseEvents(false);

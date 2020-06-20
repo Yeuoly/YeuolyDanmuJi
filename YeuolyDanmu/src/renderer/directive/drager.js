@@ -23,8 +23,8 @@ Vue.directive('drag-move',{
             const parent = binding.value.parent || el.parentElement;
             const states = getParentStates(parents);
             const default_binding = {
-                position : { x : 0, y : 0, immediate : false },
                 options : {
+                    position : { x : 0, y : 0, immediate : false },
                     area : { 
                         width : parent.offsetWidth,
                         height : parent.offsetHeight,
@@ -40,8 +40,8 @@ Vue.directive('drag-move',{
             const opts = binding.value;
             parent.style.position = 'relative';
             el.style.position = 'absolute';
-            el.style.top = opts.position.y + 'px';
-            el.style.left = opts.position.x + 'px';
+            el.style.top = opts.options.position.y + 'px';
+            el.style.left = opts.options.position.x + 'px';
             el.style.width = opts.options.size.width + 'px';
             el.style.height = opts.options.size.height + 'px';
             //记录点击时的鼠标绝对坐标，用于计算位移量
@@ -61,14 +61,14 @@ Vue.directive('drag-move',{
                 //判断是否过界
                 if(target_x <= barrier.x && target_x >= 0){
                     el.style.left = target_x + 'px';
-                    if(opts.position.immediate){
-                        opts.position.x = target_x;
+                    if(opts.options.position.immediate){
+                        opts.options.position.x = target_x;
                     }
                 }
                 if(target_y <= barrier.y && target_y >= 0){
                     el.style.top = target_y + 'px';
-                    if(opts.position.immediate){
-                        opts.position.y = target_y;
+                    if(opts.options.position.immediate){
+                        opts.options.position.y = target_y;
                     }
                 }
             }
@@ -109,8 +109,8 @@ Vue.directive('drag-move',{
                 states.moving = false;
                 vnode.drag.moving = false;
                 document.body.removeEventListener('mousemove',mouseMove);
-                opts.position.x = parseInt(el.style.left.replace(/\px/g,''));
-                opts.position.y = parseInt(el.style.top.replace(/\px/g,''));
+                opts.options.position.x = parseInt(el.style.left.replace(/\px/g,''));
+                opts.options.position.y = parseInt(el.style.top.replace(/\px/g,''));
             }
             document.body.addEventListener('mouseup', remover);
             vnode.drag.move.mouseup = remover;
@@ -134,8 +134,8 @@ Vue.directive('drag-resize',{
             const parent = binding.value.parent || el.parentElement;
             const states = getParentStates(parents);
             const default_binding = {
-                position : { x : 0, y : 0 },
                 options : {
+                    position : { x : 0, y : 0 },
                     area : { 
                         width : parent.offsetWidth,
                         height : parent.offsetHeight
@@ -220,8 +220,8 @@ Vue.directive('drag-resize',{
                     direction = direct({x, y});
                     origin_size.width = parseInt(el.style.width.replace(/\px/g,''));
                     origin_size.height = parseInt(el.style.height.replace(/\px/g,''));
-                    barrier.width = opts.options.area.width - opts.position.x;
-                    barrier.height = opts.options.area.height - opts.position.y;
+                    barrier.width = opts.options.area.width - opts.options.position.x;
+                    barrier.height = opts.options.area.height - opts.options.position.y;
                     document.body.addEventListener('mousemove', resize);
                 }
             });

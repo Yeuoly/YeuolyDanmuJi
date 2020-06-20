@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-container>
-            <el-aside width="150px">
+            <el-aside width="150px" style="user-select: none">
                 <el-menu
                     style="height:100%"
                     background-color="#3B3F52"
@@ -44,7 +44,7 @@
         <el-container>
             <el-header id="header">
                 <h1 class="title">{{ $route.meta.title }}</h1>
-                <div id="drag_area"></div>
+                <div id="drag_area" @mousedown="windowMove(true)" @mouseup="windowMove(false)"></div>
                 <i id="close" class="controller el-icon-close" @click="closeProgress"></i>
                 <i id="minimize" class="controller el-icon-minus" @click="minimizeProgress"></i>
                 <!-- <div id="index-user">
@@ -69,7 +69,7 @@
 
 <script>
 import { DanmuTransBus, OrdinaryEventBus } from '../events/evnetBus';
-import { DialogSocket } from '../modules/Channel';
+import { DialogChannel } from '../modules/Channel';
 import Logger from '../components/items/Logger.vue';
 import INFO from '../modules/Info';
 
@@ -83,21 +83,20 @@ cny_exchangerate_controller.init();
 import '../boot/plugin';
 
 //初始化窗口通讯
-const socket = new DialogSocket(32862);
-socket.startServer('main', () => {
+const messager = new DialogChannel(0);
+messager.startServer(() => {
     INFO.log('Index','主窗口通讯连接成功','green');
 });
 export const sender = (channel, data) => {
-    socket.send(JSON.stringify({channel, data}));
+    messager.send({channel, data});
 };
 export const addListener = handler => {
-    socket.addListener(handler);
+    messager.addListener(handler);
 }
 addListener( ev => {
-    const data = JSON.parse(ev.data);
-    switch(data['channel']){
+    switch(ev['channel']){
         case 'trans-info':
-            INFO.log(data['data']['block'],data['data']['info'],data['data']['color']);
+            INFO.log(ev['data']['block'],ev['data']['info'],ev['data']['color']);
             break;
     }
 });
@@ -206,6 +205,9 @@ export default {
         }
     }),
     methods: {
+        windowMove(state){
+            messager.setWindowMoveState(state);
+        },
         closeProgress(){
             ipc.send('window-close');
         },
@@ -228,12 +230,6 @@ export default {
         // }
     },
     async mounted() {
-        //linux等平台的窗口拖动
-        const clear = drag('#drag_area');
-        //windows和mac的窗口拖动
-        if(!drag.supported){
-            document.querySelector('#drag_area').style['-webkit-app-region'] = 'drag';
-        }
         //启动弹幕窗口
         const win = await this.$Win.openWin({
             width: 300,

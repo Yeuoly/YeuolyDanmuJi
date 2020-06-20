@@ -59,13 +59,13 @@
                                     <div class="text-left">x : </div>
                                 </el-col>
                                 <el-col :span="9">
-                                    <input class="attributes-editor" v-model.number="attributes.current.options.position.x" />
+                                    <input class="attributes-editor" v-model.number="attributes.current.options.options.position.x" />
                                 </el-col>
                                 <el-col :span="3">
                                    <div class="text-right">y : </div>
                                 </el-col>
                                 <el-col :span="9">
-                                    <input class="attributes-editor" v-model.number="attributes.current.options.position.y" />
+                                    <input class="attributes-editor" v-model.number="attributes.current.options.options.position.y" />
                                 </el-col>
                             </el-row>
                         </el-col>
@@ -125,8 +125,8 @@ export default {
             },
             type : 'backbroad',
             options : {
-                position : { x : 0, y : 0, immediate : true },
                 options : {
+                    position : { x : 0, y : 0, immediate : true },
                     size : { width : 625, height: 400, immediate : true }
                 },
                 index : 0
@@ -135,8 +135,8 @@ export default {
             css : {},
             type : 'message',
             options : {
-                position : { x : 260, y : 190, immediate : true },
                 options : {
+                    position : { x : 0, y : 0, immediate : true },
                     size : { width : 100, height: 30, immediate : true }
                 },
                 index : 1

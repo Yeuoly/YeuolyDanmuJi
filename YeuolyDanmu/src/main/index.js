@@ -1,6 +1,6 @@
-import { app, BrowserWindow } from 'electron'
-import { DialogSocket } from './utils/channel';
-global.channel = new DialogSocket(32862);
+import { app, BrowserWindow, remote } from 'electron'
+import { windowMove } from './move';
+
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -11,16 +11,14 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow;
+let danmuWindow;
 let danmu_win_id;
+let main_win_id;
 
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
 
-
-process.on('uncaughtException', err => {
-  console.log('求你了别退了');
-});
 
 //定义最小化事件
 const electron = require('electron');
@@ -30,25 +28,21 @@ ipc.on('window-min', function () {
   mainWindow.minimize();
 });
 //关闭窗口
-
-//这个是个大工程？大概，首先用ipc发出信号关掉两个客户端的websocket，再执行关闭服务器
 ipc.on('window-close', function () {
-  mainWindow.webContents.send('close-websocket');
-  BrowserWindow.fromId(danmu_win_id).webContents.send('close-websocket');
-});
-let closed_num = 0;
-ipc.on('closed-websocket', () => {
-  if(++closed_num === 2){
-    global.channel.stopServer(() => {
+  try{
+    if(main_win_id){
+      BrowserWindow.fromId(main_win_id).close();
+
+    }
+    if(danmu_win_id){
       BrowserWindow.fromId(danmu_win_id).close();
-      mainWindow.close();
-    });
+    }
+  }catch(e){
+    
   }
-})
-//获取弹幕窗口
-ipc.on('danmu-mounted',function(sender,id){
-  danmu_win_id = id;
 });
+
+
 function createWindow () {
   /**
    * Initial window options
@@ -95,14 +89,39 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
-})
+});
 
-
-/**
- * 为窗口通讯开启socket，为什么不用ipc呢？因为占资源太高了
- */
-
-channel.startServer();
+//窗口通讯
+ipc.on('window-mounted',(sender, data) => {
+  switch(data['window']){
+    case 0:
+      main_win_id = data['id'];
+      mainWindow = BrowserWindow.fromId(main_win_id);
+      mainWindow.webContents.send('window-mounted-success');
+      windowMove(mainWindow, 0);
+      break;
+    case 1:
+      danmu_win_id = data['id'];
+      danmuWindow = BrowserWindow.fromId(danmu_win_id);
+      danmuWindow.webContents.send('window-mounted-success');
+      windowMove(danmuWindow, 1);
+      break;
+  }
+});
+ipc.on('message',(sender, data) => {
+  switch(data['from']){
+    case 0:
+      if(danmuWindow){
+        danmuWindow.webContents.send('message', data['data']);
+      }
+      break;
+    case 1:
+      if(mainWindow){
+        mainWindow.webContents.send('message', data['data']);
+      }
+      break;
+  }
+});
 
 /**
  * Auto Updater
