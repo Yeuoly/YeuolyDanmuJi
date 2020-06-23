@@ -158,7 +158,7 @@
                     }, {
                         version: 'v1.0.6.1',
                         date: '2020/6/21',
-                        git_code: 'fca69552ef2ce6535578caf72777ba425ec095ce',
+                        git_code: 'f0022745824fa7995bba58dd0e8895f50c9a0bd9',
                         downloads: {
                             windows: {
                                 x64: 'http://downloads.srmxy.cn/YeuolyDanmu-1.0.6.1.rar',
