@@ -20,6 +20,16 @@ const speed_list_time = global_settings['loading_module']['speed_list_info'];
 
 export default class MessageHandler{
     constructor(){
+        //传输缓存
+        this.temp_danmus = [];
+        //速度相关
+        this.speed_info = { waiting_time : 1000 , latiao_min : 2 , price_min : 100 };
+
+        //速度计算参数
+        this.danmu_count = {
+            last : 0,
+            now : 0,
+        }
         //初始化礼物处理站
         const self = this;
         GiftStation.setSender( res => {
@@ -40,22 +50,9 @@ export default class MessageHandler{
             
             this.transGift(res);
         });
-        //启动循环
         this.setupLoop();
     }
 
-    //传输缓存
-    temp_danmus = [];
-    //入库缓存
-    temp_store = [];
-    //速度相关
-    speed_info = { waiting_time : 1000 , latiao_min : 2 , price_min : 100 };
-
-    //速度计算参数
-    danmu_count = {
-        last : 0,
-        now : 0,
-    }
     //计算速度
     speedCalc(){
         const dif = this.danmu_count.now - this.danmu_count.last;
@@ -74,7 +71,7 @@ export default class MessageHandler{
     }
 
     setupLoop(){
-        //消息循环
+         //消息循环
         const looper = () => {
             //传输弹幕出去
             this.transDanmu();
@@ -339,6 +336,16 @@ export default class MessageHandler{
             case 'GUARD_LOTTERY_START':
                 /**
                  * lottery : { sender : { face : string , uid : number , uname : string } }
+                 */
+                break;
+            case 'ROOM_BANNER':
+                /**
+                 * 不知道是个啥，不过好像没啥用
+                 */
+                break;
+            case 'PANEL':
+                /**
+                 * data : { biz_id : ?, icon : ?, is_outer : ?, jump_url : ?, note: 'xx版 第x名', operate: ?, status_type: ?, title : '榜', weight: ? }
                  */
                 break;
             default:

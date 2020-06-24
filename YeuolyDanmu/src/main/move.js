@@ -18,7 +18,7 @@ export const windowMove = (win, id) => {
                 const x = win_pos[0] + current_pos.x - mos_pos.x;
                 const y = win_pos[1] + current_pos.y - mos_pos.y;
                 win.setBounds({ x: x, y: y, width: win_size[0], height: win_size[1] });
-            }, 15);
+            }, 18);
         }else{
             clearInterval(moving_interval);
         }

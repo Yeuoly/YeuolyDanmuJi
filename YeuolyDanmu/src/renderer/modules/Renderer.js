@@ -8,7 +8,8 @@ const opts = {
         size : { width : 625, height: 400, immediate : true },
         animation : {
             before($el, $data){},
-            after($el, $data){}            }
+            after($el, $data){}
+        }
     },
     index : 0
 }

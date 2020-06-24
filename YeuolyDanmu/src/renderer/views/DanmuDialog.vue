@@ -39,64 +39,77 @@
                 center
                 id="setting-dig"
         >
-            <div class="block">
-                <span class="demonstration">窗口透明度</span>
-                <el-slider v-model.lazy="screen_settings.opacity" :format-tooltip="calcOpacity"></el-slider>
-            </div>
-            <div class="block">
-                <span class="demonstration">底色：</span>
-                <el-radio-group v-model.lazy="screen_settings.backgound_color">
-                    <el-radio :label="0">白色</el-radio>
-                    <el-radio :label="1">黑色</el-radio>
-                </el-radio-group>
-            </div>
-            <p class="demonstration">
-                温馨提示：透明度请以关闭设置窗口后的为准
-            </p>
-            <el-switch 
-                v-model="screen_settings.uanme_used"
-                active-text="将用户名与色组绑定"
-                style="padding-bottom:5px"
-            ></el-switch>
-            <el-switch 
-                v-model="screen_settings.text_used"
-                active-text="将弹幕文本与色组绑定"
-                style="padding-bottom:5px"
-            ></el-switch>
-            <p></p>
-            <el-switch 
-                v-model="screen_settings.show_live_info"
-                active-text="显示直播状态"
-                style="padding-bottom:5px"
-            ></el-switch>
-            <el-switch 
-                v-model="screen_settings.danmu_hidder.on"
-                active-text="开启弹幕淡出"
-                style="padding-bottom:5px"
-            ></el-switch>
-            <el-input v-model.number="screen_settings.danmu_hidder.interval">
-                <template slot="prepend">
-                    弹幕淡出时间
-                </template>
-            </el-input>
-            <p></p>
-            <p class="demonstration">
-                选择字体
-            </p>
-            <el-select v-model="screen_settings.font_family">
-                <el-option
-                    v-for="i in font_families"
-                    :key="i.id"
-                    :label="i.label"
-                    :value="i.value"
-                ></el-option>
-            </el-select>
-            <p></p>
+            <el-tabs>
+                <el-tab-pane label="常规设置">
+                    <el-switch 
+                        v-model="screen_settings.uanme_used"
+                        active-text="将用户名与色组绑定"
+                        style="padding-bottom:5px"
+                    ></el-switch>
+                    <el-switch 
+                        v-model="screen_settings.text_used"
+                        active-text="将弹幕文本与色组绑定"
+                        style="padding-bottom:5px"
+                    ></el-switch>
+                    <p></p>
+                    <el-switch 
+                        v-model="screen_settings.show_live_info"
+                        active-text="显示直播状态"
+                        style="padding-bottom:5px"
+                    ></el-switch>
+                    <el-switch 
+                        v-model="screen_settings.danmu_hidder.on"
+                        active-text="开启弹幕淡出"
+                        style="padding-bottom:5px"
+                    ></el-switch>
+                    <el-input v-model.number="screen_settings.danmu_hidder.interval">
+                        <template slot="prepend">
+                            弹幕淡出时间
+                        </template>
+                    </el-input>
+                    <p></p>
+                    <p class="demonstration">
+                        选择字体
+                    </p>
+                    <el-select v-model="screen_settings.font_family">
+                        <el-option
+                            v-for="i in font_families"
+                            :key="i.id"
+                            :label="i.label"
+                            :value="i.value"
+                        ></el-option>
+                    </el-select>
+                    <p></p>
+                </el-tab-pane>
+                <el-tab-pane label="窗口数据">
+                    <div class="block">
+                        <span class="demonstration">窗口透明度</span>
+                        <el-slider v-model.lazy="screen_settings.opacity" :format-tooltip="calcOpacity"></el-slider>
+                    </div>
+                    <div class="block">
+                        <span class="demonstration">底色：</span>
+                        <el-radio-group v-model.lazy="screen_settings.backgound_color">
+                            <el-radio :label="0">白色</el-radio>
+                            <el-radio :label="1">黑色</el-radio>
+                        </el-radio-group>
+                    </div>
+                    <div class="block">
+                        <el-switch 
+                            v-model="screen_settings.always_on_top"
+                            active-text="置顶窗口"
+                            class="pt3"
+                        ></el-switch>
+                    </div>
+                    <p class="demonstration">
+                        温馨提示：透明度请以关闭设置窗口后的为准
+                    </p>
+                    <WindowOptions class="pb3" />
+                </el-tab-pane>
+            </el-tabs>
             <el-button plain type="primary" @click="saveColorSettings">保存设置</el-button>
         </el-dialog>
         <div id="live-info" 
             :style="live_info_style" 
-            v-show="screen_settings.show_live_info"
         >
             <el-row>
                 <el-col :span="12">
@@ -113,11 +126,11 @@
 <script>
 import DanmuGroup from '../components/items/DanmuGroup';
 import SuperChatComponent from '../components/items/SuperChat';
+import WindowOptions from '../components/items/WindowOptions';
 
 const drag = require('electron-drag');
 const win = require('electron').remote.getCurrentWindow();
 const win_id = win.id;
-require('electron').remote.getCurrentWindow().setAlwaysOnTop(true);
 const ipc = require('electron').ipcRenderer;
 document.title = '弹幕窗口';
 
@@ -149,6 +162,7 @@ const screen_settings_default = {
     sleeper : true,
     font_family : 'DanmuFont',
     show_live_info : true,
+    always_on_top : true,
     danmu_hidder : {
         on : true,
         interval : 30
@@ -167,7 +181,7 @@ import { support_font } from '../class/FontController';
 
 export default {
     name : 'DanmuDialog',
-    components : { DanmuGroup , SuperChat : SuperChatComponent },
+    components : { DanmuGroup , SuperChat : SuperChatComponent, WindowOptions },
     data(){
         SuperChat(
                 '碧诗',2,'这是一条测试SC','','','','',30,0,0,'#EDF5FF','#2A60B2','#7497CD',
@@ -215,11 +229,28 @@ export default {
             return {
                 fontFamily : this.screen_settings.font_family,
                 transform : this.master_transform,
-                color : '#fff'
+                backgroundColor: this.backgroundColor,
+                color : '#fff',
             }
         },
         danmu_groups_virtual(){
             return this.danmu_groups.slice(this.list_start, this.danmu_groups.length);
+        }
+    },
+    watch: {
+        'screen_settings.show_live_info' : {
+            handler(v){
+                setTimeout(() => {
+                    this.$refs.handle.style.height = v ? 'calc(100% - 20px)' : '100%';
+                });
+            },
+            immediate : true
+        },
+        'screen_settings.always_on_top' : {
+            handler(v){
+                require('electron').remote.getCurrentWindow().setAlwaysOnTop(v);
+            },
+            immediate : true
         }
     },
     methods: {
@@ -253,19 +284,6 @@ export default {
         },
         refreshGlobalSettings(){
             refreshSettings();
-        },
-        replaceSCAnimation( cb ){
-            //如果下一个和现在的相同，就没得动画，直接开始下一轮展示
-            if(this.super_chats[this.current_super_chat] === this.super_chats[this.current_super_chat+1]){
-                typeof cb === 'function' && cb();
-                return;
-            }
-            //开始动画
-            this.sc_replacing = true;
-            typeof cb === 'function' && setTimeout( () => {
-                cb();
-                this.sc_replacing = false;
-            },700);
         },
         //装载弹幕接收钩子
         setupRevMsg(){
@@ -324,9 +342,23 @@ export default {
             this.list_start = id;
         },
         replaceCurrentSuperChat(){
+            const replaceSCAnimation = cb => {
+                //如果下一个和现在的相同，就没得动画，直接开始下一轮展示
+                if(this.super_chats[this.current_super_chat] === this.super_chats[this.current_super_chat+1]){
+                    typeof cb === 'function' && cb();
+                    return;
+                }
+
+                //开始动画
+                this.sc_replacing = true;
+                typeof cb === 'function' && setTimeout( () => {
+                    cb();
+                    this.sc_replacing = false;
+                },700);
+            }
             if(this.current_super_chat === this.super_chats.length - 1){
                 this.sc_cycling = false;
-                this.replaceSCAnimation();
+                replaceSCAnimation();
                 return;
             }else{
                 /**
@@ -334,7 +366,7 @@ export default {
                  * replaceSCAnimation会判断current与current+1是否相同
                  * 如果相同，不会出现动画，如果不相同，就会运行动画，然后再更改current
                  */
-                this.replaceSCAnimation( () => {
+                replaceSCAnimation( () => {
                     this.current_super_chat++;
                 });
                 this.sc_cycling = true;
@@ -451,14 +483,19 @@ export default {
 </script>
 
 <style>
+    html{
+        height: 100%;
+    }
+
     body{
         overflow: hidden;
         margin-top: 0;
         padding-right: 0 !important;
+        height: 100%;
     }
 
     #app{
-        height: 750px;
+        height: 100%;
     }
 
     .superchats{
@@ -474,17 +511,17 @@ export default {
         margin: 0;
         padding: 0;
         border: 0;
-        height: calc(100% - 40px);
         transition: all ease-in .5s;
     }
     #cover{
-        height: 750px;
+        height: 100%;
         width: 100%;
         scroll-behavior: smooth;
         overflow: hidden;
         padding-left: 9px;
         padding-right: 9px;
         margin-left: -9px;
+        position: absolute;
     }
     #app-cover{
         z-index: 3;
@@ -510,6 +547,13 @@ export default {
         display: block;
         height: 20px;
         line-height: 1;
-        font-weight: 600
+        font-weight: 600;
+        padding-left: 9px;
+        padding-right: 9px;
+        width: 100%;
+        margin-left: -9px;
+    }
+    .v-modal{
+        border-radius: 0;
     }
 </style>

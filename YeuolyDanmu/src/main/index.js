@@ -1,5 +1,6 @@
 import { app, BrowserWindow, remote } from 'electron'
 import { windowMove } from './move';
+import { getInitialDanmuSize, saveDanmuSize } from './resize';
 
 /**
  * Set `__static` path to static files in production
@@ -32,9 +33,9 @@ ipc.on('window-close', function () {
   try{
     if(main_win_id){
       BrowserWindow.fromId(main_win_id).close();
-
     }
     if(danmu_win_id){
+      saveDanmuSize(danmuWindow);
       BrowserWindow.fromId(danmu_win_id).close();
     }
   }catch(e){

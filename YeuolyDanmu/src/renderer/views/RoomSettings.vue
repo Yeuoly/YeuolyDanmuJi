@@ -118,14 +118,17 @@ export default {
         },
         async cycleLiveInfo(){
             const tot_len = this.history.length;
+            if(tot_len === 0){
+                return;
+            }
             let cur_len = 0;
             this.current.cycling = true;
-            const checkRoom = async ( index ) => {
+            const checkRoom = async index => {
                 try{
                     const { data } = await axios.get(`${api.bili_get_live_info}?room_id=${this.history[index].room_id}`);
                     if(data['code'] !== 0){
                         cur_len++;
-                        Info.error('GetLiveInfo',`代号:${data['code']}`);
+                        Info.error('GetLiveInfo',`加载房间信息失败，代号:${data['code']}`);
                     }else{
                         cur_len++;
                         this.history[index].title = data['data']['room_info']['title'];
@@ -144,9 +147,9 @@ export default {
                     Info.error('GetLiveInfo','获取房间信息失败');
                 }
                 //这里有必要设个300ms延迟，避免被B站banIP
-                setTimeout(() => {
+                setTimeout(async () => {
                     if(index !== tot_len - 1){
-                        checkRoom(index + 1);
+                        await checkRoom(index + 1);
                     }
                 },300);
             }

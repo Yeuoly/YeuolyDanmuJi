@@ -72,6 +72,7 @@ import { DanmuTransBus, OrdinaryEventBus } from '../events/evnetBus';
 import { DialogChannel } from '../modules/Channel';
 import Logger from '../components/items/Logger.vue';
 import INFO from '../modules/Info';
+import { getInitialDanmuSize } from '../../main/resize';
 
 //初始化礼物汇率等
 import { cny_exchangerate_controller } from '../data/settings';
@@ -231,9 +232,10 @@ export default {
     },
     async mounted() {
         //启动弹幕窗口
+        const size = getInitialDanmuSize();
         const win = await this.$Win.openWin({
-            width: 300,
-            height: 730,
+            width: size.width,
+            height: size.height,
             useContentSize: true,
             webPreferences : {
             webSecurity : false
