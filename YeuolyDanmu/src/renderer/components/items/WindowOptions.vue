@@ -1,27 +1,27 @@
 <template>
     <div>
         <el-row ref="master">
-            <el-col :span="12" class="pb2">
+            <el-col :md="12" :sm="24" class="pb2">
                 <el-input v-model.number="danmu_dialog.width">
                     <template slot="prepend">窗口宽度</template>
                 </el-input>
             </el-col>
-            <el-col :span="12" class="pb2">
+            <el-col :md="12" :sm="24" class="pb2">
                 <el-input v-model.number="danmu_dialog.height">
                     <template slot="prepend">窗口高度</template>
                 </el-input>
             </el-col>
-            <el-col :span="12">
+            <el-col :md="12" :sm="24" class="pb2">
                 <el-input v-model.number="danmu_dialog.pre_w">
                     <template slot="prepend">预设宽度</template>
                 </el-input>
             </el-col>
-            <el-col :span="12">
+            <el-col :md="12" :sm="24" class="pb2">
                 <el-input v-model.number="danmu_dialog.pre_h">
                     <template slot="prepend">预设高度</template>
                 </el-input>
             </el-col>
-            <el-col :span="24" class="pt3">
+            <el-col :md="12" :sm="24" class="pt3">
                 <el-button @click="loadDanmuDialogSize">重新加载</el-button>
                 <el-button @click="loadPreSize">载入预设</el-button>
             </el-col>

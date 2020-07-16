@@ -104,7 +104,6 @@ addListener( ev => {
 
 //import Account from '../data/user';
 
-const drag = require('electron-drag');
 const logo = require('../assets/logo.png');
 const { ipcRenderer : ipc } = require('electron');
 

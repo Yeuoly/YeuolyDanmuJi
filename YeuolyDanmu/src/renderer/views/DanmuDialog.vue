@@ -81,6 +81,9 @@
                     </el-select>
                     <p></p>
                 </el-tab-pane>
+                <el-tab-pane label="窗口大小">
+                    <WindowOptions class="pb3" />
+                </el-tab-pane>
                 <el-tab-pane label="窗口数据">
                     <div class="block">
                         <span class="demonstration">窗口透明度</span>
@@ -91,6 +94,8 @@
                         <el-radio-group v-model.lazy="screen_settings.backgound_color">
                             <el-radio :label="0">白色</el-radio>
                             <el-radio :label="1">黑色</el-radio>
+                            <el-radio :label="2">绿幕</el-radio>
+                            <el-radio :label="3">蓝幕</el-radio>
                         </el-radio-group>
                     </div>
                     <div class="block">
@@ -103,7 +108,6 @@
                     <p class="demonstration">
                         温馨提示：透明度请以关闭设置窗口后的为准
                     </p>
-                    <WindowOptions class="pb3" />
                 </el-tab-pane>
             </el-tabs>
             <el-button plain type="primary" @click="saveColorSettings">保存设置</el-button>
@@ -128,7 +132,6 @@ import DanmuGroup from '../components/items/DanmuGroup';
 import SuperChatComponent from '../components/items/SuperChat';
 import WindowOptions from '../components/items/WindowOptions';
 
-const drag = require('electron-drag');
 const win = require('electron').remote.getCurrentWindow();
 const win_id = win.id;
 const ipc = require('electron').ipcRenderer;
@@ -219,8 +222,16 @@ export default {
     },
     computed : {
         backgroundColor(){
-            return `rgba(${ this.screen_settings.backgound_color === 1 ? 
-            '0,0,0' : '255,255,255' },${ this.screen_settings.opacity / 100 })`;
+            const self = this;
+            const rgb = (function(){
+                switch(self.screen_settings.backgound_color){
+                    case 1: return '0,0,0';
+                    case 0: return '255,255,255';
+                    case 2: return '0,255,0';
+                    case 3: return '0,0,255';
+                }
+            }());
+            return `rgba(${rgb},${ this.screen_settings.opacity / 100 })`;
         },
         master_transform(){
             return `translateX(${this.hidding_dialog ? 'calc(100% + 18px)' : '0'})`;

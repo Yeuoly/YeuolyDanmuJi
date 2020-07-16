@@ -56,8 +56,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bufferutil": "^4.0.1",
+    "chromedriver": "^83.0.1",
     "echarts": "^4.6.0",
-    "electron-drag": "^1.2.2",
     "electron-log": "^4.0.7",
     "electron-store": "^5.1.0",
     "electron-vue-windows": "^1.0.41",
