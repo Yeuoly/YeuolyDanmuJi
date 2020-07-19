@@ -15,6 +15,9 @@ import router from './router'
 import vcolorpicker from 'vcolorpicker';
 Vue.use(vcolorpicker);
 
+import VueCookie from 'vue-cookie';
+Vue.use(VueCookie);
+
 //多窗口初始化
 import Win from 'electron-vue-windows';
 Win.init(router,{

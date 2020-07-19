@@ -22,7 +22,7 @@
     display: block;
     color: white;
     font-weight: 600;
-    text-shadow: 0px 0px 6px black;
+    /* text-shadow: 0px 0px 6px black; */
     padding: 3px;
     letter-spacing: 1px;
     line-height: 1.6;

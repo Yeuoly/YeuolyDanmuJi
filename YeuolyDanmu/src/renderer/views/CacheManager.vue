@@ -20,13 +20,38 @@
         </el-dialog>
         <el-row>
             <el-col :span="22">
-                <el-col v-for="(i, key) in data" :span="11" :key="key">
+                <el-col v-for="(i, key) in data" :span="12" :key="key">
                     <div class="px3 py2">
                         <div class="block pl3 py5">
                             <p class="block-label text-12 text-grey">{{i.label}}</p>
                             <p class="block-value text-25 text-primary my1">{{i.value}}</p>
                         </div>
                     </div>
+                </el-col>
+                <el-col :span="22" class="pl3">
+                    <p class="block-label text-14 text-grey">退出选项</p>
+                </el-col>
+                <el-col :span="24">
+                    <el-col :span="12" class="pl3">
+                        <el-switch
+                            style="display: block"
+                            v-model="auto_quit.on"
+                            active-color="#ff4949"
+                            inactive-color="#13ce66"
+                            active-text="直接退出或最小化"
+                            inactive-text="直接退出前提示">
+                        </el-switch>               
+                    </el-col>
+                    <el-col :span="12">
+                        <el-switch
+                            style="display: block"
+                            v-model="auto_quit.mode"
+                            active-color="#ff4949"
+                            inactive-color="#13ce66"
+                            active-text="退出"
+                            inactive-text="最小化">
+                        </el-switch>
+                    </el-col>
                 </el-col>
             </el-col>
             <el-col :span="2">
@@ -55,6 +80,7 @@ import { MessageBox } from 'element-ui';
 import { getDailyGiftRecords, getDailyDanmuRecords } from '../data/records_ipc';
 import { OrdinaryEventBus } from '../events/evnetBus';
 import { getAvatarOrigin, getAvatarCount, setAvatar, getAvatarsList, saveAvatars } from '../modules/Avatar';
+import { getStorage, modifyStorage } from '../modules/Store';
 
 const store = new Store();
 
@@ -95,7 +121,7 @@ export default {
             icon : 'el-icon-refresh-right',
             value : 'refresh-avatars',
             color : 'primary'
-        }],
+        },],
         refresh : {
             show : false,
             timer : null,
@@ -104,10 +130,32 @@ export default {
             cur : 0,
             tot : 0,
         },
+        auto_quit : {
+            on : false,
+            mode : false
+        }
     }),
+    watch : {
+        'auto_quit.on' : {
+            handler(v){
+                modifyStorage('auto-quit', `${this.auto_quit_switch_res}${this.auto_quit_mode_res}`);
+            }
+        },
+        'auto_quit.mode' : {
+            handler(v){
+                modifyStorage('auto-quit', `${this.auto_quit_switch_res}${this.auto_quit_mode_res}`);
+            }
+        }
+    },
     computed: {
         refresh_status(){
             return this.refresh.over ? 'success' : 'text';
+        },
+        auto_quit_switch_res(){
+            return this.auto_quit.on ? '1' : '0';
+        },
+        auto_quit_mode_res(){
+            return this.auto_quit.mode ? '1' : '0';
         }
     },
     methods: {
@@ -132,6 +180,11 @@ export default {
                     break;
             }
         },
+        loadAutoQuitState(){
+            const auto_quit = getStorage('auto-quit','00');
+            this.auto_quit.on = auto_quit[0] === '1';
+            this.auto_quit.mode = auto_quit[1] === '1' ? true : false;
+        },
         stopRefreshAvatars(done){
             if(!this.refresh.over){
                 MessageBox.confirm('您确定要取消吗？').then(() => {
@@ -140,16 +193,13 @@ export default {
                     this.refresh.progress = 0;
                     this.refresh.over = false;
                     saveAvatars();
-                }).catch(() => {
-
-                });
+                }).catch(() => {});
             }else{
                 done();
                 this.refresh.progress = 0;
                 this.refresh.over = false;
                 saveAvatars();
-            }
-            
+            }    
         },
         refreshAvatars(){
             this.refresh.show = true;
@@ -188,6 +238,7 @@ export default {
     },
     mounted() {
         this.loadData();
+        this.loadAutoQuitState();
         OrdinaryEventBus.$on('router-to-cache-manager',this.loadData);
     },
 }

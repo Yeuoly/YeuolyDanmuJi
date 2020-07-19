@@ -73,12 +73,15 @@ import { DialogChannel } from '../modules/Channel';
 import Logger from '../components/items/Logger.vue';
 import INFO from '../modules/Info';
 import { getInitialDanmuSize } from '../../main/resize';
+import { MessageBox } from 'element-ui';
 
 //初始化礼物汇率等
 import { cny_exchangerate_controller } from '../data/settings';
 import GiftStation from '../modules/GiftStation';
 GiftStation.getGiftConfig();
 cny_exchangerate_controller.init();
+
+import { getStorage, modifyStorage } from '../modules/Store';
 
 //初始化插件
 import '../boot/plugin';
@@ -202,14 +205,41 @@ export default {
         },
         meta : {
             logo
-        }
+        },
+        quit_dialog_visible : false
     }),
     methods: {
         windowMove(state){
             messager.setWindowMoveState(state);
         },
         closeProgress(){
-            ipc.send('window-close');
+            let choice = 0;
+            const auto_quit = getStorage('auto-quit', '00');
+            const confrim = then => {
+                MessageBox.confirm('是否记住选择？可以在缓存管理中重新设置', '提示').then(() => {
+                    modifyStorage('auto-quit', '1' + choice);
+                }).catch(() => {
+                    modifyStorage('auto-quit', '0' + choice);
+                }).finally(() => {
+                    setTimeout(then, 100);
+                });
+            }
+            if(auto_quit[0] === '1'){
+                auto_quit[1] === '0' ? this.minimizeProgress() : ipc.send('window-close');
+            }else{
+                MessageBox.confirm('您确定要退出吗？','提示',
+                    { 
+                        confirmButtonText : '退出', 
+                        cancelButtonText : '最小化',
+                    }
+                ).then(() => {
+                    choice = 1;
+                    confrim(() => ipc.send('window-close'));
+                }).catch(() => {
+                    choice = 0;
+                    confrim(() => ipc.send('window-min'));
+                });
+            } 
         },
         minimizeProgress(){
             ipc.send('window-min');

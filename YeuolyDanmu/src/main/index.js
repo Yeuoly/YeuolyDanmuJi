@@ -70,7 +70,11 @@ function createWindow () {
   mainWindow.loadURL(winURL);
 
   mainWindow.on('closed', () => {
-    mainWindow = null
+    mainWindow = null;
+    if(danmu_win_id){
+      saveDanmuSize(danmuWindow);
+      BrowserWindow.fromId(danmu_win_id).close();
+    }
   });
 
   mainWindow.on('ready-to-show',() => {

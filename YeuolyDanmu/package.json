@@ -71,6 +71,7 @@
     "utf-8-validate": "^5.0.2",
     "vcolorpicker": "^0.1.8",
     "vue": "^2.5.16",
+    "vue-cookie": "^1.1.4",
     "vue-echarts": "^5.0.0-beta.0",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
