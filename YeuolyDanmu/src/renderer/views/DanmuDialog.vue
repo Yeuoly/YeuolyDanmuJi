@@ -57,6 +57,11 @@
                         active-text="显示直播状态"
                         style="padding-bottom:5px"
                     ></el-switch>
+                    <el-switch
+                        v-model="screen_settings.sc_cycle_mode"
+                        active-text="开启SC轮播"
+                        style="padding-bottom:5px"
+                    ></el-switch>
                     <el-switch 
                         v-model="screen_settings.danmu_hidder.on"
                         active-text="开启弹幕淡出"
@@ -170,6 +175,7 @@ const screen_settings_default = {
         on : true,
         interval : 30
     },
+    sc_cycle_mode : true,
 };
 
 const screen_settings = store.get('danmu-dialog|screen_settings',{});
@@ -398,15 +404,14 @@ export default {
             this.super_chats.push(src);
         },
         appendDanmu(source,type){
-            const self = this;
-            const index = self.current_danmu_count++;
+            const index = this.current_danmu_count++;
             const dom = {
                 type : type,
                 value : source,
                 id : index,
                 clear : false
             };
-            self.danmu_groups.push(dom);
+            this.danmu_groups.push(dom);
         },
         loadGift(gift){
             if(gift.is_super){
@@ -416,11 +421,16 @@ export default {
             }
         },
         loadSuperChat(sc){
-            //获取sc轮询次数
-            sc.last_tims = SCTimer.getTimes(sc.price);
-            this.spendSC(sc);
-            if(!this.sc_cycling){
-                this.replaceCurrentSuperChat();
+            //如果是轮播模式
+            if(this.screen_settings.sc_cycle_mode){
+                //获取sc轮询次数
+                sc.last_tims = SCTimer.getTimes(sc.price);
+                this.spendSC(sc);
+                if(!this.sc_cycling){
+                    this.replaceCurrentSuperChat();
+                }
+            }else{
+                this.appendDanmu([sc],'sc');
             }
         },
         loadGuard(guard){

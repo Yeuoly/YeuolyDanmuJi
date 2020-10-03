@@ -77,7 +77,7 @@
                                 x86: ""
                             }
                         },
-                        introduction: "YeuolyDanmu第一个稳定版本发布"
+                        introduction: "YeuolyDanmu第一个稳定版本发布。"
                     }, {
                         version: "v1.0.2",
                         date: "2020/3/13",
@@ -88,7 +88,7 @@
                                 x86: ""
                             }
                         },
-                        introduction: "添加记录和统计模块，可惜没届到（哭辽"
+                        introduction: "添加记录和统计模块，可惜没届到（哭辽。"
                     }, {
                         version: "v1.0.3",
                         date: "2020/3/17",
@@ -99,7 +99,7 @@
                                 x86: ""
                             }
                         },
-                        introduction: "添加排名、反馈、恰饭、舰长记录，优化任务界面"
+                        introduction: "添加排名、反馈、恰饭、舰长记录，优化任务界面。"
                     }, {
                         version: "v1.0.4",
                         date: "2020/3/27",
@@ -110,7 +110,7 @@
                                 x86: ""
                             }
                         },
-                        introduction: "添加插件模块"
+                        introduction: "添加插件模块。"
                     }, {
                         version: "v1.0.4.01",
                         date: "2020/3/28",
@@ -121,7 +121,7 @@
                                 x86: ""
                             }
                         },
-                        introduction: "大改UI，添加账户，终于有logo了"
+                        introduction: "大改UI，添加账户，终于有logo了。"
                     }, {
                         version: "v1.0.4.02",
                         date: "2020/4/7",
@@ -132,7 +132,7 @@
                                 x86: ""
                             }
                         },
-                        introduction: "移除恰饭，添加缓存模块"
+                        introduction: "移除恰饭，添加缓存模块。"
                     }, {
                         version: "v1.0.5",
                         date: "2020/4/18",
@@ -143,7 +143,7 @@
                                 x86: ""
                             }
                         },
-                        introduction: "更改缓存模块，添加头像刷新、读弹幕"
+                        introduction: "更改缓存模块，添加头像刷新、读弹幕。"
                     }, {
                         version: 'v1.0.6',
                         date: '2020/5/30',
@@ -154,7 +154,7 @@
                                 x86: ''
                             },
                         },
-                        introduction: '更换通讯方式，修复无法加载弹幕，更改人气统计算法，优化代码结构'
+                        introduction: '更换通讯方式，修复无法加载弹幕，更改人气统计算法，优化代码结构。'
                     }, {
                         version: 'v1.0.6.1',
                         date: '2020/6/21',
@@ -165,7 +165,28 @@
                                 x86: ''
                             },
                         },
-                        introduction: '因为不可抗力把通讯换回了ipc，修复部分电脑上窗口拖动和computed无法返回函数的bug'
+                        introduction: '因为不可抗力把通讯换回了ipc，修复部分电脑上窗口拖动和computed无法返回函数的bug。'
+                    }, {
+                        version: 'v1.0.6.2',
+                        date: '2020/7/17',
+                        git_code: '56c755e775d2ca300667645901eeb969ce9fd1f3',
+                        downloads: {
+                            windows: {
+                                x64: 'http://downloads.srmxy.cn/YeuolyDanmu-1.0.6.2.rar',
+                                x86: ''
+                            },
+                        },
+                        introduction: '为了配合直播，加入了绿幕模式。添加尺寸记忆，以后都不用重新调整大小啦。修复部分机型上拖动窗口的鬼畜现象。'
+                    }, {
+                        version: 'v1.0.6.2.apd-1',
+                        date: '2020/7/20',
+                        git_code: '8bf3382f28c77479f73672868c4eca19e7a8a37e',
+                        downloads: {
+                            windows: {
+                                x64: 'http://downloads.srmxy.cn/YeuolyDanmu-1.0.6.2.apd-1.rar'
+                            }
+                        },
+                        introduction: '1.0.6.2追加内容1：添加退出提示，去除弹幕周围的阴影框。'
                     }]
                 }
             },

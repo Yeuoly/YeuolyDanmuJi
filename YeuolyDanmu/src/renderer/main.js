@@ -4,7 +4,9 @@ import axios from 'axios'
 //初始化设置
 import './style/danmu.css';
 import './style/index.css';
-import './directive/index';
+
+//自定义弹幕需要用到这个指令集，现在没必要加载进来
+//import './directive/index';
 
 axios.defaults.withCredentials = true;
 

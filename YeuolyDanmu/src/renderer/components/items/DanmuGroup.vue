@@ -21,6 +21,9 @@
                 :font="font"
             />
         </div>
+        <div v-else-if="type === 'sc'" class="py2 px2">
+            <SuperChat :Danmu="Danmus[0]" :font="font"/>
+        </div>
     </div>
 </template>
  
@@ -29,13 +32,14 @@
 import Danmu from './Danmu';
 import Guard from './Guard';
 import GiftDanmu from './GiftDanmu';
+import SuperChat from './SuperChat';
 import { DanmuGroupEventBus } from '../../events/evnetBus';
 
 const max_offset = window.innerHeight;
 
 export default {
     name : 'DanmuGroup',
-    components : { Danmu, Guard, GiftDanmu },
+    components : { Danmu, Guard, GiftDanmu, SuperChat },
     props : ['Danmus','textColor','unameColor','font','type','index','hidder','hidder-time','clear'],
     data : () => ({
         offset : 0,

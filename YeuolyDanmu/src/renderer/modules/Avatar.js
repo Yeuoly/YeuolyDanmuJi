@@ -1,20 +1,18 @@
 import axios from 'axios';
 import api from '../settings/api';
-import Store from 'electron-store';
-import HashList from '../class/HashList';
 
+import HashList from '../class/HashList';
+import { getStorage, modifyStorage } from './Store';
 /**
  * 3e8次计算平均585ms（计算能力一般的笔记本 N3450 1.10Ghz）
  */
-
-const store = new Store();
 
 //每多temp_max_count个头像入一次库
 const temp_max_count = 20;
 let append_count = 0;
 
 //别数了，一共256个数组，是原始数据
-const store_avatar = store.get('avatars-cache') || [
+const store_avatar = getStorage('avatars-cache') || [
     [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]],
     [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]],
     [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]],
@@ -40,7 +38,7 @@ avatars.cover(store_avatar, 2);
 const defualt_avatar = 'http://i0.hdslb.com/bfs/album/6389ef2f437a4b00d0dc863b44f4084bf6b4165a.jpg';
 
 export const saveAvatars = () => {
-    store.set('avatars-cache',avatars.getOrigin());
+    modifyStorage('avatars-cache',avatars.getOrigin());
 }
 
 //整活整活，Promise还挺好用

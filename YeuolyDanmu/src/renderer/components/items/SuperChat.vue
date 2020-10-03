@@ -2,14 +2,14 @@
     <div class="superchat">
         <div :style="{ backgroundColor : Danmu.background_color ,
                        backgroundImage : 'url(' + Danmu.background_image + ')' ,
-                       color : Danmu.price_color }" 
+                       color : Danmu.price_color, fontFamily: font }" 
             class="superchat-title"
         >  
             <img :src="Danmu.user.face" class="sc-avatar">
-            <span class="sc-uname"> {{ Danmu.user.id }} </span> 
-            <span class="sc-price"> ￥：{{ Danmu.price }} </span>
+            <span class="sc-uname" :style="{ fontFamily: font }"> {{ Danmu.user.id }} </span> 
+            <span class="sc-price" :style="{ fontFamily: font }"> ￥：{{ Danmu.price }} </span>
         </div>
-        <div :style="{ backgroundColor : Danmu.background_color_bottom }" 
+        <div :style="{ backgroundColor : Danmu.background_color_bottom, fontFamily: font }" 
             class="superchat-info"
         >{{ Danmu.message }}
         </div>
@@ -19,7 +19,7 @@
 <script>
 export default {
     name : 'SuperChat',
-    props : ['Danmu']
+    props : ['Danmu','font']
 }
 </script>
 

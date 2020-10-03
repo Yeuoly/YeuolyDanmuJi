@@ -223,7 +223,7 @@ export default class DanmuLoader{
     }
 
     onClose(e){
-        INFO.log('WSConnection','连接断开:'+e.reason);
+        INFO.log('WSConnection','连接断开:' + e.data);
     }
 
     onError(e){

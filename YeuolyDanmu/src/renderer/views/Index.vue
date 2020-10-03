@@ -110,6 +110,8 @@ addListener( ev => {
 const logo = require('../assets/logo.png');
 const { ipcRenderer : ipc } = require('electron');
 
+import { launchStatistics, getLastVersion } from '../modules/statistics';
+
 export default {
     name : 'Index',
     components : { Logger },
@@ -139,10 +141,10 @@ export default {
             },{
                 name : '高级设置',
                 url : '/index/advance-settings'
-            },{
+            }/*,{
                 name : '自定义弹幕',
                 url : '/index/custom-danmu'
-            }]
+            }*/]
         },/*{
             name : '账户',
             icon : 'el-icon-user',
@@ -262,7 +264,7 @@ export default {
     async mounted() {
         //启动弹幕窗口
         const size = getInitialDanmuSize();
-        const win = await this.$Win.openWin({
+        const win = this.$Win.openWin({
             width: size.width,
             height: size.height,
             useContentSize: true,
@@ -277,6 +279,20 @@ export default {
                 name : '弹幕窗口',
             }
         });
+        //统计
+        launchStatistics();
+        //获取版本列表，检查更新
+        const data = await getLastVersion();
+        if(data){
+            const versions = data['data']['data'];
+            const current = 'v1.0.6.3';
+            if(versions[0].version !== current){
+                const itrdt = JSON.parse(versions[0].introduction);
+                INFO.warning('Statistics', `已经有新版本了哟，最新更新内容：${itrdt['introduction']}，更新日期：${itrdt['date']}，下载地址：http://downloads.srmxy.cn`);
+            }else{
+                INFO.log('Statistics','您的版本已经是最新版本了哟','green');
+            }
+        }
     },
 }
 </script>
