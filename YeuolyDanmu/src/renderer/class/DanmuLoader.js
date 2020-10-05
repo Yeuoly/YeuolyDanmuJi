@@ -30,6 +30,7 @@ export default class DanmuLoader{
     init_base_instance(){
         this.socket = null;
         this.heart_beat_interval = null;
+        this.connected = false;
         this.message_handler = new MessageHandler();
         //挂载新增弹幕钩子，当有新弹幕传输的时候会调用onDanmu
         this.message_handler.onDanmu = danmu => {
@@ -83,29 +84,43 @@ export default class DanmuLoader{
         }
         INFO.log('WSConnection',`开始连接至直播间，当前房间号：${this.room_id}`);
         //获取服务器信息与token
-        this.getConf(() => {
-            let host_index = this.host_index;
-            this.socket = new WebSocket(
-                `wss://${this.server_list[host_index]['host']}:${this.server_list[host_index]['wss_port']}/sub`
-            );
-            this.socket.onmessage = e => {
-                this.onMessage(e);
-            };
-            this.socket.onopen = e => {
-                setTimeout(() => {
-                    fn_suc(live_status);
-                },0);
-                this.onOpen(e);
-            };
-            this.socket.onerror = e => {
-                setTimeout(fn_fai,0);
-                this.onError(e);
-            };
-            this.socket.onclose = e =>{
-                setTimeout(fn_fai,0);
-                this.onClose(e);
-            }
-        });
+        const connect = index => {
+            this.getConf(() => {
+                INFO.log('WSConnection',`开始连接至弹幕服务器：${this.server_list[index]['host']}:${this.server_list[index]['wss_port']}`);
+                this.socket = new WebSocket(
+                    `wss://${this.server_list[index]['host']}:${this.server_list[index]['wss_port']}/sub`
+                );
+                this.socket.onmessage = e => {
+                    this.onMessage(e);
+                };
+                this.socket.onopen = e => {
+                    setTimeout(() => {
+                        fn_suc(live_status);
+                    },0);
+                    this.onOpen(e);
+                };
+                this.socket.onerror = e => {
+                    setTimeout(fn_fai,0);
+                    this.onError(e);
+                };
+                this.socket.onclose = e =>{
+                    //如果还没连上就进close里的话就是没连上，那就换服务器
+                    if(!this.connected){
+                        //如果当前index已经是最后一个了，那就不继续了，说明服务器全满了。。。。
+                        if(index == this.server_list.length - 1){
+                            INFO.warning('WSConnection', '当前所有服务器已满负载，请稍后重试');
+                        }else{
+                            INFO.log('WSConnection','当前服务器拒绝连接，开始尝试其他服务器……');
+                            connect(index + 1);
+                        }
+                    }else{
+                        this.onClose(e);
+                        this.connected = false;
+                    }
+                }
+            });
+        }
+        connect(0);
     }
 
     //关闭，成功后调用这个钩子
@@ -147,6 +162,7 @@ export default class DanmuLoader{
                 switch(self.getOp()){
                     case 8:
                         INFO.log('SuccessHandShaking','握手成功，正在加载心跳……','green');
+                        this.connected = true;
                         //开始心跳循环
                         this.heartBeat();
                         this.heart_beat_interval = setInterval(() => { this.heartBeat() }, heart_beat_time);
@@ -223,7 +239,7 @@ export default class DanmuLoader{
     }
 
     onClose(e){
-        INFO.log('WSConnection','连接断开:' + e.data);
+        INFO.log('WSConnection','连接断开:' + JSON.stringify(e));
     }
 
     onError(e){

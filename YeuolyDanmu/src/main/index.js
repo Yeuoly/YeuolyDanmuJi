@@ -16,6 +16,9 @@ let danmuWindow;
 let danmu_win_id;
 let main_win_id;
 
+//锁着的时候关不掉弹幕窗口
+let danmu_lock = true;
+
 const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
@@ -30,19 +33,29 @@ ipc.on('window-min', function () {
 });
 //关闭窗口
 ipc.on('window-close', function () {
-  try{
-    if(main_win_id){
-      BrowserWindow.fromId(main_win_id).close();
-    }
-    if(danmu_win_id){
-      saveDanmuSize(danmuWindow);
-      BrowserWindow.fromId(danmu_win_id).close();
-    }
-  }catch(e){
-    
+  if(main_win_id){
+    BrowserWindow.fromId(main_win_id).close();
   }
 });
 
+const closeMain = () => {
+  if(main_win_id){
+    const window = BrowserWindow.fromId(main_win_id);
+    if(window){
+      window.close();
+    }
+  }
+}
+
+const closeDanmu = () => {
+  if(danmu_win_id){
+    const window = BrowserWindow.fromId(danmu_win_id);
+    saveDanmuSize(window);
+    if(window){
+      window.close();
+    }
+  }
+}
 
 function createWindow () {
   /**
@@ -68,14 +81,6 @@ function createWindow () {
   //mainWindow.setIcon(require('path').join(__dirname,'./../assets/logo.ico'));
 
   mainWindow.loadURL(winURL);
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-    if(danmu_win_id){
-      saveDanmuSize(danmuWindow);
-      BrowserWindow.fromId(danmu_win_id).close();
-    }
-  });
 
   mainWindow.on('ready-to-show',() => {
     mainWindow.show();
@@ -103,12 +108,21 @@ ipc.on('window-mounted',(sender, data) => {
       main_win_id = data['id'];
       mainWindow = BrowserWindow.fromId(main_win_id);
       mainWindow.webContents.send('window-mounted-success');
+      mainWindow.on('close', () => {
+        danmu_lock = false;
+        closeDanmu();
+      })
       windowMove(mainWindow, 0);
       break;
     case 1:
       danmu_win_id = data['id'];
       danmuWindow = BrowserWindow.fromId(danmu_win_id);
       danmuWindow.webContents.send('window-mounted-success');
+      danmuWindow.on('close', e => {
+        if(danmu_lock){
+          e.preventDefault();
+        }
+      });
       windowMove(danmuWindow, 1);
       break;
   }
